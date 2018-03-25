@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>工作证明与挖矿 | 比特币实验室</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="工作证明工作证明(Proof Of Work，简称POW)，顾名思义，即工作量的证明。通常来说只能从结果证明，因为监测工作过程通常是繁琐与低效的。 比特币在Block的生成过程中使用了POW机制，一个符合要求的Block Hash由N个前导零构成，零的个数取决于网络的难度值。要得到合理的Block Hash需要经过大量尝试计算，计算时间取决于机器的哈希运算速度。当某个节点提供出一个合理的Block">
+<meta property="og:type" content="article">
+<meta property="og:title" content="工作证明与挖矿">
+<meta property="og:url" content="http://blog.biqu.io/2013/08/03/proof-of-work-and-mining/index.html">
+<meta property="og:site_name" content="比特币实验室">
+<meta property="og:description" content="工作证明工作证明(Proof Of Work，简称POW)，顾名思义，即工作量的证明。通常来说只能从结果证明，因为监测工作过程通常是繁琐与低效的。 比特币在Block的生成过程中使用了POW机制，一个符合要求的Block Hash由N个前导零构成，零的个数取决于网络的难度值。要得到合理的Block Hash需要经过大量尝试计算，计算时间取决于机器的哈希运算速度。当某个节点提供出一个合理的Block">
+<meta property="og:image" content="https://f.cloud.github.com/assets/514951/886819/d2df8f62-f9f0-11e2-93da-4f66e3093c33.png">
+<meta property="og:image" content="https://f.cloud.github.com/assets/514951/864443/94b6ba76-f621-11e2-95b0-febc373535b7.png">
+<meta property="og:image" content="https://f.cloud.github.com/assets/514951/902244/a22dae50-fb92-11e2-95aa-3e346efdab40.png">
+<meta property="og:image" content="https://f.cloud.github.com/assets/514951/905393/e386fa6c-fc20-11e2-8376-73d9a367bf98.png">
+<meta property="og:image" content="https://f.cloud.github.com/assets/514951/905394/d08dfcca-fc21-11e2-9740-907f2a89de88.png">
+<meta property="og:image" content="https://f.cloud.github.com/assets/514951/905406/b08c63ec-fc23-11e2-8f43-c932daec9f7c.png">
+<meta property="og:image" content="https://f.cloud.github.com/assets/514951/905408/e6c5ed84-fc23-11e2-9334-ca8e768c5aa0.png">
+<meta property="og:updated_time" content="2018-03-25T15:08:43.567Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="工作证明与挖矿">
+<meta name="twitter:description" content="工作证明工作证明(Proof Of Work，简称POW)，顾名思义，即工作量的证明。通常来说只能从结果证明，因为监测工作过程通常是繁琐与低效的。 比特币在Block的生成过程中使用了POW机制，一个符合要求的Block Hash由N个前导零构成，零的个数取决于网络的难度值。要得到合理的Block Hash需要经过大量尝试计算，计算时间取决于机器的哈希运算速度。当某个节点提供出一个合理的Block">
+<meta name="twitter:image" content="https://f.cloud.github.com/assets/514951/886819/d2df8f62-f9f0-11e2-93da-4f66e3093c33.png">
+  
+    <link rel="alternative" href="/atom.xml" title="比特币实验室" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">比特币实验室</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">blog.biqu.io</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://blog.biqu.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-proof-of-work-and-mining" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/08/03/proof-of-work-and-mining/" class="article-date">
+  <time datetime="2013-08-03T12:01:00.000Z" itemprop="datePublished">Aug 3 2013</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      工作证明与挖矿
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="工作证明"><a href="#工作证明" class="headerlink" title="工作证明"></a>工作证明</h3><p>工作证明(Proof Of Work，简称POW)，顾名思义，即工作量的证明。通常来说只能从结果证明，因为监测工作过程通常是繁琐与低效的。</p>
+<p>比特币在Block的生成过程中使用了POW机制，一个符合要求的Block Hash由N个前导零构成，零的个数取决于网络的难度值。要得到合理的Block Hash需要经过大量尝试计算，计算时间取决于机器的哈希运算速度。当某个节点提供出一个合理的Block Hash值，说明该节点确实经过了大量的尝试计算，当然，并不能得出计算次数的绝对值，因为寻找合理hash是一个概率事件。当节点拥有占全网n%的算力时，该节点即有n/100的概率找到Block Hash。</p>
+<p>工作证明机制看似很神秘，其实在社会中的应用非常广泛。例如，毕业证、学位证等证书，就是工作证明，拥有证书即表明你在过去投入了学习与工作。生活大部分事情都是通过结果来判断的。</p>
+<h3 id="挖矿"><a href="#挖矿" class="headerlink" title="挖矿"></a>挖矿</h3><p>挖矿即不断接入新的Block延续Block Chain的过程。</p>
+<p><img src="https://f.cloud.github.com/assets/514951/886819/d2df8f62-f9f0-11e2-93da-4f66e3093c33.png" alt="blockchain"></p>
+<p>挖矿为整个系统的运转提供原动力，是比特币的发动机，<code>没有挖矿就没有比特币</code>。挖矿有三个重要功能：</p>
+<ol>
+<li>发行新的货币（总量达到之前）</li>
+<li>维系货币的支付功能</li>
+<li>通过算力保障系统安全</li>
+</ol>
+<p>金矿消耗资源将黄金注入流通经济，比特币通过“挖矿”完成相同的事情，只不过消耗的是CPU时间与电力。当然，比特币的挖矿意义远大于此。</p>
+<h4 id="Block-Hash算法"><a href="#Block-Hash算法" class="headerlink" title="Block Hash算法"></a>Block Hash算法</h4><p>Block头部信息的构成：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">字段名</th>
+<th>含义</th>
+<th style="text-align:center">大小(字节)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Version</td>
+<td>版本号</td>
+<td style="text-align:center">4</td>
+</tr>
+<tr>
+<td style="text-align:left">hashPrevBlock</td>
+<td>上一个block hash值</td>
+<td style="text-align:center">32 </td>
+</tr>
+<tr>
+<td style="text-align:left">hashMerkleRoot</td>
+<td>上一个block产生之后至新block生成此时间内，<br>交易数据打包形成的Hash</td>
+<td style="text-align:center">32</td>
+</tr>
+<tr>
+<td style="text-align:left">Time</td>
+<td>Unix时间戳</td>
+<td style="text-align:center">4</td>
+</tr>
+<tr>
+<td style="text-align:left">Bits</td>
+<td>目标值，即难度</td>
+<td style="text-align:center">4</td>
+</tr>
+<tr>
+<td style="text-align:left">Nonce</td>
+<td>随机数</td>
+<td style="text-align:center">4</td>
+</tr>
+</tbody>
+</table>
+<p>下面采用高度为<a href="http://blockexplorer.com/rawblock/00000000000000001e8d6829a8a21adc5d38d0a473b144b6765798e61f98bd1d" target="_blank" rel="noopener">125552</a>的block数据为例，演示block hash的计算过程：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span>                                                                                                                             </span><br><span class="line">$header_hex = <span class="string">"01000000"</span> . <span class="comment">// version</span></span><br><span class="line">              <span class="comment">// previous block hash</span></span><br><span class="line">              <span class="string">"81cd02ab7e569e8bcd9317e2fe99f2de44d49ab2b8851ba4a308000000000000"</span> .</span><br><span class="line">              <span class="comment">// merkle root hash of transactions in this block</span></span><br><span class="line">              <span class="string">"e320b6c2fffc8d750423db8b1eb942ae710e951ed797f7affc8892b0f1fc122b"</span> .</span><br><span class="line">              <span class="comment">// Time</span></span><br><span class="line">              <span class="string">"c7f5d74d"</span> .</span><br><span class="line">              <span class="comment">// Bits (Difficulty)</span></span><br><span class="line">              <span class="string">"f2b9441a"</span> .</span><br><span class="line">              <span class="comment">// Nonce</span></span><br><span class="line">              <span class="string">"42a14695"</span>;</span><br><span class="line">$header_bin = pack(<span class="string">"H*"</span>, $header_hex);  <span class="comment">// hex to bin</span></span><br><span class="line">$h = hash(<span class="string">'sha256'</span>, hash(<span class="string">'sha256'</span>, $header_bin, <span class="keyword">true</span>), <span class="keyword">true</span>);  <span class="comment">// double sha256</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> bin2hex($h), <span class="string">"\n"</span>;</span><br><span class="line"><span class="comment">// output: 1dbd981fe6985776b644b173a4d0385ddc1aa2a829688d1e0000000000000000</span></span><br><span class="line"><span class="keyword">echo</span> bin2hex(strrev($h)), <span class="string">"\n"</span>;</span><br><span class="line"><span class="comment">// output: 00000000000000001e8d6829a8a21adc5d38d0a473b144b6765798e61f98bd1d</span></span><br></pre></td></tr></table></figure>
+<p>该计算过程简单明了：首先将数个字段合并成一块数据，然后对这块数据进行双SHA256运算。</p>
+<h4 id="产量调节"><a href="#产量调节" class="headerlink" title="产量调节"></a>产量调节</h4><p>Block的产量为大约每两周2016个，即每10分钟一块。该规则在每个节点的代码里都固定了。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 目标时间窗口长度：两周</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> int64 nTargetTimespan = <span class="number">14</span> * <span class="number">24</span> * <span class="number">60</span> * <span class="number">60</span>;</span><br><span class="line"><span class="comment">// block频率，每10分钟一块</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> int64 nTargetSpacing  = <span class="number">10</span> * <span class="number">60</span>;</span><br><span class="line"><span class="comment">// 每两周的产量2016，也是调节周期</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> int64 nInterval       = nTargetTimespan / nTargetSpacing;</span><br></pre></td></tr></table></figure>
+<p>但由于实际算力总是不断变化的（目前一直是快速上升的），所以需根据最近2016个块的耗费时间来调整难度值，维持每10分钟一个block的频率.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Only change once per interval</span></span><br><span class="line"><span class="keyword">if</span> ((pindexLast-&gt;nHeight+<span class="number">1</span>) % nInterval != <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="comment">// 未达到周期个数，无需调节</span></span><br><span class="line">    <span class="keyword">return</span> pindexLast-&gt;nBits;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Go back by what we want to be 14 days worth of blocks</span></span><br><span class="line"><span class="keyword">const</span> CBlockIndex* pindexFirst = pindexLast;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; pindexFirst &amp;&amp; i &lt; nInterval<span class="number">-1</span>; i++)</span><br><span class="line">    pindexFirst = pindexFirst-&gt;pprev;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算本次2016个块的实际产生时间</span></span><br><span class="line"><span class="comment">// Limit adjustment step</span></span><br><span class="line">int64 nActualTimespan = pindexLast-&gt;GetBlockTime() - pindexFirst-&gt;GetBlockTime();</span><br><span class="line"><span class="comment">// 限定幅度，最低为1/4，最高为4倍</span></span><br><span class="line"><span class="keyword">if</span> (nActualTimespan &lt; nTargetTimespan/<span class="number">4</span>)</span><br><span class="line">    nActualTimespan = nTargetTimespan/<span class="number">4</span>;</span><br><span class="line"><span class="keyword">if</span> (nActualTimespan &gt; nTargetTimespan*<span class="number">4</span>)</span><br><span class="line">    nActualTimespan = nTargetTimespan*<span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据最近2016个块的时间，重新计算目标难度 </span></span><br><span class="line"><span class="comment">// Retarget</span></span><br><span class="line">CBigNum bnNew;</span><br><span class="line">bnNew.SetCompact(pindexLast-&gt;nBits);</span><br><span class="line">bnNew *= nActualTimespan;</span><br><span class="line">bnNew /= nTargetTimespan;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> (bnNew &gt; bnProofOfWorkLimit)</span><br><span class="line">    bnNew = bnProofOfWorkLimit;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">return</span> bnNew.GetCompact();</span><br></pre></td></tr></table></figure>
+<h4 id="Block字段详解"><a href="#Block字段详解" class="headerlink" title="Block字段详解"></a>Block字段详解</h4><ul>
+<li>Version，版本号，很少变动，一般用于软件全网升级时做标识</li>
+<li>hashPrevBlock，前向Block Hash值，该字段强制多个Block之间形成链接</li>
+<li>hashMerkleRoot，交易Hash树的根节点Hash值，起校验作用，保障Block在网络传输过程中的数据一致性，有新交易加入即发生变化</li>
+<li>Time，Unix时间戳，每秒自增一，标记Block的生成时间，同时为block hash探寻引入一个频繁的变动因子</li>
+<li>Bits，可以推算出难度值，用于验证block hash难度是否达标</li>
+<li>Nonce，随机数，在上面数个字段都固定的情况下，不停地更换随机数来探寻</li>
+</ul>
+<p>最为关键的字段是<code>hashPrevBlock</code>，该字段使得Block之间链接起来，形成一个巨大的“链条”。Block本是稀松平常的数据结构，但以链式结构组织起来后却使得它们具有非常深远的意义：</p>
+<ol>
+<li>形成分支博弈，使得算力总是在主分支上角逐</li>
+<li>算力攻击的概率难度呈指数上升（泊松分布）</li>
+</ol>
+<p>每个block都必须指向前一个block，否则无法验证通过。追溯至源头，便是高度为零的创世纪块(Genesis Block)，这里是Block Chain的起点，其前向block hash为零，或者说为空。</p>
+<h4 id="新block诞生过程"><a href="#新block诞生过程" class="headerlink" title="新block诞生过程"></a>新block诞生过程</h4><p>下面是一个简单的步骤描述，实际矿池运作会有区别，复杂一些：</p>
+<ol>
+<li>节点监听全网交易，通过验证的交易进入节点的内存池(Tx Mem Pool)，并更新交易数据的Merkle Hash值</li>
+<li>更新时间戳</li>
+<li>尝试不同的随机数(Nonce)，进行hash计算</li>
+<li>重复该过程至找到合理的hash</li>
+<li>打包block：先装入block meta信息，然后是交易数据</li>
+<li>对外部广播出新block</li>
+<li>其他节点验证通过后，链接至Block Chain，主链高度加一，然后切换至新block后面挖矿</li>
+</ol>
+<p>由于hashPrevBlock字段的存在，使得大家总是在最新的block后面开挖，稍后会分析原因。</p>
+<h4 id="主链分叉"><a href="#主链分叉" class="headerlink" title="主链分叉"></a>主链分叉</h4><p>从block hash算法我们知道，合理的block并不是唯一的，同一高度存在多个block的可能性。那么，当同一个高度出现多个时，主链即出现分叉(Fork)。遇到分叉时，网络会根据下列原则选举出Best Chain：</p>
+<ol>
+<li>不同高度的分支，总是接受最高（即最长）的那条分支</li>
+<li>相同高度的，接受难度最大的</li>
+<li>高度相同且难度一致的，接受时间最早的</li>
+<li>若所有均相同，则按照从网络接受的顺序</li>
+<li>等待Block Chain高度增一，则重新选择Best Chain</li>
+</ol>
+<p><img src="https://f.cloud.github.com/assets/514951/864443/94b6ba76-f621-11e2-95b0-febc373535b7.png" alt="blockchain"></p>
+<p>按照这个规则运作的节点，称为诚实节点(Honest Nodes)。节点可以诚实也可以不诚实。</p>
+<h4 id="分支博弈"><a href="#分支博弈" class="headerlink" title="分支博弈"></a>分支博弈</h4><p>我们假设所有的节点：</p>
+<ol>
+<li>都是理性的，追求收益最大化</li>
+<li>都是不诚实的，且不惜任何手段获取利益</li>
+</ol>
+<p>所有节点均独自挖矿不理会其他节点，并将所得收益放入自己口袋，现象就是一个节点挖一个分支。由于机器的配置总是有差别的，那么算力最强的节点挖得的分支必然是最长的，如果一个节点的分支不是最长的，意味其收益存在不被认可的风险（即零收益）。为了降低、逃避此风险，一些节点肯定会联合起来一起挖某个分支，试图成为最长的分支或保持最长分支优势。</p>
+<p>一旦出现有少量的节点联合，那么其他节点必然会效仿，否则他们收益为零的风险会更大。于是，分支迅速合并汇集，所有节点都会选择算力更强的分支，只有这样才能保持收益风险最小。最终，只会存在一个这样的分支，就是主干分支(Best/Main Chain)。</p>
+<p>对于不诚实节点来说，结局是无奈的：能且只能加入主干挖矿。不加入即意味被抛弃，零收益；加入就是老实干活，按占比分成。</p>
+<h4 id="Hash-Dance"><a href="#Hash-Dance" class="headerlink" title="Hash Dance"></a>Hash Dance</h4><p>Block hash的计算是随机概率事件，当有节点广播出难度更高的block后，大家便跑到那个分支。在比特币系统运行过程中，算力经常在分支间跳来跳去，此现象称为<code>Hash Dance</code>。一般情况下，分支的高度为1~2，没有大的故障很难出现高于2的分支。</p>
+<p>Hash Dance起名源于<a href="https://www.google.com.hk/search?q=google+dance" target="_blank" rel="noopener">Google Dance</a>.</p>
+<h4 id="算力攻击的概率"><a href="#算力攻击的概率" class="headerlink" title="算力攻击的概率"></a>算力攻击的概率</h4><p><em>本节内容参考：<a href="https://bitcoin.org/bitcoin.pdf" target="_blank" rel="noopener">Bitcoin: A Peer-to-Peer Electronic Cash System</a></em></p>
+<p>算力攻击是一个概率问题，这里作简单叙述：</p>
+<ul>
+<li>p = 诚实节点挖出block概率</li>
+<li>q = 攻击者挖出block概率，q = 1 - p</li>
+<li>qz = 攻击者从z个block追上的概率</li>
+</ul>
+<p><img src="https://f.cloud.github.com/assets/514951/902244/a22dae50-fb92-11e2-95aa-3e346efdab40.png" alt="算力攻击的概率"></p>
+<p>我们假设p&gt;q，否则攻击者掌握了一半以上的算力，那么概率上永远是赢的。该事件（攻击者胜出）的概率是固定，且N次事件之间是相互独立的，那么这一系列随机过程符合<code>泊松分布(Poisson Distribution)</code>。<em>Z</em>个块时，攻击者胜出的期望为<em>lambda</em>：</p>
+<p><img src="https://f.cloud.github.com/assets/514951/905393/e386fa6c-fc20-11e2-8376-73d9a367bf98.png" alt="攻击者胜出的期望"></p>
+<p>攻击者在攻击时已经偷偷的计算了<em>k</em>个块，那么这<em>k</em>个块概率符合泊松分布(下图左侧部分)，若<em>k&lt;=z</em>，那么追赶上后续<em>z-k</em>个块的概率为<em>(q/p)^(z-k)</em>，即：</p>
+<p><img src="https://f.cloud.github.com/assets/514951/905394/d08dfcca-fc21-11e2-9740-907f2a89de88.png" alt="k个块概率符合泊松分布"></p>
+<p>展开为如下形式：</p>
+<p><img src="https://f.cloud.github.com/assets/514951/905406/b08c63ec-fc23-11e2-8f43-c932daec9f7c.png" alt="k个块概率符合泊松分布"></p>
+<p>计算该过程的C语言代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;math.h&gt;</span></span><span class="function"><span class="keyword">double</span> <span class="title">AttackerSuccessProbability</span><span class="params">(<span class="keyword">double</span> q, <span class="keyword">int</span> z)</span></span>&#123;    <span class="keyword">double</span> sum    = <span class="number">1.0</span>;    <span class="keyword">double</span> p      = <span class="number">1.0</span> - q;    <span class="keyword">double</span> lambda = z * (q / p);    <span class="keyword">int</span> i, k;    <span class="keyword">for</span> (k = <span class="number">0</span>; k &lt;= z; k++) &#123;        <span class="keyword">double</span> poisson = <span class="built_in">exp</span>(-lambda);        <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt;= k; i++)            poisson *= lambda / i;        sum -= poisson * (<span class="number">1</span> - <span class="built_in">pow</span>(q / p, z - k));    &#125;    <span class="keyword">return</span> sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们选取几个值，结果如下：</p>
+<p><img src="https://f.cloud.github.com/assets/514951/905408/e6c5ed84-fc23-11e2-9334-ca8e768c5aa0.png" alt="概率结果"></p>
+<p>可以看到，由于block的链式形式，随着块数的上升，攻击者赢得的概率呈指数下降。这是很多应用等待六个甚至六个以上确认的原因，一旦超过N个确认，攻击者得逞的可能微乎其微，概率值快速趋近零。</p>
+<p>当攻击者的算力超过50%时，便可以控制Block Chain，俗称51%攻击。</p>
+<h4 id="算力攻击的危害"><a href="#算力攻击的危害" class="headerlink" title="算力攻击的危害"></a>算力攻击的危害</h4><p>攻击者算出block后，block&amp;Txs必须能够通过验证，否则其他节点都会拒掉，攻击便无意义。攻击者<strong>无法</strong>做出下列行为：</p>
+<ol>
+<li>偷盗他人的币。消费某个地址的币时，需要对应的ECDSA私钥签名，而私钥是无法破解的。</li>
+<li>凭空制造比特币。每个block奖励的币值是统一的规则，篡改奖励币值会导致其他节点会拒绝该block。</li>
+</ol>
+<p>唯一的益处是可以选择性的收录进入block的交易，对自己的币进行<code>多重消费(Double Spending)</code>。</p>
+<p>过程是这样的：假设现在block高度为100，攻击者给商户发了一个交易10BTC，记作交易A，通常这笔交易会被收录进高度101的block中，当商户在101块中看到这笔交易后，就把货物给了攻击者。此时，攻击者便开始构造另一个高度为101的block，但用交易B替换了交易A，交易B中的输入是同一笔，使得发给商户的那笔钱发给他自己。同时，攻击者需要努力计算block，使得他的分支能够赶上主分支，并合并(Merge)被大家接受，一旦接受，便成功地完成了一次Double Spending。</p>
+<p>攻击难度呈指数上升，所以成功的Double Spending通常是一个极小概率事件。</p>
+<h4 id="算力巨头"><a href="#算力巨头" class="headerlink" title="算力巨头"></a>算力巨头</h4><p>全网算力的上升对比特币是极其有利的，这是毫无疑问的。但目前大矿池与矿业巨头使得算力高度集中化，这与中本聪所设想的<code>一CPU一票（one-CPU-one-vote）</code>的分散局面背道而驰，或许是他未曾预料的。</p>
+<p>挖矿是一项专业劳动，最后必然会交给最专业的人或团队，因为这样才能实现资源配置最优，效率最高。普通投资人通过购买算力巨头的股票：1. 完成投资；2. 分享算力红利。看似中心化的背后其实依然是分散的：</p>
+<ol>
+<li>矿业公司的背后是无数分散的投资人</li>
+<li>矿池背后是无数分散的个体算力</li>
+</ol>
+<p>既得利益使得算力巨头倾向于维护系统而不是破坏，因其收益均建立在比特币系统之上，既得利益者断然不会搬石头砸自己脚。甚至很多巨头在达到一定算力占比后会主动控制算力增长，使得低于某阈值内。</p>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>本篇几乎都在讲挖矿，因为挖矿对于比特币系统来说实在是太重要了。需要了解：1. block是基于工作量证明的。2. block以链式结构存在时的深远意义。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://blog.biqu.io/2013/08/03/proof-of-work-and-mining/" data-id="cjf6ypznz0002ut0047jj2ozz" class="article-share-link">Share</a>
+      
+        <a href="http://blog.biqu.io/2013/08/03/proof-of-work-and-mining/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/08/12/timestamp-system-and-proof-of-existance/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          时间戳服务与存在证明
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2013/07/30/bitcoin-basic/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">比特币基础知识</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  
+    
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a><span class="archive-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/03/25/The-Significance-of-the-Lightning-Network/">闪电网络的伟大意义 The Significance of the Lightning Network</a>
+          </li>
+        
+          <li>
+            <a href="/2016/04/21/BIP9/">新的软分叉升级规范BIP9</a>
+          </li>
+        
+          <li>
+            <a href="/2016/04/08/understand-bitcoin-script/">理解比特币脚本</a>
+          </li>
+        
+          <li>
+            <a href="/2015/03/11/shadowsocks-add-bitcoin-support/">Shadowsocks 加入比特币的支持</a>
+          </li>
+        
+          <li>
+            <a href="/2014/06/15/safe-wallet-idea/">比特币安全钱包的想法</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Kevin Pan<br>
+      Powered by <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'bitkevin';
+  
+  var disqus_url = 'http://blog.biqu.io/2013/08/03/proof-of-work-and-mining/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//go.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>比特币客户端与钱包 | 比特币实验室</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="简介拥有和保存比特币，需要通过客户端，通常把该软件称为钱包。目前，整个比特币项目由Bitcoin Foundation来开发与维护，通常把他们称为官方团队。官方推出的客户端是Bitcoin Qt, 由C++编写核心功能，GUI界面由Python Qt完成。不含有GUI界面的被成为bitcoind，许多服务与核心功能均由其实现。运行bitcoind的通常称为节点(Bitcoin Node), 一个节">
+<meta property="og:type" content="article">
+<meta property="og:title" content="比特币客户端与钱包">
+<meta property="og:url" content="http://blog.biqu.io/2013/07/20/bitcoin-clients/index.html">
+<meta property="og:site_name" content="比特币实验室">
+<meta property="og:description" content="简介拥有和保存比特币，需要通过客户端，通常把该软件称为钱包。目前，整个比特币项目由Bitcoin Foundation来开发与维护，通常把他们称为官方团队。官方推出的客户端是Bitcoin Qt, 由C++编写核心功能，GUI界面由Python Qt完成。不含有GUI界面的被成为bitcoind，许多服务与核心功能均由其实现。运行bitcoind的通常称为节点(Bitcoin Node), 一个节">
+<meta property="og:updated_time" content="2018-03-25T15:08:43.565Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="比特币客户端与钱包">
+<meta name="twitter:description" content="简介拥有和保存比特币，需要通过客户端，通常把该软件称为钱包。目前，整个比特币项目由Bitcoin Foundation来开发与维护，通常把他们称为官方团队。官方推出的客户端是Bitcoin Qt, 由C++编写核心功能，GUI界面由Python Qt完成。不含有GUI界面的被成为bitcoind，许多服务与核心功能均由其实现。运行bitcoind的通常称为节点(Bitcoin Node), 一个节">
+  
+    <link rel="alternative" href="/atom.xml" title="比特币实验室" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">比特币实验室</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">blog.biqu.io</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://blog.biqu.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-bitcoin-clients" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/07/20/bitcoin-clients/" class="article-date">
+  <time datetime="2013-07-20T09:00:00.000Z" itemprop="datePublished">Jul 20 2013</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      比特币客户端与钱包
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>拥有和保存比特币，需要通过客户端，通常把该软件称为钱包。目前，整个比特币项目由<code>Bitcoin Foundation</code>来开发与维护，通常把他们称为官方团队。官方推出的客户端是<code>Bitcoin Qt</code>, 由C++编写核心功能，GUI界面由Python Qt完成。不含有GUI界面的被成为<code>bitcoind</code>，许多服务与核心功能均由其实现。运行bitcoind的通常称为节点(Bitcoin Node), 一个节点通常拥有完整的BlockChain数据，并实时与外界网络同步更新。</p>
+<p>钱包中通常含有：</p>
+<ul>
+<li>公钥、私钥、地址</li>
+<li>与钱包中地址相关的交易信息</li>
+<li>其他辅助数据</li>
+</ul>
+<p>最核心的数据就是密钥，拥有密钥便拥有一切，相关信息均可由其而来。钱包并不一定需要包含完整的BlockChain数据，不包含BlockChain数据的钱包称为轻钱包(Light Weight Wallet)。对于大部分日常使用来讲，轻钱包便足够了。</p>
+<h3 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h3><ul>
+<li>完全节点型(Full Node)：含有BlockChain所有完整数据</li>
+<li>简易节点型(SPV Node)：Header-Only Clients，仅有Block头部信息，无需交易数据</li>
+<li>CS型(Server-Client)：服务端-客户端模式，大部分数据存储在服务端</li>
+<li>BS型：所有数据均通过浏览器在线使用</li>
+</ul>
+<p>Bitcoin Qt，因为其是一款完整的钱包软件，需要下载大约超过<code>10GB</code>的BlockChain数据(24万个block)，对于大部分人来讲，是没有必要的。目前，官方主页上默认推荐的客户端已经不再是Bitcoin Qt, 而是<a href="https://multibit.org" target="_blank" rel="noopener">MultiBit</a>（支持Windows, MacOS和Linux的轻钱包）；移动端目前最好用的是<a href="https://play.google.com/store/apps/details?id=de.schildbach.wallet" target="_blank" rel="noopener">Bitcoin Wallet</a>(安卓平台)，iOS平台由于政策原因，一直未有出色的软件，Blockchain.Info为iOS提供了一个简单的钱包软件，<a href="http://itunes.com/apps/blockchain" target="_blank" rel="noopener">Blockchain for the iPhone</a>。还有就是在线钱包，如优秀的<a href="https://blockchain.info" target="_blank" rel="noopener">BlockChain.Info</a>，其安全性均超过自行保存管理，推荐使用之。</p>
+<p>最近还有一种流行的钱包：脑钱包。因其安全性较低，并不推荐大家使用，仅临时性场合使用之。其原理是由一串密码短语，通过Hash运算，得到密钥，只要记住这串密语即可使用钱包。因为密码短语符合大家习惯和记忆特点，可以通过计算大量常见组合来破解。除了暴力破解的问题外，失忆是最大的风险，比如摔个跟头跌成脑震荡，或长期不用自然忘得一干二净。</p>
+<h3 id="选择-amp-存储"><a href="#选择-amp-存储" class="headerlink" title="选择&amp;存储"></a>选择&amp;存储</h3><ul>
+<li><p>日常使用的额度通常小于10个币，可以存放在电脑或手机App中。通常存放1个币以下是比较保险的，丢了不太心疼嘛</p>
+</li>
+<li><p>持有几十、几百个币的，可以选择BlockChain.Info，Inputs.io等在线钱包。其也可以当做日常钱包使用。</p>
+</li>
+<li><p>持有上千甚至数万的，应该分开存储，并隔离存放。使用离线电脑生产密钥，打印出来托管至银行等高安全场所存储，并销毁现有密钥。同时还需要多份隔离存储，甚至对密钥进行加密。</p>
+</li>
+</ul>
+<p>密钥即一切，如不慎弄丢钱包，便永远失去这笔比特币。所以钱包需要小心妥善保管，不在自己的PC或者手机App中存储大量比特币，丢失的风险太高，病毒木马、硬件损坏、手机丢失等均造成无法挽救的损失。俗话讲鸡蛋不要搁在一个篮子里，多种方式存储也是降低风险的有效方式。目前丢失的比特币或有数百万BTC之巨。</p>
+<h3 id="常见钱包"><a href="#常见钱包" class="headerlink" title="常见钱包"></a>常见钱包</h3><ul>
+<li><a href="https://en.bitcoin.it/wiki/Bitcoin-Qt" target="_blank" rel="noopener">Bitcoin-Qt</a> - 官方客户端，基于C++/Qt，全平台，完全数据。</li>
+<li><a href="https://en.bitcoin.it/wiki/MultiBit" target="_blank" rel="noopener">MultiBit</a> - 全平台，轻钱包，官方推荐</li>
+<li><a href="https://en.bitcoin.it/wiki/Electrum" target="_blank" rel="noopener">Electrum</a> - 著名轻钱包</li>
+<li><a href="https://en.bitcoin.it/wiki/Armory" target="_blank" rel="noopener">Armory</a> - 基于Python，含有诸多特性的轻钱包</li>
+<li><a href="https://blockchain.info" target="_blank" rel="noopener">BlockChain.info</a> - 非常著名在线钱包</li>
+</ul>
+<h3 id="开发库"><a href="#开发库" class="headerlink" title="开发库"></a>开发库</h3><ul>
+<li><a href="https://en.bitcoin.it/wiki/Bitcoind" target="_blank" rel="noopener">bitcoind</a> - 官方客户端，无GUI，开发者必备</li>
+<li><a href="https://github.com/libcoin/libcoin" target="_blank" rel="noopener">libcoin</a> - libcoin</li>
+<li><a href="https://github.com/spesmilo/libbitcoin" target="_blank" rel="noopener">libbitcoin</a> - asynchronous C++ library for Bitcoin</li>
+<li><a href="https://github.com/MatthewLM/cbitcoin" target="_blank" rel="noopener">cbitcoin</a> - A low-level bitcoin library written in standard C</li>
+<li><a href="https://code.google.com/p/bitcoinj/" target="_blank" rel="noopener">Bitcoinj</a> - a Java implementation of the Bitcoin protocol</li>
+<li><a href="https://github.com/piotrnar/gocoin" target="_blank" rel="noopener">gocoin</a> - Bitcoin client library for Go / golang</li>
+<li><a href="https://github.com/jgarzik/pynode" target="_blank" rel="noopener">pynode</a> - Bitcoin P2P router, in python</li>
+<li><a href="https://github.com/gavinandresen/bitcointools" target="_blank" rel="noopener">bitcointools</a> - Python-based tools for the Bitcoin cryptocurrency system，By Gavin Andresen</li>
+<li><a href="https://github.com/jtobey/bitcoin-abe" target="_blank" rel="noopener">bitcoin-abe</a> - Abe: block browser for Bitcoin and similar currencies</li>
+</ul>
+<h3 id="数据检索"><a href="#数据检索" class="headerlink" title="数据检索"></a>数据检索</h3><ul>
+<li><a href="https://blockchain.info" target="_blank" rel="noopener">BlockChain.info</a></li>
+<li><a href="http://blockexplorer.com/" target="_blank" rel="noopener">Bitcoin Block Explorer</a></li>
+</ul>
+<hr>
+<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><ol>
+<li>Bitcoin Foundation： <a href="https://bitcoinfoundation.org/" target="_blank" rel="noopener">https://bitcoinfoundation.org/</a></li>
+<li>Why Apple Is Afraid Of Bitcoin: <a href="http://www.forbes.com/sites/jonmatonis/2012/06/13/why-apple-is-afraid-of-bitcoin/" target="_blank" rel="noopener">http://www.forbes.com/sites/jonmatonis/2012/06/13/why-apple-is-afraid-of-bitcoin/</a></li>
+<li>List of Bitcoin-related software： <a href="https://en.bitcoin.it/wiki/Software" target="_blank" rel="noopener">https://en.bitcoin.it/wiki/Software</a></li>
+<li>Bitcoin Clients: <a href="https://en.bitcoin.it/wiki/Clients" target="_blank" rel="noopener">https://en.bitcoin.it/wiki/Clients</a></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://blog.biqu.io/2013/07/20/bitcoin-clients/" data-id="cjf6ypzny0001ut00s1xxge6j" class="article-share-link">Share</a>
+      
+        <a href="http://blog.biqu.io/2013/07/20/bitcoin-clients/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2013/07/30/bitcoin-basic/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          比特币基础知识
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2013/07/20/what-is-bitcoin/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">比特币是什么?</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  
+    
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a><span class="archive-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/03/25/The-Significance-of-the-Lightning-Network/">闪电网络的伟大意义 The Significance of the Lightning Network</a>
+          </li>
+        
+          <li>
+            <a href="/2016/04/21/BIP9/">新的软分叉升级规范BIP9</a>
+          </li>
+        
+          <li>
+            <a href="/2016/04/08/understand-bitcoin-script/">理解比特币脚本</a>
+          </li>
+        
+          <li>
+            <a href="/2015/03/11/shadowsocks-add-bitcoin-support/">Shadowsocks 加入比特币的支持</a>
+          </li>
+        
+          <li>
+            <a href="/2014/06/15/safe-wallet-idea/">比特币安全钱包的想法</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Kevin Pan<br>
+      Powered by <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'bitkevin';
+  
+  var disqus_url = 'http://blog.biqu.io/2013/07/20/bitcoin-clients/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//go.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>

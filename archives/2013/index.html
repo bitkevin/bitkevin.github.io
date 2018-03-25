@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Archives: 2013 | 比特币实验室</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="比特币实验室">
+<meta property="og:url" content="http://blog.biqu.io/archives/2013/index.html">
+<meta property="og:site_name" content="比特币实验室">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="比特币实验室">
+  
+    <link rel="alternative" href="/atom.xml" title="比特币实验室" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">比特币实验室</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">blog.biqu.io</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://blog.biqu.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-bitcoin-transaction-02" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/10/27/bitcoin-transaction-02/" class="article-date">
+  <time datetime="2013-10-27T11:54:00.000Z" itemprop="datePublished">Oct 27 2013</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/10/27/bitcoin-transaction-02/">比特币交易构成（二）</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="交易的构造、签名与广播"><a href="#交易的构造、签名与广播" class="headerlink" title="交易的构造、签名与广播"></a>交易的构造、签名与广播</h2><p>上篇介绍了交易结构、签名等，为了更直观的认识比特币，借助<strong>bitcoind</strong>演示手动构造并广播交易的完整过程。</p>
+<h3 id="普通交易"><a href="#普通交易" class="headerlink" title="普通交易"></a>普通交易</h3><h4 id="1-找出未花费的币（unspent-output）"><a href="#1-找出未花费的币（unspent-output）" class="headerlink" title="1. 找出未花费的币（unspent output）"></a>1. 找出未花费的币（unspent output）</h4><p>通过命令：<code>listunspent [minconf=1] [maxconf=9999999]  [&quot;address&quot;,...]</code>列出某个地址未花费的币(交易)，<code>minconf</code>/<code>maxconf</code>表示该笔收入交易的确认数范围，如果需要列出还未确认的交易，需将<code>minconf</code>设置为0。</p>
+<p>执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bitcoind listunspent 0 100 &apos;[&quot;1Lab618UuWjLmVA1Q64tHZXcLoc4397ZX3&quot;]&apos;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        &quot;txid&quot; : &quot;296ea7bf981b44999d689853d17fe0ceb852a8a34e68fcd19f0a41e589132156&quot;,</span><br><span class="line">        &quot;vout&quot; : 0,</span><br><span class="line">        &quot;address&quot; : &quot;1Lab618UuWjLmVA1Q64tHZXcLoc4397ZX3&quot;,</span><br><span class="line">        &quot;account&quot; : &quot;&quot;,</span><br><span class="line">        &quot;scriptPubKey&quot; : &quot;76a914d6c492056f3f99692b56967a42b8ad44ce76b67a88ac&quot;,</span><br><span class="line">        &quot;amount&quot; : 0.19900000,</span><br><span class="line">        &quot;confirmations&quot; : 1</span><br><span class="line">    &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>我们找到该地址的一个未花费交易，位于交易<a href="http://blockchain.info/tx/296ea7bf981b44999d689853d17fe0ceb852a8a34e68fcd19f0a41e589132156" target="_blank" rel="noopener">296ea7bf981b4499…9f0a41e589132156</a>的第0个位置。</p>
+<h4 id="2-创建待发送交易"><a href="#2-创建待发送交易" class="headerlink" title="2. 创建待发送交易"></a>2. 创建待发送交易</h4><p>创建待发送交易，由命令：<code>createrawtransaction [{&quot;txid&quot;:txid,&quot;vout&quot;:n},...] {address:amount,...}</code>来完成。我们将 <em>0.1</em> BTC发送至 <em>1Q8s4qDRbCbFypG5AFNR9tFC57PStkPX1x</em> ，并支付 <em>0.0001</em> BTC做为矿工费。输入交易的额度为 <em>0.199</em> ，输出为 <em>0.1 + 0.0001 = 0.1001</em> ，那么还剩余： <em>0.199 - 0.1001 = 0.0989</em> ，将此作为找零发回给自己。</p>
+<p>执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bitcoind createrawtransaction \</span><br><span class="line">&apos;[&#123;&quot;txid&quot;:&quot;296ea7bf981b44999d689853d17fe0ceb852a8a34e68fcd19f0a41e589132156&quot;,&quot;vout&quot;:0&#125;]&apos; \</span><br><span class="line">&apos;&#123;&quot;1Q8s4qDRbCbFypG5AFNR9tFC57PStkPX1x&quot;:0.1, &quot;1Lab618UuWjLmVA1Q64tHZXcLoc4397ZX3&quot;:0.0989&#125;&apos;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">010000000156211389e5410a9fd1fc684ea3a852b8cee07fd15398689d99441b98bfa76e290000000000ffffffff0280969800000000001976a914fdc7990956642433ea75cabdcc0a9447c5d2b4ee88acd0e89600000000001976a914d6c492056f3f99692b56967a42b8ad44ce76b67a88ac00000000</span><br></pre></td></tr></table></figure>
+<p>通过命令：<code>decoderawtransaction &lt;hex string&gt;</code>，可以将此段十六进制字符串解码。</p>
+<p>执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bitcoind decoderawtransaction &apos;010000000156211389e5410a9fd1fc684ea3a852b8cee07fd15398689d99441b98bfa76e290000000000ffffffff0280969800000000001976a914fdc7990956642433ea75cabdcc0a9447c5d2b4ee88acd0e89600000000001976a914d6c492056f3f99692b56967a42b8ad44ce76b67a88ac00000000&apos;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;txid&quot; : &quot;54f773a3fdf7cb3292fc76b46c97e536348b3a0715886dbfd2f60e115fb3a8f0&quot;,</span><br><span class="line">    &quot;version&quot; : 1,</span><br><span class="line">    &quot;locktime&quot; : 0,</span><br><span class="line">    &quot;vin&quot; : [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;txid&quot; : &quot;296ea7bf981b44999d689853d17fe0ceb852a8a34e68fcd19f0a41e589132156&quot;,</span><br><span class="line">            &quot;vout&quot; : 0,</span><br><span class="line">            &quot;scriptSig&quot; : &#123;</span><br><span class="line">                &quot;asm&quot; : &quot;&quot;,</span><br><span class="line">                &quot;hex&quot; : &quot;&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;sequence&quot; : 4294967295</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    &quot;vout&quot; : [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;value&quot; : 0.10000000,</span><br><span class="line">            &quot;n&quot; : 0,</span><br><span class="line">            &quot;scriptPubKey&quot; : &#123;</span><br><span class="line">                &quot;asm&quot; : &quot;OP_DUP OP_HASH160 fdc7990956642433ea75cabdcc0a9447c5d2b4ee OP_EQUALVERIFY OP_CHECKSIG&quot;,</span><br><span class="line">                &quot;hex&quot; : &quot;76a914fdc7990956642433ea75cabdcc0a9447c5d2b4ee88ac&quot;,</span><br><span class="line">                &quot;reqSigs&quot; : 1,</span><br><span class="line">                &quot;type&quot; : &quot;pubkeyhash&quot;,</span><br><span class="line">                &quot;addresses&quot; : [</span><br><span class="line">                    &quot;1Q8s4qDRbCbFypG5AFNR9tFC57PStkPX1x&quot;</span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;value&quot; : 0.09890000,</span><br><span class="line">            &quot;n&quot; : 1,</span><br><span class="line">            &quot;scriptPubKey&quot; : &#123;</span><br><span class="line">                &quot;asm&quot; : &quot;OP_DUP OP_HASH160 d6c492056f3f99692b56967a42b8ad44ce76b67a OP_EQUALVERIFY OP_CHECKSIG&quot;,</span><br><span class="line">                &quot;hex&quot; : &quot;76a914d6c492056f3f99692b56967a42b8ad44ce76b67a88ac&quot;,</span><br><span class="line">                &quot;reqSigs&quot; : 1,</span><br><span class="line">                &quot;type&quot; : &quot;pubkeyhash&quot;,</span><br><span class="line">                &quot;addresses&quot; : [</span><br><span class="line">                    &quot;1Lab618UuWjLmVA1Q64tHZXcLoc4397ZX3&quot;</span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>至此，一个“空白交易”就构造好了，尚未使用私钥对交易进行签名，字段<code>scriptSig</code>是留空的，无签名的交易是无效的。此时的Tx ID并不是最终的Tx ID，填入签名后Tx ID会发生变化。</p>
+<p>在手动创建交易时，务必注意输入、输出的值，<code>非常容易犯错的是忘记构造找零输出</code>（如非必要勿手动构造交易）。曾经有人构造交易时忘记找零，发生了<a href="https://blockchain.info/tx/4ed20e0768124bc67dc684d57941be1482ccdaa45dadb64be12afba8c8554537" target="_blank" rel="noopener">支付 <strong>200 BTC</strong> 的矿工费</a>的人间惨剧，所幸的是收录该笔交易的Block由著名挖矿团队“烤猫（Friedcat）”挖得，该团队非常厚道的<a href="https://blockchain.info/tx/b18abce37b48a5f434f108ae7ce34f22aa2bfbd9eb9310314029e4b9e3c7cf95" target="_blank" rel="noopener">退回了多余费用</a>。</p>
+<h4 id="3-签名"><a href="#3-签名" class="headerlink" title="3. 签名"></a>3. 签名</h4><p>交易签名使用命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">signrawtransaction &lt;hex string&gt; \</span><br><span class="line">[&#123;&quot;txid&quot;:txid,&quot;vout&quot;:n,&quot;scriptPubKey&quot;:hex,&quot;redeemScript&quot;:hex&#125;,...] [&lt;privatekey1&gt;,...] \</span><br><span class="line">[sighashtype=&quot;ALL&quot;]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>第一个参数是创建的待签名交易的十六进制字符串；</li>
+<li>第二个参数有点类似创建交易时的参数，不过需要多出一个公钥字段<code>scriptPubKey</code>，其他节点验证交易时是通过公钥和签名来完成的，所以要提供公钥；如果是合成地址，则需要提供<code>redeemScript</code>；</li>
+<li>第三个参数是即将花费的币所在地址的私钥，用来对交易进行签名，如果该地址私钥已经导入至bitcoind中，则无需显式提供；</li>
+<li>最后一个参数表示签名类型，在上一篇里，介绍了三种交易签名类型；</li>
+</ul>
+<p>签名之前需要找到<code>scriptPubKey</code>，提取输入交易信息即可获取(也可以根据其公钥自行计算)，由命令：<code>getrawtransaction &lt;txid&gt; [verbose=0]</code>完成。</p>
+<p>执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bitcoind getrawtransaction 296ea7bf981b44999d689853d17fe0ceb852a8a34e68fcd19f0a41e589132156 1</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;hex&quot; : &quot;01000000010511331f639e974283d3909496787a660583dc88f41598d177e225b5f352314a000000006c493046022100be8c796122ec598295e6dfd6664a20a7e20704a17f76d3d925c9ec421ca60bc1022100cf9f2d7b9f24285f7c119c91f24521e5483f6b141de6ee55658fa70116ee04d4012103cad07f6de0b181891b5291a5bc82b228fe6509699648b0b53556dc0057eeb5a4ffffffff0160a62f01000000001976a914d6c492056f3f99692b56967a42b8ad44ce76b67a88ac00000000&quot;,</span><br><span class="line">    &quot;txid&quot; : &quot;296ea7bf981b44999d689853d17fe0ceb852a8a34e68fcd19f0a41e589132156&quot;,</span><br><span class="line">    &quot;version&quot; : 1,</span><br><span class="line">    &quot;locktime&quot; : 0,</span><br><span class="line">    &quot;vin&quot; : [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;txid&quot; : &quot;4a3152f3b525e277d19815f488dc8305667a78969490d38342979e631f331105&quot;,</span><br><span class="line">            &quot;vout&quot; : 0,</span><br><span class="line">            &quot;scriptSig&quot; : &#123;</span><br><span class="line">                &quot;asm&quot; : &quot;3046022100be8c796122ec598295e6dfd6664a20a7e20704a17f76d3d925c9ec421ca60bc1022100cf9f2d7b9f24285f7c119c91f24521e5483f6b141de6ee55658fa70116ee04d401 03cad07f6de0b181891b5291a5bc82b228fe6509699648b0b53556dc0057eeb5a4&quot;,</span><br><span class="line">                &quot;hex&quot; : &quot;493046022100be8c796122ec598295e6dfd6664a20a7e20704a17f76d3d925c9ec421ca60bc1022100cf9f2d7b9f24285f7c119c91f24521e5483f6b141de6ee55658fa70116ee04d4012103cad07f6de0b181891b5291a5bc82b228fe6509699648b0b53556dc0057eeb5a4&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;sequence&quot; : 4294967295</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    &quot;vout&quot; : [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;value&quot; : 0.19900000,</span><br><span class="line">            &quot;n&quot; : 0,</span><br><span class="line">            &quot;scriptPubKey&quot; : &#123;</span><br><span class="line">                &quot;asm&quot; : &quot;OP_DUP OP_HASH160 d6c492056f3f99692b56967a42b8ad44ce76b67a OP_EQUALVERIFY OP_CHECKSIG&quot;,</span><br><span class="line">                &quot;hex&quot; : &quot;76a914d6c492056f3f99692b56967a42b8ad44ce76b67a88ac&quot;,</span><br><span class="line">                &quot;reqSigs&quot; : 1,</span><br><span class="line">                &quot;type&quot; : &quot;pubkeyhash&quot;,</span><br><span class="line">                &quot;addresses&quot; : [</span><br><span class="line">                    &quot;1Lab618UuWjLmVA1Q64tHZXcLoc4397ZX3&quot;</span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    &quot;blockhash&quot; : &quot;000000000000000488f18f7659acd85b2bd06a5ed2c4439eea74a8b968d16656&quot;,</span><br><span class="line">    &quot;confirmations&quot; : 19,</span><br><span class="line">    &quot;time&quot; : 1383235737,</span><br><span class="line">    &quot;blocktime&quot; : 1383235737</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>scriptPubKey</code>位于”vout”[0]-&gt;”scriptPubKey”-&gt;”hex”，即： <em>76a914d6c492056f3f99692b56967a42b8ad44ce76b67a88ac</em> 。</p>
+<p>签名使用ECDSA算法，对其，“空白交易”签名之，执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">bitcoind signrawtransaction \</span><br><span class="line">&quot;010000000156211389e5410a9fd1fc684ea3a852b8cee07fd15398689d99441b98bfa76e290000000000ffffffff0280969800000000001976a914fdc7990956642433ea75cabdcc0a9447c5d2b4ee88acd0e89600000000001976a914d6c492056f3f99692b56967a42b8ad44ce76b67a88ac00000000&quot; \</span><br><span class="line">&apos;[&#123;&quot;txid&quot;:&quot;296ea7bf981b44999d689853d17fe0ceb852a8a34e68fcd19f0a41e589132156&quot;,&quot;vout&quot;:0,&quot;scriptPubKey&quot;:&quot;76a914d6c492056f3f99692b56967a42b8ad44ce76b67a88ac&quot;&#125;]&apos;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;hex&quot; : &quot;010000000156211389e5410a9fd1fc684ea3a852b8cee07fd15398689d99441b98bfa76e29000000008c493046022100f9da4f53a6a4a8317f6e7e9cd9a7b76e0f5e95dcdf70f1b1e2b3548eaa3a6975022100858d48aed79da8873e09b0e41691f7f3e518ce9a88ea3d03f7b32eb818f6068801410477c075474b6798c6e2254d3d06c1ae3b91318ca5cc62d18398697208549f798e28efb6c55971a1de68cca81215dd53686c31ad8155cdc03563bf3f73ce87b4aaffffffff0280969800000000001976a914fdc7990956642433ea75cabdcc0a9447c5d2b4ee88acd0e89600000000001976a914d6c492056f3f99692b56967a42b8ad44ce76b67a88ac00000000&quot;,</span><br><span class="line">    &quot;complete&quot; : true</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>签名后，签名值会填入上文所述的空字段中，从而得到一个完整的交易。可通过上文介绍的命令<code>decoderawtransaction &lt;hex string&gt;</code>解码查看之。</p>
+<p>最后一步，就是将其广播出去，等待网络传播至所有节点，约10~60秒广播至全球节点，取决与你的节点的网络连接状况。稍后一些时刻，就会进入Block中。广播由命令<code>sendrawtransaction &lt;hex string&gt;</code>来完成。如果没有运行节点，可以通过公共节点的API进行广播，例如：<a href="https://blockchain.info/pushtx" target="_blank" rel="noopener">blockchain.info/pushtx</a>。</p>
+<p>执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bitcoind sendrawtransaction \</span><br><span class="line">&quot;010000000156211389e5410a9fd1fc684ea3a852b8cee07fd15398689d99441b98bfa76e29000000008c493046022100f9da4f53a6a4a8317f6e7e9cd9a7b76e0f5e95dcdf70f1b1e2b3548eaa3a6975022100858d48aed79da8873e09b0e41691f7f3e518ce9a88ea3d03f7b32eb818f6068801410477c075474b6798c6e2254d3d06c1ae3b91318ca5cc62d18398697208549f798e28efb6c55971a1de68cca81215dd53686c31ad8155cdc03563bf3f73ce87b4aaffffffff0280969800000000001976a914fdc7990956642433ea75cabdcc0a9447c5d2b4ee88acd0e89600000000001976a914d6c492056f3f99692b56967a42b8ad44ce76b67a88ac00000000&quot;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">b5f8da1ea9e02ec3cc0765f9600f49945e94ed4b0c88ed0648896bf3e213205d</span><br></pre></td></tr></table></figure>
+<p>返回的是Transaction Hash值，即<a href="https://blockchain.info/tx/b5f8da1ea9e02ec3cc0765f9600f49945e94ed4b0c88ed0648896bf3e213205d" target="_blank" rel="noopener">该交易</a>的ID。至此，交易构造、签名、发送的完整过程完成了。</p>
+<h3 id="合成地址交易"><a href="#合成地址交易" class="headerlink" title="合成地址交易"></a>合成地址交易</h3><p>合成地址以3开头，可以实现多方管理资产，极大提高安全性，也可以轻松实现基于比特币原生的三方交易担保支付。一个<code>M-of-N</code>的模式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">m &#123;pubkey&#125;...&#123;pubkey&#125; n OP_CHECKMULTISIG</span><br></pre></td></tr></table></figure>
+<p>M和N需满足：</p>
+<ul>
+<li><code>1&lt;=N&lt;=3</code></li>
+<li><code>1&lt;=M&lt;=N</code></li>
+</ul>
+<p>可以是<code>1 of 1</code>，<code>1 of 2</code>，<code>2 of 3</code>等组合，通常选择<code>N=3</code>：</p>
+<ul>
+<li><code>1 of 3</code>，最大程度私钥冗余。防丢私钥损失，3把私钥中任意一把即可签名发币，即使丢失2把都可以保障不受损失；</li>
+<li><code>2 of 3</code>，提高私钥冗余度的同时解决单点信任问题。3把私钥任意2把私钥可签名发币，三方不完全信任的情形，即中介交易中，非常适用；</li>
+<li><code>3 of 3</code>，最大程度解决资金信任问题，无私钥冗余。必须3把私钥全部签名才能发币，适用多方共同管理重要资产，但任何一方遗失私钥均造成严重损失；</li>
+</ul>
+<p>合成地址的交易构造、签名、发送过程与普通交易类似，这里只介绍如何创建一个合成地址。大神Gavin Andresen已经演示过，下面内容摘自其<a href="https://gist.github.com/gavinandresen/3966071" target="_blank" rel="noopener">gist</a>.</p>
+<p>首先，需要三对公钥、私钥。公钥创建地址、私钥用于签名。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># No.1</span><br><span class="line">0491bba2510912a5bd37da1fb5b1673010e43d2c6d812c514e91bfa9f2eb129e1c183329db55bd868e209aac2fbc02cb33d98fe74bf23f0c235d6126b1d8334f86 / 5JaTXbAUmfPYZFRwrYaALK48fN6sFJp4rHqq2QSXs8ucfpE4yQU</span><br><span class="line"># No.2 </span><br><span class="line">04865c40293a680cb9c020e7b1e106d8c1916d3cef99aa431a56d253e69256dac09ef122b1a986818a7cb624532f062c1d1f8722084861c5c3291ccffef4ec6874 / 5Jb7fCeh1Wtm4yBBg3q3XbT6B525i17kVhy3vMC9AqfR6FH2qGk</span><br><span class="line"># No.3</span><br><span class="line">048d2455d2403e08708fc1f556002f1b6cd83f992d085097f9974ab08a28838f07896fbab08f39495e15fa6fad6edbfb1e754e35fa1c7844c41f322a1863d46213 / 5JFjmGo5Fww9p8gvx48qBYDJNAzR9pmH5S389axMtDyPT8ddqmw</span><br></pre></td></tr></table></figure>
+<p>使用命令：<code>createmultisig &lt;nrequired&gt; &lt;&#39;[&quot;key&quot;,&quot;key&quot;]&#39;&gt;</code>来合成，其中<code>key</code>为公钥，创建地址时仅需公钥。创建类型是<code>2 of 3</code>.</p>
+<p>输入：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">bitcoind createmultisig 2 \</span><br><span class="line">&apos;[&quot;0491bba2510912a5bd37da1fb5b1673010e43d2c6d812c514e91bfa9f2eb129e1c183329db55bd868e209aac2fbc02cb33d98fe74bf23f0c235d6126b1d8334f86&quot;,&quot;04865c40293a680cb9c020e7b1e106d8c1916d3cef99aa431a56d253e69256dac09ef122b1a986818a7cb624532f062c1d1f8722084861c5c3291ccffef4ec6874&quot;,&quot;048d2455d2403e08708fc1f556002f1b6cd83f992d085097f9974ab08a28838f07896fbab08f39495e15fa6fad6edbfb1e754e35fa1c7844c41f322a1863d46213&quot;]&apos;</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;address&quot; : &quot;3QJmV3qfvL9SuYo34YihAf3sRCW3qSinyC&quot;,</span><br><span class="line">    &quot;redeemScript&quot; : &quot;52410491bba2510912a5bd37da1fb5b1673010e43d2c6d812c514e91bfa9f2eb129e1c183329db55bd868e209aac2fbc02cb33d98fe74bf23f0c235d6126b1d8334f864104865c40293a680cb9c020e7b1e106d8c1916d3cef99aa431a56d253e69256dac09ef122b1a986818a7cb624532f062c1d1f8722084861c5c3291ccffef4ec687441048d2455d2403e08708fc1f556002f1b6cd83f992d085097f9974ab08a28838f07896fbab08f39495e15fa6fad6edbfb1e754e35fa1c7844c41f322a1863d4621353ae&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>得到的合成地址是：<code>3QJmV3qfvL9SuYo34YihAf3sRCW3qSinyC</code>，该地址没有公钥，仅有<code>redeemScript</code>，作用与公钥相同。后续的构造、签名、发送过程与上文普通地址交易类似，略去。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://blog.biqu.io/2013/10/27/bitcoin-transaction-02/" data-id="cjf6ypzo50007ut00lmguf1ph" class="article-share-link">Share</a>
+      
+        <a href="http://blog.biqu.io/2013/10/27/bitcoin-transaction-02/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-bitcoin-transaction-01" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/10/27/bitcoin-transaction-01/" class="article-date">
+  <time datetime="2013-10-27T11:42:00.000Z" itemprop="datePublished">Oct 27 2013</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/10/27/bitcoin-transaction-01/">比特币交易构成（一）</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>交易(Transaction)是比特币系统的信息载体，最小单元。而块(Block)就是将这些基础单元打包装箱，贴上封条，并串联起来。巨大算力保障了块的安全，也就保障了单个交易的安全。</p>
+<h2 id="类型"><a href="#类型" class="headerlink" title="类型"></a>类型</h2><p>交易有三种常见类型：产量交易(Generation)，合成地址交易(Script Hash)，通用地址交易(Pubkey Hash)。该分类并非严格意义的，只是根据交易的输入输出做的简单区分。</p>
+<h3 id="Generation-TX"><a href="#Generation-TX" class="headerlink" title="Generation TX"></a>Generation TX</h3><p>每个Block都对应一个产量交易(Generation TX)，该类交易是没有输入交易的，挖出的新币是所有币的源头。</p>
+<h3 id="Script-Hash-TX"><a href="#Script-Hash-TX" class="headerlink" title="Script Hash TX"></a>Script Hash TX</h3><p>该类交易目前不是很常见，大部分人可能没有听说过，但是非常有意义。未来应该会在某些场合频繁使用。该类交易的接受地址不是通常意义的地址，而是一个合成地址，以3开头（对，以3开头的也是比特币地址！）。三对公私钥，可以生成一个合成地址。在生成过程时指定<code>n of 3</code>中的n，n范围是<code>[1, 3]</code>，若n=1，则仅需一个私钥签名即可花费该地址的币，若n=3，则需要三把私钥依次签名才可以。</p>
+<h3 id="Pubkey-Hash-TX"><a href="#Pubkey-Hash-TX" class="headerlink" title="Pubkey Hash TX"></a>Pubkey Hash TX</h3><p>该类是最常见的交易类型，由N个输入、M个输出构成。</p>
+<h2 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h2><p>交易中存放的是货币所有权的流转信息，所有权登记在比特币地址上(Public Key)。这些信息是全网公开的，以明文形式存储（比特币系统里的所有数据都是明文的），只有当需要转移货币所有权时，才需要用私钥签名来验证。</p>
+<table>
+<thead>
+<tr>
+<th>字段大小</th>
+<th>描述</th>
+<th>数据类型</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4</td>
+<td>version, 版本</td>
+<td>uint32_t</td>
+<td>交易数据结构的版本号</td>
+</tr>
+<tr>
+<td>1+</td>
+<td>tx_in count, 输入数量</td>
+<td>var_int</td>
+<td>输入交易的数量</td>
+</tr>
+<tr>
+<td>41+</td>
+<td>tx_in</td>
+<td>tx_in[]</td>
+<td>输入交易的数组，每个输入&gt;=41字节</td>
+</tr>
+<tr>
+<td>1+</td>
+<td>tx_out count, 输出数量</td>
+<td>var_int</td>
+<td>输出地址的数量</td>
+</tr>
+<tr>
+<td>9+</td>
+<td>tx_out</td>
+<td>tx_out[]</td>
+<td>输入地址的数组，每个输入&gt;=9字节</td>
+</tr>
+<tr>
+<td>4</td>
+<td>lock_time, 锁定时间</td>
+<td>uint32_t</td>
+<td>见下方解释</td>
+</tr>
+</tbody>
+</table>
+<p><code>lock_time</code>是一个多意字段，表示在某个高度的Block之前或某个时间点之前该交易处于锁定态，无法收录进Block。</p>
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>立即生效</td>
+</tr>
+<tr>
+<td>&lt; 500000000</td>
+<td>含义为Block高度，处于该Block之前为锁定（不生效）</td>
+</tr>
+<tr>
+<td>&gt;= 500000000</td>
+<td>含义为Unix时间戳，处于该时刻之前为锁定（不生效）</td>
+</tr>
+</tbody>
+</table>
+<p>若该笔交易的所有输入交易的<code>sequence</code>字段，均为INT32最大值(0xffffffff)，则忽略<code>lock_time</code>字段。否则，该交易在未达到Block高度或达到某个时刻之前，是不会被收录进Block中的。</p>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><p>为了演示方便，我们读取稍早期的块数据，以高度116219 Block为例。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># ~  bitcoind getblock 0000000000007c639f2cbb23e4606a1d022fa4206353b9d92e99f5144bd74611           </span><br><span class="line">&#123;</span><br><span class="line">    &quot;hash&quot; : &quot;0000000000007c639f2cbb23e4606a1d022fa4206353b9d92e99f5144bd74611&quot;,</span><br><span class="line">    &quot;confirmations&quot; : 144667,</span><br><span class="line">    &quot;size&quot; : 1536,</span><br><span class="line">    &quot;height&quot; : 116219,</span><br><span class="line">    &quot;version&quot; : 1,</span><br><span class="line">    &quot;merkleroot&quot; : &quot;587fefd748f899f84d0fa1d8a3876fdb406a4bb8f54a31445cb72564701daea6&quot;,</span><br><span class="line">    &quot;tx&quot; : [</span><br><span class="line">        &quot;be8f08d7f519eb863a68cf292ca51dbab7c9b49f50a96d13f2db32e432db363e&quot;,</span><br><span class="line">        &quot;a387039eca66297ba51ef2da3dcc8a0fc745bcb511e20ed9505cc6762be037bb&quot;,</span><br><span class="line">        &quot;2bd83162e264abf59f9124ca517050065f8c8eed2a21fbf85d454ee4e0e4c267&quot;,</span><br><span class="line">        &quot;028cfae228f8a4b0caee9c566bd41aed36bcd237cdc0eb18f0331d1e87111743&quot;,</span><br><span class="line">        &quot;3a06b6615756dc3363a8567fbfa8fe978ee0ba06eb33fd844886a0f01149ad62&quot;</span><br><span class="line">    ],</span><br><span class="line">    &quot;time&quot; : 1301705313,</span><br><span class="line">    &quot;nonce&quot; : 1826107553,</span><br><span class="line">    &quot;bits&quot; : &quot;1b00f339&quot;,</span><br><span class="line">    &quot;difficulty&quot; : 68977.78463021,</span><br><span class="line">    &quot;previousblockhash&quot; : &quot;00000000000010d549135eb39bd3bbb1047df8e1512357216e8a85c57a1efbfb&quot;,</span><br><span class="line">    &quot;nextblockhash&quot; : &quot;000000000000e9fcc59a6850f64a94476a30f5fe35d6d8c4b4ce0b1b04103a77&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该Block里面有5笔交易，第一笔为Generation TX，解析出来看一下具体内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"># ~  bitcoind getrawtransaction be8f08d7f519eb863a68cf292ca51dbab7c9b49f50a96d13f2db32e432db363e 1</span><br><span class="line">&#123;</span><br><span class="line">    &quot;hex&quot; : &quot;01000000010000000000000000000000000000000000000000000000000000000000000000ffffffff070439f3001b0134ffffffff014034152a010000004341045b3aaa284d169c5ae2d20d0b0673468ed3506aa8fea5976eacaf1ff304456f6522fbce1a646a24005b8b8e771a671f564ca6c03e484a1c394bf96e2a4ad01dceac00000000&quot;,</span><br><span class="line">    &quot;txid&quot; : &quot;be8f08d7f519eb863a68cf292ca51dbab7c9b49f50a96d13f2db32e432db363e&quot;,</span><br><span class="line">    &quot;version&quot; : 1,</span><br><span class="line">    &quot;locktime&quot; : 0,</span><br><span class="line">    &quot;vin&quot; : [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;coinbase&quot; : &quot;0439f3001b0134&quot;,</span><br><span class="line">            &quot;sequence&quot; : 4294967295</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    &quot;vout&quot; : [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;value&quot; : 50.01000000,</span><br><span class="line">            &quot;n&quot; : 0,</span><br><span class="line">            &quot;scriptPubKey&quot; : &#123;</span><br><span class="line">                &quot;asm&quot; : &quot;045b3aaa284d169c5ae2d20d0b0673468ed3506aa8fea5976eacaf1ff304456f6522fbce1a646a24005b8b8e771a671f564ca6c03e484a1c394bf96e2a4ad01dce OP_CHECKSIG&quot;,</span><br><span class="line">                &quot;hex&quot; : &quot;41045b3aaa284d169c5ae2d20d0b0673468ed3506aa8fea5976eacaf1ff304456f6522fbce1a646a24005b8b8e771a671f564ca6c03e484a1c394bf96e2a4ad01dceac&quot;,</span><br><span class="line">                &quot;reqSigs&quot; : 1,</span><br><span class="line">                &quot;type&quot; : &quot;pubkey&quot;,</span><br><span class="line">                &quot;addresses&quot; : [</span><br><span class="line">                    &quot;1LgZTvoTJ6quJNCURmBUaJJkWWQZXkQnDn&quot;</span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    &quot;blockhash&quot; : &quot;0000000000007c639f2cbb23e4606a1d022fa4206353b9d92e99f5144bd74611&quot;,</span><br><span class="line">    &quot;confirmations&quot; : 145029,</span><br><span class="line">    &quot;time&quot; : 1301705313,</span><br><span class="line">    &quot;blocktime&quot; : 1301705313</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Generation TX的输入不是一个交易，而带有<code>coinbase</code>字段的结构。该字段的值由挖出此Block的人填写，这是一种“特权”：可以把信息写入货币系统（大家很喜欢用系统中的数据结构字段名来命名站点，例如blockchain、coinbase等，这些词的各种后缀域名都被抢注一空）。中本聪在比特币的第一个交易中的写入的<code>coinbase</code>值是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&quot;coinbase&quot;:&quot;04ffff001d0104455468652054696d65732030332f4a616e2f32303039204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e64206261696c6f757420666f722062616e6b73&quot;</span><br></pre></td></tr></table></figure>
+<p>将该段16进制转换为ASCII字符，就是那段著名的创世块留言：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The Times 03/Jan/2009 Chancellor on brink of second bailout for banks</span><br></pre></td></tr></table></figure>
+<p>接下来展示的是一个三个输入、两个输出的普通交易：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"># ~  bitcoind getrawtransaction 028cfae228f8a4b0caee9c566bd41aed36bcd237cdc0eb18f0331d1e87111743 1</span><br><span class="line">&#123;</span><br><span class="line">    &quot;hex&quot; : &quot;0100000003c9f3b07ebfca68fd1a6339d0808fbb013c90c6095fc93901ea77410103489ab7000000008a473044022055bac1856ecbc377dd5e869b1a84ed1d5228c987b098c095030c12431a4d5249022055523130a9d0af5fc27828aba43b464ecb1991172ba2a509b5fbd6cac97ff3af0141048aefd78bba80e2d1686225b755dacea890c9ca1be10ec98173d7d5f2fefbbf881a6e918f3b051f8aaaa3fcc18bbf65097ce8d30d5a7e5ef8d1005eaafd4b3fbeffffffffc9f3b07ebfca68fd1a6339d0808fbb013c90c6095fc93901ea77410103489ab7010000008a47304402206b993231adec55e6085e75f7dc5ca6c19e42e744cd60abaff957b1c352b3ef9a022022a22fec37dfa2c646c78d9a0753d56cb4393e8d0b22dc580ef1aa6cccef208d0141042ff65bd6b3ef04253225405ccc3ab2dd926ff2ee48aac210819698440f35d785ec3cec92a51330eb0c76cf49e9e474fb9159ab41653a9c1725c031449d31026affffffffc98620a6c40fc7b3a506ad79af339541762facd1dd80ff0881d773fb72b230da010000008b483045022040a5d957e087ed61e80f1110bcaf4901b5317c257711a6cbc54d6b98b6a8563f02210081e3697031fe82774b8f44dd3660901e61ac5a99bff2d0efc83ad261da5b4f1d014104a7d1a57e650613d3414ebd59e3192229dc09d3613e547bdd1f83435cc4ca0a11c679d96456cae75b1f5563728ec7da1c1f42606db15bf554dbe8a829f3a8fe2fffffffff0200bd0105000000001976a914634228c26cf40a02a05db93f2f98b768a8e0e61b88acc096c7a6030000001976a9147514080ab2fcac0764de3a77d10cb790c71c74c288ac00000000&quot;,</span><br><span class="line">    &quot;txid&quot; : &quot;028cfae228f8a4b0caee9c566bd41aed36bcd237cdc0eb18f0331d1e87111743&quot;,</span><br><span class="line">    &quot;version&quot; : 1,</span><br><span class="line">    &quot;locktime&quot; : 0,</span><br><span class="line">    &quot;vin&quot; : [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;txid&quot; : &quot;b79a4803014177ea0139c95f09c6903c01bb8f80d039631afd68cabf7eb0f3c9&quot;,</span><br><span class="line">            &quot;vout&quot; : 0,</span><br><span class="line">            &quot;scriptSig&quot; : &#123;</span><br><span class="line">                &quot;asm&quot; : &quot;3044022055bac1856ecbc377dd5e869b1a84ed1d5228c987b098c095030c12431a4d5249022055523130a9d0af5fc27828aba43b464ecb1991172ba2a509b5fbd6cac97ff3af01 048aefd78bba80e2d1686225b755dacea890c9ca1be10ec98173d7d5f2fefbbf881a6e918f3b051f8aaaa3fcc18bbf65097ce8d30d5a7e5ef8d1005eaafd4b3fbe&quot;,</span><br><span class="line">                &quot;hex&quot; : &quot;473044022055bac1856ecbc377dd5e869b1a84ed1d5228c987b098c095030c12431a4d5249022055523130a9d0af5fc27828aba43b464ecb1991172ba2a509b5fbd6cac97ff3af0141048aefd78bba80e2d1686225b755dacea890c9ca1be10ec98173d7d5f2fefbbf881a6e918f3b051f8aaaa3fcc18bbf65097ce8d30d5a7e5ef8d1005eaafd4b3fbe&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;sequence&quot; : 4294967295</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;txid&quot; : &quot;b79a4803014177ea0139c95f09c6903c01bb8f80d039631afd68cabf7eb0f3c9&quot;,</span><br><span class="line">            &quot;vout&quot; : 1,</span><br><span class="line">            &quot;scriptSig&quot; : &#123;</span><br><span class="line">                &quot;asm&quot; : &quot;304402206b993231adec55e6085e75f7dc5ca6c19e42e744cd60abaff957b1c352b3ef9a022022a22fec37dfa2c646c78d9a0753d56cb4393e8d0b22dc580ef1aa6cccef208d01 042ff65bd6b3ef04253225405ccc3ab2dd926ff2ee48aac210819698440f35d785ec3cec92a51330eb0c76cf49e9e474fb9159ab41653a9c1725c031449d31026a&quot;,</span><br><span class="line">                &quot;hex&quot; : &quot;47304402206b993231adec55e6085e75f7dc5ca6c19e42e744cd60abaff957b1c352b3ef9a022022a22fec37dfa2c646c78d9a0753d56cb4393e8d0b22dc580ef1aa6cccef208d0141042ff65bd6b3ef04253225405ccc3ab2dd926ff2ee48aac210819698440f35d785ec3cec92a51330eb0c76cf49e9e474fb9159ab41653a9c1725c031449d31026a&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;sequence&quot; : 4294967295</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;txid&quot; : &quot;da30b272fb73d78108ff80ddd1ac2f76419533af79ad06a5b3c70fc4a62086c9&quot;,</span><br><span class="line">            &quot;vout&quot; : 1,</span><br><span class="line">            &quot;scriptSig&quot; : &#123;</span><br><span class="line">                &quot;asm&quot; : &quot;3045022040a5d957e087ed61e80f1110bcaf4901b5317c257711a6cbc54d6b98b6a8563f02210081e3697031fe82774b8f44dd3660901e61ac5a99bff2d0efc83ad261da5b4f1d01 04a7d1a57e650613d3414ebd59e3192229dc09d3613e547bdd1f83435cc4ca0a11c679d96456cae75b1f5563728ec7da1c1f42606db15bf554dbe8a829f3a8fe2f&quot;,</span><br><span class="line">                &quot;hex&quot; : &quot;483045022040a5d957e087ed61e80f1110bcaf4901b5317c257711a6cbc54d6b98b6a8563f02210081e3697031fe82774b8f44dd3660901e61ac5a99bff2d0efc83ad261da5b4f1d014104a7d1a57e650613d3414ebd59e3192229dc09d3613e547bdd1f83435cc4ca0a11c679d96456cae75b1f5563728ec7da1c1f42606db15bf554dbe8a829f3a8fe2f&quot;</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;sequence&quot; : 4294967295</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    &quot;vout&quot; : [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;value&quot; : 0.84000000,</span><br><span class="line">            &quot;n&quot; : 0,</span><br><span class="line">            &quot;scriptPubKey&quot; : &#123;</span><br><span class="line">                &quot;asm&quot; : &quot;OP_DUP OP_HASH160 634228c26cf40a02a05db93f2f98b768a8e0e61b OP_EQUALVERIFY OP_CHECKSIG&quot;,</span><br><span class="line">                &quot;hex&quot; : &quot;76a914634228c26cf40a02a05db93f2f98b768a8e0e61b88ac&quot;,</span><br><span class="line">                &quot;reqSigs&quot; : 1,</span><br><span class="line">                &quot;type&quot; : &quot;pubkeyhash&quot;,</span><br><span class="line">                &quot;addresses&quot; : [</span><br><span class="line">                    &quot;1A3q9pDtR4h8wpvyb8SVpiNPpT8ZNbHY8h&quot;</span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;value&quot; : 156.83000000,</span><br><span class="line">            &quot;n&quot; : 1,</span><br><span class="line">            &quot;scriptPubKey&quot; : &#123;</span><br><span class="line">                &quot;asm&quot; : &quot;OP_DUP OP_HASH160 7514080ab2fcac0764de3a77d10cb790c71c74c2 OP_EQUALVERIFY OP_CHECKSIG&quot;,</span><br><span class="line">                &quot;hex&quot; : &quot;76a9147514080ab2fcac0764de3a77d10cb790c71c74c288ac&quot;,</span><br><span class="line">                &quot;reqSigs&quot; : 1,</span><br><span class="line">                &quot;type&quot; : &quot;pubkeyhash&quot;,</span><br><span class="line">                &quot;addresses&quot; : [</span><br><span class="line">                    &quot;1Bg44FZsoTeYteRykC1XHz8facWYKhGvQ8&quot;</span><br><span class="line">                ]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ],</span><br><span class="line">    &quot;blockhash&quot; : &quot;0000000000007c639f2cbb23e4606a1d022fa4206353b9d92e99f5144bd74611&quot;,</span><br><span class="line">    &quot;confirmations&quot; : 147751,</span><br><span class="line">    &quot;time&quot; : 1301705313,</span><br><span class="line">    &quot;blocktime&quot; : 1301705313</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>字段<code>hex</code>记录了所有相关信息，后面显示的是<code>hex</code>解析出来的各类字段信息。下面把逐个分解<code>hex</code>内容（hex可以从上面的直接看到）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">01000000   // 版本号，UINT32</span><br><span class="line">03         // Tx输入数量，变长INT。3个输入。</span><br><span class="line"></span><br><span class="line">/*** 第一组Input Tx ***/</span><br><span class="line">// Tx Hash，固定32字节</span><br><span class="line">c9f3b07ebfca68fd1a6339d0808fbb013c90c6095fc93901ea77410103489ab7</span><br><span class="line">00000000  // 消费的Tx位于前向交易输出的第0个，UINT32，固定4字节</span><br><span class="line">8a        // 签名的长度, 0x8A = 138字节</span><br><span class="line">// 138字节长度的签名，含有两个部分：公钥+签名</span><br><span class="line">47       // 签名长度，0x47 = 71字节</span><br><span class="line">3044022055bac1856ecbc377dd5e869b1a84ed1d5228c987b098c095030c12431a4d5249022055523130a9d0af5fc27828aba43b464ecb1991172ba2a509b5fbd6cac97ff3af01</span><br><span class="line">41       // 公钥长度，0x41 = 65字节</span><br><span class="line">048aefd78bba80e2d1686225b755dacea890c9ca1be10ec98173d7d5f2fefbbf881a6e918f3b051f8aaaa3fcc18bbf65097ce8d30d5a7e5ef8d1005eaafd4b3fbe</span><br><span class="line">ffffffff  // sequence，0xffffffff = 4294967295， UINT32, 固定4字节</span><br><span class="line"></span><br><span class="line">/*** 第二组Input Tx。与上同理，省略分解 ***/</span><br><span class="line">c9f3b07ebfca68fd1a6339d0808fbb013c90c6095fc93901ea77410103489ab7010000008a47304402206b993231adec55e6085e75f7dc5ca6c19e42e744cd60abaff957b1c352b3ef9a022022a22fec37dfa2c646c78d9a0753d56cb4393e8d0b22dc580ef1aa6cccef208d0141042ff65bd6b3ef04253225405ccc3ab2dd926ff2ee48aac210819698440f35d785ec3cec92a51330eb0c76cf49e9e474fb9159ab41653a9c1725c031449d31026affffffff</span><br><span class="line"></span><br><span class="line">/*** 第三组Input Tx ***/</span><br><span class="line">c98620a6c40fc7b3a506ad79af339541762facd1dd80ff0881d773fb72b230da010000008b483045022040a5d957e087ed61e80f1110bcaf4901b5317c257711a6cbc54d6b98b6a8563f02210081e3697031fe82774b8f44dd3660901e61ac5a99bff2d0efc83ad261da5b4f1d014104a7d1a57e650613d3414ebd59e3192229dc09d3613e547bdd1f83435cc4ca0a11c679d96456cae75b1f5563728ec7da1c1f42606db15bf554dbe8a829f3a8fe2fffffffff</span><br><span class="line"></span><br><span class="line">02  // Tx输出数量，变长INT。两个输出。</span><br><span class="line"></span><br><span class="line">/*** 第一组输出 ***/</span><br><span class="line">00bd010500000000    // 输出的币值，UINT64，8个字节。字节序需翻转，~= 0x000000000501bd00 = 84000000 satoshi</span><br><span class="line">19                  // 输出目的地址字节数, 0x19 = 25字节，由一些操作码与数值构成</span><br><span class="line">// 目标地址</span><br><span class="line">// 0x76 -&gt; OP_DUP(stack ops)</span><br><span class="line">// 0xa9 -&gt; OP_HASH160(crypto)</span><br><span class="line">// 0x14 -&gt; 长度，0x14 = 20字节</span><br><span class="line">76 a9 14 </span><br><span class="line">// 地址的HASH160值，20字节</span><br><span class="line">634228c26cf40a02a05db93f2f98b768a8e0e61b </span><br><span class="line">// 0x88 -&gt; OP_EQUALVERIFY(bit logic)</span><br><span class="line">// 0xac -&gt; OP_CHECKSIG(crypto)</span><br><span class="line">88 ac</span><br><span class="line"></span><br><span class="line">/*** 第二组输出 ***/</span><br><span class="line">c096c7a603000000</span><br><span class="line">19</span><br><span class="line">76 a9 14 7514080ab2fcac0764de3a77d10cb790c71c74c2 88 ac</span><br><span class="line"></span><br><span class="line">00000000  // lock_time，UINT32，固定4字节</span><br></pre></td></tr></table></figure>
+<p>Tx Hash，俗称交易ID，由<code>hex</code>得出：<code>Tx Hash = SHA256(SHA256(hex))</code>。由于每个交易只能成为下一个的输入，有且仅有一次，那么不存在输入完全相同的交易，那么就不存在相同的Tx Hash（SHA256碰撞概率极小，所以无需考虑Hash碰撞的问题，就像无需考虑地址私钥被别人撞到一样）。</p>
+<p>即便如此，在系统里依然产生了相同的Tx Hash，是某位矿工兄弟挖出Block后，打包Block时忘记修改Generation Tx coinbase字段的值，币量相同且输出至相同的地址，那么就构造了两个完全一模一样的交易，分别位于两个Block的第一个位置。这个对系统不会产生什么问题，但只要花费其中一笔，另一个也被花费了。相同的Generation Tx相当于覆盖了另一个，白白损失了挖出的币。该交易ID为<a href="https://blockchain.info/tx/e3bf3d07d4b0375638d5f1db5255fe07ba2c4cb067cd81b84ee974b6585fb468" title="e3bf3d07d4b0375638d5f1db5255fe07ba2c4cb067cd81b84ee974b6585fb468" target="_blank" rel="noopener">e3bf3d07d4b0375638d5f1db5255fe07ba2c4cb067cd81b84ee974b6585fb468</a>，第一次出现在<a href="https://blockchain.info/block/00000000000271a2dc26e7667f8419f2e15416dc6955e5a6c6cdf3f2574dd08e" target="_blank" rel="noopener">#91722</a>，第二次出现在<a href="https://blockchain.info/block/00000000000743f190a18c5577a3c2d2a1f610ae9601ac046a38084ccb7cd721" target="_blank" rel="noopener">#91880</a>。</p>
+<p><img src="https://f.cloud.github.com/assets/514951/1415138/b01dc7da-3edf-11e3-86eb-d015037e9440.png" alt="qq20131027-2"></p>
+<h2 id="交易签名"><a href="#交易签名" class="headerlink" title="交易签名"></a>交易签名</h2><p>签名是对所有权的验证，节点收到交易广播后，会对交易进行验证，通过后则收录进内存、打包进Block，否则，丢弃之。签名就类似传统纸质合同盖章、签字过程，合法转移所有权的保证手段。</p>
+<h3 id="签名类型"><a href="#签名类型" class="headerlink" title="签名类型"></a>签名类型</h3><p>由于一个交易的输入、输出都可能具有多个，那么签名也具有多种类型，目前共三类：SIGHASH_ALL, SIGHASH_NONE, SIGHASH_SINGLE。</p>
+<h4 id="SIGHASH-ALL"><a href="#SIGHASH-ALL" class="headerlink" title="SIGHASH_ALL"></a>SIGHASH_ALL</h4><p>该签名类型为默认类型，也是目前绝大部分交易采用的，顾名思义即签名整单交易。首先，组织所有输出、输入，就像上文分解Hex过程一样，每个输入都对应一个签名，暂时留空，其他包括sequence等字段均须填写，这样就形成了一个完整的交易Hex（只缺签名字段）。然后，每一个输入均需使用私钥对该段数据进行签名，签名完成后各自填入相应的位置，N个输入N个签名。简单理解就是：对于该笔单子，认可且只认可的这些输入、输出，并同意花费我的那笔输入。</p>
+<h4 id="SIGHASH-NONE"><a href="#SIGHASH-NONE" class="headerlink" title="SIGHASH_NONE"></a>SIGHASH_NONE</h4><p>该签名类型是最自由松散的，仅对输入签名，不对输出签名，输出可以任意指定。某人对某笔币签名后交给你，你可以在任意时刻填入任意接受地址，广播出去令其生效。简单理解就是：我同意花费我的那笔钱，至于给谁，我不关心。</p>
+<h4 id="SIGHASH-SINGLE"><a href="#SIGHASH-SINGLE" class="headerlink" title="SIGHASH_SINGLE"></a>SIGHASH_SINGLE</h4><p>该签名类型其次自由松散，仅对自己的输入、输出签名，并留空sequence字段。其输入的次序对应其输出的次序，比如输入是第3个，那么签名的输出也是第三个。简单理解就是：我同意花费我的那笔钱，且只能花费到我认可的输出，至于单子里的其他输入、输出，我不关心。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://blog.biqu.io/2013/10/27/bitcoin-transaction-01/" data-id="cjf6ypzo30005ut00xhfnpogu" class="article-share-link">Share</a>
+      
+        <a href="http://blog.biqu.io/2013/10/27/bitcoin-transaction-01/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-timestamp-system-and-proof-of-existance" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/08/12/timestamp-system-and-proof-of-existance/" class="article-date">
+  <time datetime="2013-08-12T14:53:00.000Z" itemprop="datePublished">Aug 12 2013</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/08/12/timestamp-system-and-proof-of-existance/">时间戳服务与存在证明</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="存在证明"><a href="#存在证明" class="headerlink" title="存在证明"></a>存在证明</h3><p>存在证明就是向第三方证明某个物品/事件，在过去的某个时刻存在过。</p>
+<p>这是一件很简单的事情，提供票据、通信记录之类的就可以办到。但这些并不严格，因为这些证据都是非常易伪造或销毁。要完成证明，必须依赖强有力的证据链，这个必须是任何人都无法伪造与销毁的，或者说伪造成本极其高昂近乎不可能。</p>
+<p>回忆一下，电影里经常出现的绑匪镜头，他们为了证明在某个时间确实拥有人质，而不是事前拍摄的视频，通常会用当天的发行量很大的报纸来辅助证明。当香港媒体误报“成龙高楼坠亡”时，成龙也不得不拿报纸来证明自己的存在：</p>
+<p><img src="https://f.cloud.github.com/assets/514951/906787/0f6c4fcc-fcdc-11e2-8770-b72819e92915.jpg" alt="124897097_11n"></p>
+<p>报纸之所以能够成为有效的时间证明系统是因为：</p>
+<ol>
+<li>不可伪造性。新闻等信息是无法预测的，尤其是证券大盘数据，报纸上大量充满这样的信息，所以无人能够提前伪造。</li>
+<li>公开且不可销毁。报纸通常拥有很大的发行数量，受众广泛，一旦发布出去就分散到各个角落，很难再次收集齐全并全部销毁。通常图书馆也会存档数十年期限的报纸。</li>
+<li>具有时间特征。报纸具有很强时间特征，版面到处可见的是时间标记。</li>
+</ol>
+<p>借助报纸可以完成某个时间之后的存在证明，但无法完成某个时间之前的。例如，你拿9月1号的报纸拍摄进照片，那么仅能证明其在9月1号之后拍摄，可能是9月1号，也可能是9月15号。</p>
+<h3 id="时间戳服务"><a href="#时间戳服务" class="headerlink" title="时间戳服务"></a>时间戳服务</h3><p><code>比特币本质是构造了一个永不停息、无坚不摧的时间戳系统</code>。</p>
+<p><img src="https://f.cloud.github.com/assets/514951/906809/5281de94-fce1-11e2-83be-e80533cae1e9.png" alt="qq20130804-9"></p>
+<p>然后该系统上添加若干特性后使得具有货币的功能。报纸从另一个角度讲也是一种时间戳服务。</p>
+<p>比特币具有下列优良的特性可以更完美的用于存在证明：</p>
+<ul>
+<li>不可预测/伪造。因block的计算是随机事件，其hash值是一个32字节的随机大数(2^256)。想蒙对该数的概率实在是太低了。</li>
+<li>不可销毁/修改。Block Chain拥有巨大的算力在维护与延续，对于N个确认的block，想篡改是不可能的。</li>
+<li>block具有天然时间特性。timestamp是block meta字段之一。</li>
+<li>block可以存储信息。对于block meta信息，是无法控制的。但block会收录交易，而交易是可以”写入”自己的数据。</li>
+</ul>
+<h3 id="数字摘要"><a href="#数字摘要" class="headerlink" title="数字摘要"></a>数字摘要</h3><p>简单来说，对一串数据进行Hash运算，得到的Hash值称为数字摘要。除了Hash函数，还有其他方式，如密钥签名等也可以得到。Hash值通常是一个非常巨大的数，例如用SHA256时，Hash值区间非常大：1~2^256。数字摘要的计算过程不可逆，那么可以认为：</p>
+<pre><code>欲证明你拥有某个文件，提供该文件的Hash值（及Hash函数）即可。第三方可以轻易验证文件的Hash值来判断之。
+</code></pre><h3 id="比特币做存在证明"><a href="#比特币做存在证明" class="headerlink" title="比特币做存在证明"></a>比特币做存在证明</h3><h4 id="时间点后向证明"><a href="#时间点后向证明" class="headerlink" title="时间点后向证明"></a>时间点后向证明</h4><p>因为block hash的不可伪造性，能提供Block Hash即可证明存在于该Block时刻之后。例如，你在拍照的时候，拿着打印有block hash的纸即可证明：你在该block时刻之后进行的拍摄。</p>
+<h4 id="时间点前向证明"><a href="#时间点前向证明" class="headerlink" title="时间点前向证明"></a>时间点前向证明</h4><p>前向证明需要精心构造一个包含数字摘要的交易，待该交易进入block中。便可以证明你在该block时刻之前拥有该数字摘要。<code>前向证明的关键是能把信息写入时间戳服务载体</code>。</p>
+<h4 id="时间区间证明"><a href="#时间区间证明" class="headerlink" title="时间区间证明"></a>时间区间证明</h4><p>有时候，仅仅证明时间点之前或之后是不够的，需要能够确认到某一个时刻。将上述方式综合即可完成：</p>
+<ol>
+<li>将block A的hash值添入数据文件，并制作文件数字摘要。（时间点后向证明）</li>
+<li>将摘要信息构造至交易中，广播之。（时间点前向证明）</li>
+<li>当交易被block B收录进去，那么即可证明，该文件于block A与B的时间间隔中存在。</li>
+</ol>
+<p>如果交易给了足够的矿工费(Transaction Fee)，具有较高优先级的话，便很有可能被紧随其后的block收录。连续的block约10分钟，那么就在一个相对小的时间内作了证明，可以近似认为是时间点。</p>
+<h3 id="构造特殊交易"><a href="#构造特殊交易" class="headerlink" title="构造特殊交易"></a>构造特殊交易</h3><p>带有数字摘要的交易如何构造呢？下面以32字节的数字摘要为例，提出数个可行方法，其他长度的可变换得出。</p>
+<h4 id="方式一：交易额承载信息"><a href="#方式一：交易额承载信息" class="headerlink" title="方式一：交易额承载信息"></a>方式一：交易额承载信息</h4><p>32字节可以分割为16个双字节，每个双字节的数值范围是：0~65535。比特币的现行单位可以分割至小数点后八位，那么我们可以利用最后的5位来存放一个数值，一共需要16个输出(Tx output)即可完成32字节的信息存储。中间涉及比特币最大数量为: </p>
+<pre><code>.00065535 * 16 = .0104856 btc
+</code></pre><p>需要的比特币数量很少，约0.01Btc，且输出依然发回给自己的地址，唯一的代价就是付出矿工费(Tx Fee)。任何人都可以使用之。</p>
+<h5 id="SatoshiDice种子文件时间证明"><a href="#SatoshiDice种子文件时间证明" class="headerlink" title="SatoshiDice种子文件时间证明"></a>SatoshiDice种子文件时间证明</h5><p>著名站点SatoshiDice就是采用这种方式为其服务端种子文件做时间前向证明的。下面演示一下步骤。服务端的种子文件为<code>hash.keys</code>，我们对其做SHA256运算，得到hash值，32个字节。</p>
+<pre><code>$ sha256sum hash.keys
+# hash of file &quot;hash.keys&quot;, in hex:
+9b0d87ac871518cfd8601aa456b58fa74c01194cfeb25e7f3eecf43759d6ccb4  hash.keys
+</code></pre><p>将该hash转为16个10进制数值：</p>
+<pre><code>9b0d = 39693
+87ac = 34732
+8715 = 34581
+18cf = 6351
+d860 = 55392
+1aa4 = 6820
+56b5 = 22197
+8fa7 = 36775
+4c01 = 19457
+194c = 6476
+feb2 = 65202
+5e7f = 24191
+3eec = 16108
+f437 = 62519
+59d6 = 22998
+ccb4 = 52404
+</code></pre><p>将这16个数除以10^8，作为输出额度，构造<a href="http://blockchain.info/tx/428bcc630b00fe431623b4e1fb0f726493dc0a2ead86ace9f65cd51bc8092459" target="_blank" rel="noopener">交易</a>：</p>
+<p><img src="https://f.cloud.github.com/assets/514951/947402/555dc5de-0352-11e3-8cf9-c7d8de72adbe.png" alt="qq20130812-2"></p>
+<p>交易被收录，证明完成。</p>
+<h4 id="方式二：数字摘要的Hash作地址输入"><a href="#方式二：数字摘要的Hash作地址输入" class="headerlink" title="方式二：数字摘要的Hash作地址输入"></a>方式二：数字摘要的Hash作地址输入</h4><p>回顾一下地址的生成算法（下图是一个未压缩公钥生成地址的过程，公钥是否压缩对该证明过程没有影响）：</p>
+<p><img src="https://f.cloud.github.com/assets/514951/947559/47602d38-0356-11e3-8fa7-ba59e99eee85.png" alt="qq20130812-3"></p>
+<p>我们用数字摘要的Hash值代替图中红色框中的值，然后得到一个地址，我们把0.00000001 btc打入该地址，形成交易，收录后完成证明。验证时，需要首先得到数字摘要hash值，再生成对应的地址，核对地址是否一致即可。</p>
+<p>这个方法有个缺点，打入该地址的币永远消失了，因为没有其对应的私钥。虽然可以只需1聪，目前价值几乎忽略不计，但毕竟浪费了。该方法可以进一步衍生一些类似的方法。曾有个网站使用之，后来该网站关闭了。</p>
+<h4 id="方式三：数字摘要的Hash作私钥"><a href="#方式三：数字摘要的Hash作私钥" class="headerlink" title="方式三：数字摘要的Hash作私钥"></a>方式三：数字摘要的Hash作私钥</h4><p>大小介于<code>1 ~ 0xFFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFE BAAE DCE6 AF48 A03B BFD2 5E8C D036 4141</code>之间的数，都可以认为是一个合法的私钥，其大小为32字节。那么，可以把数字摘要的Hash作私钥，并推算出公钥和地址。</p>
+<p>将任意币值输出至该地址构成交易，交易收录后，通过私钥再转移走即可。这样便在block chain里留下了这个地址。验证时重复该过程，检查地址是否一致即可。</p>
+<p>该方法不会像方法二那样形成浪费，也比较容易操作。我们依然SatoshiDice的种子文件为例，种子数字摘要的Hash为：<code>9b0d87ac871518cfd8601aa456b58fa74c01194cfeb25e7f3eecf43759d6ccb4</code>。</p>
+<p>借助<a href="https://www.bitaddress.org/" target="_blank" rel="noopener">bitaddress.org</a>，输入私钥（种子hash）后：</p>
+<p><img src="https://f.cloud.github.com/assets/514951/947730/30cc9c38-035a-11e3-98da-590a87880173.png" alt="qq20130812-5"></p>
+<p>得到两把公钥，分别对应两个地址。证明时将币打入任何一个地址即可，建议使用未压缩公钥地址，因为并不是所有客户端都对压缩公钥支持良好。然后将该私钥导入任何一个客户端，再把该地址的钱转移到一个安全的地方。最后，公开私钥和对应收录地址的交易。</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>方法二浪费，应避免使用。方法一繁琐，需要工具辅助转换。方法三相对容易，门槛低一些，大部分客户端都支持，私钥公钥地址的推导也有很多工具支持。</p>
+<p>就这样比特币系统轻松的完成了存在证明，安全稳固，公信力远胜任何第三方、机构、政府。过程极其简单，使得任何一人都可以轻易地做出存在证明，其意义非常重大。可以预见，未来将比特币作为存在证明会得到广泛的应用。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://blog.biqu.io/2013/08/12/timestamp-system-and-proof-of-existance/" data-id="cjf6ypzo20004ut00l4z36rzd" class="article-share-link">Share</a>
+      
+        <a href="http://blog.biqu.io/2013/08/12/timestamp-system-and-proof-of-existance/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-proof-of-work-and-mining" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/08/03/proof-of-work-and-mining/" class="article-date">
+  <time datetime="2013-08-03T12:01:00.000Z" itemprop="datePublished">Aug 3 2013</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/08/03/proof-of-work-and-mining/">工作证明与挖矿</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="工作证明"><a href="#工作证明" class="headerlink" title="工作证明"></a>工作证明</h3><p>工作证明(Proof Of Work，简称POW)，顾名思义，即工作量的证明。通常来说只能从结果证明，因为监测工作过程通常是繁琐与低效的。</p>
+<p>比特币在Block的生成过程中使用了POW机制，一个符合要求的Block Hash由N个前导零构成，零的个数取决于网络的难度值。要得到合理的Block Hash需要经过大量尝试计算，计算时间取决于机器的哈希运算速度。当某个节点提供出一个合理的Block Hash值，说明该节点确实经过了大量的尝试计算，当然，并不能得出计算次数的绝对值，因为寻找合理hash是一个概率事件。当节点拥有占全网n%的算力时，该节点即有n/100的概率找到Block Hash。</p>
+<p>工作证明机制看似很神秘，其实在社会中的应用非常广泛。例如，毕业证、学位证等证书，就是工作证明，拥有证书即表明你在过去投入了学习与工作。生活大部分事情都是通过结果来判断的。</p>
+<h3 id="挖矿"><a href="#挖矿" class="headerlink" title="挖矿"></a>挖矿</h3><p>挖矿即不断接入新的Block延续Block Chain的过程。</p>
+<p><img src="https://f.cloud.github.com/assets/514951/886819/d2df8f62-f9f0-11e2-93da-4f66e3093c33.png" alt="blockchain"></p>
+<p>挖矿为整个系统的运转提供原动力，是比特币的发动机，<code>没有挖矿就没有比特币</code>。挖矿有三个重要功能：</p>
+<ol>
+<li>发行新的货币（总量达到之前）</li>
+<li>维系货币的支付功能</li>
+<li>通过算力保障系统安全</li>
+</ol>
+<p>金矿消耗资源将黄金注入流通经济，比特币通过“挖矿”完成相同的事情，只不过消耗的是CPU时间与电力。当然，比特币的挖矿意义远大于此。</p>
+<h4 id="Block-Hash算法"><a href="#Block-Hash算法" class="headerlink" title="Block Hash算法"></a>Block Hash算法</h4><p>Block头部信息的构成：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">字段名</th>
+<th>含义</th>
+<th style="text-align:center">大小(字节)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Version</td>
+<td>版本号</td>
+<td style="text-align:center">4</td>
+</tr>
+<tr>
+<td style="text-align:left">hashPrevBlock</td>
+<td>上一个block hash值</td>
+<td style="text-align:center">32 </td>
+</tr>
+<tr>
+<td style="text-align:left">hashMerkleRoot</td>
+<td>上一个block产生之后至新block生成此时间内，<br>交易数据打包形成的Hash</td>
+<td style="text-align:center">32</td>
+</tr>
+<tr>
+<td style="text-align:left">Time</td>
+<td>Unix时间戳</td>
+<td style="text-align:center">4</td>
+</tr>
+<tr>
+<td style="text-align:left">Bits</td>
+<td>目标值，即难度</td>
+<td style="text-align:center">4</td>
+</tr>
+<tr>
+<td style="text-align:left">Nonce</td>
+<td>随机数</td>
+<td style="text-align:center">4</td>
+</tr>
+</tbody>
+</table>
+<p>下面采用高度为<a href="http://blockexplorer.com/rawblock/00000000000000001e8d6829a8a21adc5d38d0a473b144b6765798e61f98bd1d" target="_blank" rel="noopener">125552</a>的block数据为例，演示block hash的计算过程：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span>                                                                                                                             </span><br><span class="line">$header_hex = <span class="string">"01000000"</span> . <span class="comment">// version</span></span><br><span class="line">              <span class="comment">// previous block hash</span></span><br><span class="line">              <span class="string">"81cd02ab7e569e8bcd9317e2fe99f2de44d49ab2b8851ba4a308000000000000"</span> .</span><br><span class="line">              <span class="comment">// merkle root hash of transactions in this block</span></span><br><span class="line">              <span class="string">"e320b6c2fffc8d750423db8b1eb942ae710e951ed797f7affc8892b0f1fc122b"</span> .</span><br><span class="line">              <span class="comment">// Time</span></span><br><span class="line">              <span class="string">"c7f5d74d"</span> .</span><br><span class="line">              <span class="comment">// Bits (Difficulty)</span></span><br><span class="line">              <span class="string">"f2b9441a"</span> .</span><br><span class="line">              <span class="comment">// Nonce</span></span><br><span class="line">              <span class="string">"42a14695"</span>;</span><br><span class="line">$header_bin = pack(<span class="string">"H*"</span>, $header_hex);  <span class="comment">// hex to bin</span></span><br><span class="line">$h = hash(<span class="string">'sha256'</span>, hash(<span class="string">'sha256'</span>, $header_bin, <span class="keyword">true</span>), <span class="keyword">true</span>);  <span class="comment">// double sha256</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> bin2hex($h), <span class="string">"\n"</span>;</span><br><span class="line"><span class="comment">// output: 1dbd981fe6985776b644b173a4d0385ddc1aa2a829688d1e0000000000000000</span></span><br><span class="line"><span class="keyword">echo</span> bin2hex(strrev($h)), <span class="string">"\n"</span>;</span><br><span class="line"><span class="comment">// output: 00000000000000001e8d6829a8a21adc5d38d0a473b144b6765798e61f98bd1d</span></span><br></pre></td></tr></table></figure>
+<p>该计算过程简单明了：首先将数个字段合并成一块数据，然后对这块数据进行双SHA256运算。</p>
+<h4 id="产量调节"><a href="#产量调节" class="headerlink" title="产量调节"></a>产量调节</h4><p>Block的产量为大约每两周2016个，即每10分钟一块。该规则在每个节点的代码里都固定了。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 目标时间窗口长度：两周</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> int64 nTargetTimespan = <span class="number">14</span> * <span class="number">24</span> * <span class="number">60</span> * <span class="number">60</span>;</span><br><span class="line"><span class="comment">// block频率，每10分钟一块</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> int64 nTargetSpacing  = <span class="number">10</span> * <span class="number">60</span>;</span><br><span class="line"><span class="comment">// 每两周的产量2016，也是调节周期</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> int64 nInterval       = nTargetTimespan / nTargetSpacing;</span><br></pre></td></tr></table></figure>
+<p>但由于实际算力总是不断变化的（目前一直是快速上升的），所以需根据最近2016个块的耗费时间来调整难度值，维持每10分钟一个block的频率.</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Only change once per interval</span></span><br><span class="line"><span class="keyword">if</span> ((pindexLast-&gt;nHeight+<span class="number">1</span>) % nInterval != <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="comment">// 未达到周期个数，无需调节</span></span><br><span class="line">    <span class="keyword">return</span> pindexLast-&gt;nBits;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Go back by what we want to be 14 days worth of blocks</span></span><br><span class="line"><span class="keyword">const</span> CBlockIndex* pindexFirst = pindexLast;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; pindexFirst &amp;&amp; i &lt; nInterval<span class="number">-1</span>; i++)</span><br><span class="line">    pindexFirst = pindexFirst-&gt;pprev;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算本次2016个块的实际产生时间</span></span><br><span class="line"><span class="comment">// Limit adjustment step</span></span><br><span class="line">int64 nActualTimespan = pindexLast-&gt;GetBlockTime() - pindexFirst-&gt;GetBlockTime();</span><br><span class="line"><span class="comment">// 限定幅度，最低为1/4，最高为4倍</span></span><br><span class="line"><span class="keyword">if</span> (nActualTimespan &lt; nTargetTimespan/<span class="number">4</span>)</span><br><span class="line">    nActualTimespan = nTargetTimespan/<span class="number">4</span>;</span><br><span class="line"><span class="keyword">if</span> (nActualTimespan &gt; nTargetTimespan*<span class="number">4</span>)</span><br><span class="line">    nActualTimespan = nTargetTimespan*<span class="number">4</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据最近2016个块的时间，重新计算目标难度 </span></span><br><span class="line"><span class="comment">// Retarget</span></span><br><span class="line">CBigNum bnNew;</span><br><span class="line">bnNew.SetCompact(pindexLast-&gt;nBits);</span><br><span class="line">bnNew *= nActualTimespan;</span><br><span class="line">bnNew /= nTargetTimespan;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> (bnNew &gt; bnProofOfWorkLimit)</span><br><span class="line">    bnNew = bnProofOfWorkLimit;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">return</span> bnNew.GetCompact();</span><br></pre></td></tr></table></figure>
+<h4 id="Block字段详解"><a href="#Block字段详解" class="headerlink" title="Block字段详解"></a>Block字段详解</h4><ul>
+<li>Version，版本号，很少变动，一般用于软件全网升级时做标识</li>
+<li>hashPrevBlock，前向Block Hash值，该字段强制多个Block之间形成链接</li>
+<li>hashMerkleRoot，交易Hash树的根节点Hash值，起校验作用，保障Block在网络传输过程中的数据一致性，有新交易加入即发生变化</li>
+<li>Time，Unix时间戳，每秒自增一，标记Block的生成时间，同时为block hash探寻引入一个频繁的变动因子</li>
+<li>Bits，可以推算出难度值，用于验证block hash难度是否达标</li>
+<li>Nonce，随机数，在上面数个字段都固定的情况下，不停地更换随机数来探寻</li>
+</ul>
+<p>最为关键的字段是<code>hashPrevBlock</code>，该字段使得Block之间链接起来，形成一个巨大的“链条”。Block本是稀松平常的数据结构，但以链式结构组织起来后却使得它们具有非常深远的意义：</p>
+<ol>
+<li>形成分支博弈，使得算力总是在主分支上角逐</li>
+<li>算力攻击的概率难度呈指数上升（泊松分布）</li>
+</ol>
+<p>每个block都必须指向前一个block，否则无法验证通过。追溯至源头，便是高度为零的创世纪块(Genesis Block)，这里是Block Chain的起点，其前向block hash为零，或者说为空。</p>
+<h4 id="新block诞生过程"><a href="#新block诞生过程" class="headerlink" title="新block诞生过程"></a>新block诞生过程</h4><p>下面是一个简单的步骤描述，实际矿池运作会有区别，复杂一些：</p>
+<ol>
+<li>节点监听全网交易，通过验证的交易进入节点的内存池(Tx Mem Pool)，并更新交易数据的Merkle Hash值</li>
+<li>更新时间戳</li>
+<li>尝试不同的随机数(Nonce)，进行hash计算</li>
+<li>重复该过程至找到合理的hash</li>
+<li>打包block：先装入block meta信息，然后是交易数据</li>
+<li>对外部广播出新block</li>
+<li>其他节点验证通过后，链接至Block Chain，主链高度加一，然后切换至新block后面挖矿</li>
+</ol>
+<p>由于hashPrevBlock字段的存在，使得大家总是在最新的block后面开挖，稍后会分析原因。</p>
+<h4 id="主链分叉"><a href="#主链分叉" class="headerlink" title="主链分叉"></a>主链分叉</h4><p>从block hash算法我们知道，合理的block并不是唯一的，同一高度存在多个block的可能性。那么，当同一个高度出现多个时，主链即出现分叉(Fork)。遇到分叉时，网络会根据下列原则选举出Best Chain：</p>
+<ol>
+<li>不同高度的分支，总是接受最高（即最长）的那条分支</li>
+<li>相同高度的，接受难度最大的</li>
+<li>高度相同且难度一致的，接受时间最早的</li>
+<li>若所有均相同，则按照从网络接受的顺序</li>
+<li>等待Block Chain高度增一，则重新选择Best Chain</li>
+</ol>
+<p><img src="https://f.cloud.github.com/assets/514951/864443/94b6ba76-f621-11e2-95b0-febc373535b7.png" alt="blockchain"></p>
+<p>按照这个规则运作的节点，称为诚实节点(Honest Nodes)。节点可以诚实也可以不诚实。</p>
+<h4 id="分支博弈"><a href="#分支博弈" class="headerlink" title="分支博弈"></a>分支博弈</h4><p>我们假设所有的节点：</p>
+<ol>
+<li>都是理性的，追求收益最大化</li>
+<li>都是不诚实的，且不惜任何手段获取利益</li>
+</ol>
+<p>所有节点均独自挖矿不理会其他节点，并将所得收益放入自己口袋，现象就是一个节点挖一个分支。由于机器的配置总是有差别的，那么算力最强的节点挖得的分支必然是最长的，如果一个节点的分支不是最长的，意味其收益存在不被认可的风险（即零收益）。为了降低、逃避此风险，一些节点肯定会联合起来一起挖某个分支，试图成为最长的分支或保持最长分支优势。</p>
+<p>一旦出现有少量的节点联合，那么其他节点必然会效仿，否则他们收益为零的风险会更大。于是，分支迅速合并汇集，所有节点都会选择算力更强的分支，只有这样才能保持收益风险最小。最终，只会存在一个这样的分支，就是主干分支(Best/Main Chain)。</p>
+<p>对于不诚实节点来说，结局是无奈的：能且只能加入主干挖矿。不加入即意味被抛弃，零收益；加入就是老实干活，按占比分成。</p>
+<h4 id="Hash-Dance"><a href="#Hash-Dance" class="headerlink" title="Hash Dance"></a>Hash Dance</h4><p>Block hash的计算是随机概率事件，当有节点广播出难度更高的block后，大家便跑到那个分支。在比特币系统运行过程中，算力经常在分支间跳来跳去，此现象称为<code>Hash Dance</code>。一般情况下，分支的高度为1~2，没有大的故障很难出现高于2的分支。</p>
+<p>Hash Dance起名源于<a href="https://www.google.com.hk/search?q=google+dance" target="_blank" rel="noopener">Google Dance</a>.</p>
+<h4 id="算力攻击的概率"><a href="#算力攻击的概率" class="headerlink" title="算力攻击的概率"></a>算力攻击的概率</h4><p><em>本节内容参考：<a href="https://bitcoin.org/bitcoin.pdf" target="_blank" rel="noopener">Bitcoin: A Peer-to-Peer Electronic Cash System</a></em></p>
+<p>算力攻击是一个概率问题，这里作简单叙述：</p>
+<ul>
+<li>p = 诚实节点挖出block概率</li>
+<li>q = 攻击者挖出block概率，q = 1 - p</li>
+<li>qz = 攻击者从z个block追上的概率</li>
+</ul>
+<p><img src="https://f.cloud.github.com/assets/514951/902244/a22dae50-fb92-11e2-95aa-3e346efdab40.png" alt="算力攻击的概率"></p>
+<p>我们假设p&gt;q，否则攻击者掌握了一半以上的算力，那么概率上永远是赢的。该事件（攻击者胜出）的概率是固定，且N次事件之间是相互独立的，那么这一系列随机过程符合<code>泊松分布(Poisson Distribution)</code>。<em>Z</em>个块时，攻击者胜出的期望为<em>lambda</em>：</p>
+<p><img src="https://f.cloud.github.com/assets/514951/905393/e386fa6c-fc20-11e2-8376-73d9a367bf98.png" alt="攻击者胜出的期望"></p>
+<p>攻击者在攻击时已经偷偷的计算了<em>k</em>个块，那么这<em>k</em>个块概率符合泊松分布(下图左侧部分)，若<em>k&lt;=z</em>，那么追赶上后续<em>z-k</em>个块的概率为<em>(q/p)^(z-k)</em>，即：</p>
+<p><img src="https://f.cloud.github.com/assets/514951/905394/d08dfcca-fc21-11e2-9740-907f2a89de88.png" alt="k个块概率符合泊松分布"></p>
+<p>展开为如下形式：</p>
+<p><img src="https://f.cloud.github.com/assets/514951/905406/b08c63ec-fc23-11e2-8f43-c932daec9f7c.png" alt="k个块概率符合泊松分布"></p>
+<p>计算该过程的C语言代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;math.h&gt;</span></span><span class="function"><span class="keyword">double</span> <span class="title">AttackerSuccessProbability</span><span class="params">(<span class="keyword">double</span> q, <span class="keyword">int</span> z)</span></span>&#123;    <span class="keyword">double</span> sum    = <span class="number">1.0</span>;    <span class="keyword">double</span> p      = <span class="number">1.0</span> - q;    <span class="keyword">double</span> lambda = z * (q / p);    <span class="keyword">int</span> i, k;    <span class="keyword">for</span> (k = <span class="number">0</span>; k &lt;= z; k++) &#123;        <span class="keyword">double</span> poisson = <span class="built_in">exp</span>(-lambda);        <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt;= k; i++)            poisson *= lambda / i;        sum -= poisson * (<span class="number">1</span> - <span class="built_in">pow</span>(q / p, z - k));    &#125;    <span class="keyword">return</span> sum;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们选取几个值，结果如下：</p>
+<p><img src="https://f.cloud.github.com/assets/514951/905408/e6c5ed84-fc23-11e2-9334-ca8e768c5aa0.png" alt="概率结果"></p>
+<p>可以看到，由于block的链式形式，随着块数的上升，攻击者赢得的概率呈指数下降。这是很多应用等待六个甚至六个以上确认的原因，一旦超过N个确认，攻击者得逞的可能微乎其微，概率值快速趋近零。</p>
+<p>当攻击者的算力超过50%时，便可以控制Block Chain，俗称51%攻击。</p>
+<h4 id="算力攻击的危害"><a href="#算力攻击的危害" class="headerlink" title="算力攻击的危害"></a>算力攻击的危害</h4><p>攻击者算出block后，block&amp;Txs必须能够通过验证，否则其他节点都会拒掉，攻击便无意义。攻击者<strong>无法</strong>做出下列行为：</p>
+<ol>
+<li>偷盗他人的币。消费某个地址的币时，需要对应的ECDSA私钥签名，而私钥是无法破解的。</li>
+<li>凭空制造比特币。每个block奖励的币值是统一的规则，篡改奖励币值会导致其他节点会拒绝该block。</li>
+</ol>
+<p>唯一的益处是可以选择性的收录进入block的交易，对自己的币进行<code>多重消费(Double Spending)</code>。</p>
+<p>过程是这样的：假设现在block高度为100，攻击者给商户发了一个交易10BTC，记作交易A，通常这笔交易会被收录进高度101的block中，当商户在101块中看到这笔交易后，就把货物给了攻击者。此时，攻击者便开始构造另一个高度为101的block，但用交易B替换了交易A，交易B中的输入是同一笔，使得发给商户的那笔钱发给他自己。同时，攻击者需要努力计算block，使得他的分支能够赶上主分支，并合并(Merge)被大家接受，一旦接受，便成功地完成了一次Double Spending。</p>
+<p>攻击难度呈指数上升，所以成功的Double Spending通常是一个极小概率事件。</p>
+<h4 id="算力巨头"><a href="#算力巨头" class="headerlink" title="算力巨头"></a>算力巨头</h4><p>全网算力的上升对比特币是极其有利的，这是毫无疑问的。但目前大矿池与矿业巨头使得算力高度集中化，这与中本聪所设想的<code>一CPU一票（one-CPU-one-vote）</code>的分散局面背道而驰，或许是他未曾预料的。</p>
+<p>挖矿是一项专业劳动，最后必然会交给最专业的人或团队，因为这样才能实现资源配置最优，效率最高。普通投资人通过购买算力巨头的股票：1. 完成投资；2. 分享算力红利。看似中心化的背后其实依然是分散的：</p>
+<ol>
+<li>矿业公司的背后是无数分散的投资人</li>
+<li>矿池背后是无数分散的个体算力</li>
+</ol>
+<p>既得利益使得算力巨头倾向于维护系统而不是破坏，因其收益均建立在比特币系统之上，既得利益者断然不会搬石头砸自己脚。甚至很多巨头在达到一定算力占比后会主动控制算力增长，使得低于某阈值内。</p>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h3><p>本篇几乎都在讲挖矿，因为挖矿对于比特币系统来说实在是太重要了。需要了解：1. block是基于工作量证明的。2. block以链式结构存在时的深远意义。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://blog.biqu.io/2013/08/03/proof-of-work-and-mining/" data-id="cjf6ypznz0002ut0047jj2ozz" class="article-share-link">Share</a>
+      
+        <a href="http://blog.biqu.io/2013/08/03/proof-of-work-and-mining/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-bitcoin-basic" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/07/30/bitcoin-basic/" class="article-date">
+  <time datetime="2013-07-30T15:58:00.000Z" itemprop="datePublished">Jul 30 2013</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/07/30/bitcoin-basic/">比特币基础知识</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h3><h4 id="椭圆曲线数字签名算法"><a href="#椭圆曲线数字签名算法" class="headerlink" title="椭圆曲线数字签名算法"></a>椭圆曲线数字签名算法</h4><p>椭圆曲线数字签名算法（ECDSA）是使用椭圆曲线对数字签名算法（DSA）的模拟，该算法是构成比特币系统的基石。</p>
+<h5 id="私钥"><a href="#私钥" class="headerlink" title="私钥"></a>私钥</h5><p>非公开，拥有者需安全保管。通常是由随机算法生成的，说白了，就是一个巨大的随机整数，256位、32字节。大小介于<code>1 ~ 0xFFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFE BAAE DCE6 AF48 A03B BFD2 5E8C D036 4141</code>之间的数，都可以认为是一个合法的私钥。于是，除了随机方法外，采用特定算法由固定的输入，得到32字节输出的算法就可以成为得到私钥的方法。于是，便有了迷你私钥(Mini Privkey)，原理很简单，例如，采用SHA256的一种实现：</p>
+<pre><code>private key = SHA256(&lt;passphase&gt;)
+</code></pre><p>迷你私钥存在安全问题，因为输入集合太小，易被构造常见组合的彩虹表暴力破解，所以通常还是使用系统随机生成的比较好，无安全隐患。</p>
+<h5 id="公钥"><a href="#公钥" class="headerlink" title="公钥"></a>公钥</h5><p>公钥与私钥是相对应的，一把私钥可以推出唯一的公钥，但公钥却无法推导出私钥。公钥有两种形式：压缩与非压缩。</p>
+<p>早期比特币均使用非压缩公钥，现大部分客户端已默认使用压缩公钥。这个貌似是比特币系统一个长得像feature的bug，早期人少活多代码写得不够精细，openssl库的文档又不足够好，导致Satoshi以为必须使用非压缩的完整公钥，后来大家发现其实公钥的左右两个32字节是有关联的，左侧(X)可以推出右侧(Y)的平方值，有左侧(X)就可以了。</p>
+<p>现在系统里两种方式共存，应该会一直共存下去。两种公钥的首个字节为标识位，压缩为33字节，非压缩为65字节。以0x04开头为非压缩，0x02/0x03开头为压缩公钥，0x02/0x03的选取由右侧Y开方后的奇偶决定。</p>
+<p>压缩形式可以减小Tx/Block的体积，每个Tx Input减少32字节。</p>
+<h5 id="签名"><a href="#签名" class="headerlink" title="签名"></a>签名</h5><p>使用私钥对数据进行签署(Sign)会得到签名(Signature)。通常会将数据先生成Hash值，然后对此Hash值进行签名。签名(signature)有两部分组成: R + S。由签名(signature)与Hash值，便可以推出一个公钥，验证此公钥，便可知道此签名是否由公钥对应的私钥签名。</p>
+<p>通常，每个签名会有三个长度：73、72、71，符合校验的概率为25%、50%、25%。所以每次签署后，需要找出符合校验的签名长度，再提供给验证方。</p>
+<h5 id="地址"><a href="#地址" class="headerlink" title="地址"></a>地址</h5><p>地址是为了人们交换方便而弄出来的一个方案，因为公钥太长了(130字符串或66字符串)。地址长度为25字节，转为base58编码后，为34或35个字符。base58是类似base64的编码，但去掉了易引起视觉混淆的字符，又在地址末尾添加了4个字节校验位，保障在人们交换个别字符错误时，也能够因地址校验失败而制止了误操作。</p>
+<p>由于存在公钥有两种形式，那么一个公钥便对应两个地址。这两个地址都可由同一私钥签署交易。</p>
+<p>公钥生成地址的算法：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Version = 1 byte of 0 (zero); on the test network, this is 1 byte of 111</span><br><span class="line">Key hash = Version concatenated with RIPEMD-160(SHA-256(public key))</span><br><span class="line">Checksum = 1st 4 bytes of SHA-256(SHA-256(Key hash))</span><br><span class="line">Bitcoin Address = Base58Encode(Key hash concatenated with Checksum)</span><br></pre></td></tr></table></figure>
+<p>下图是非压缩公钥生成地址的过程：</p>
+<p><img src="https://f.cloud.github.com/assets/514951/880381/6290a5ea-f93a-11e2-9ac4-835e86a38642.png" alt="pubkeytoaddr"></p>
+<p>对于压缩公钥生成地址时，则只取公钥的X部分即可。</p>
+<h5 id="推导关系"><a href="#推导关系" class="headerlink" title="推导关系"></a>推导关系</h5><p>三者推导关系：私钥 &gt;&gt; 公钥 &gt;&gt; 两个地址。过程均不可逆。拥有私钥便拥有一切，但通常为了方便，会把对应的公钥、地址也存储起来。</p>
+<h4 id="交易"><a href="#交易" class="headerlink" title="交易"></a>交易</h4><p>比特币的交易(Transation，缩写Tx)，并不是通常意义的交易，例如一手交钱一手交货，而是转账。交易由N个输入和M个输出两部分组成。交易的每个输入便是前向交易的某个输出，那么追踪到源头，必然出现一个没有输入的交易，此类交易称为CoinBase Tx。CoinBase类交易是奖励挖矿者而产生的交易，该交易总是位于Block块的第一笔。</p>
+<p><img src="https://f.cloud.github.com/assets/514951/864163/7c9c862e-f61b-11e2-9dfe-324d025e5dd3.png" alt="qq20130727-18"></p>
+<p>拥有一个输入与输出的Tx数据：</p>
+<pre><code>Input:
+Previous tx: f5d8ee39a430901c91a5917b9f2dc19d6d1a0e9cea205b009ca73dd04470b9a6
+Index: 0
+scriptSig: 304502206e21798a42fae0e854281abd38bacd1aeed3ee3738d9e1446618c4571d10
+90db022100e2ac980643b0b82c0e88ffdfec6b64e3e6ba35e7ba5fdd7d5d6cc8d25c6b241501
+
+Output:
+Value: 5000000000
+scriptPubKey: OP_DUP OP_HASH160 404371705fa9bd789a2fcd52d2c580b65d35549d
+OP_EQUALVERIFY OP_CHECKSIG
+</code></pre><p>一旦某个Tx的第N个输出成为另一个Tx的输入，那么该笔比特币即为已花费。每个交易有唯一Hash字符串来标识，通过对交易数据做两次SHA256哈希运算而来：</p>
+<pre><code>Tx Hash ID = SHA256(SHA256(Tx Data))
+</code></pre><h4 id="矿工费"><a href="#矿工费" class="headerlink" title="矿工费"></a>矿工费</h4><p>矿工费（Transaction Fee）是鼓励矿工将Tx打包进Block的激励报酬。计算一笔交易的矿工费：</p>
+<pre><code>Transaction Fee = SUM(Input&apos;s amount) - SUM(Output&apos;s amount)
+</code></pre><p>每笔Tx的矿工费必然大于等于零，否则该笔Tx即为非法，不会被网络接收。</p>
+<h4 id="数据块"><a href="#数据块" class="headerlink" title="数据块"></a>数据块</h4><p>数据块(Block)是存储Block Meta与Tx的地方。Block的第一笔Tx总是CoinBase Tx，因此Block中的交易数量总是大于等于1，随后是这段时间内网络广播出来的Tx。</p>
+<p>找到合适的Block是一件非常困难的事情，需要通过大量的数学计算才能发现，该计算过程称为“挖矿”。首个发现者，会得到一些比特币作为奖励。</p>
+<h4 id="数据链"><a href="#数据链" class="headerlink" title="数据链"></a>数据链</h4><p>多个Block连接起来成为数据链(Block Chain)。</p>
+<p><img src="https://f.cloud.github.com/assets/514951/864443/94b6ba76-f621-11e2-95b0-febc373535b7.png" alt="blockchain"></p>
+<p>为了引入容错与竞争机制，比特币系统允许Block Chain出现分叉，但每个节点总是倾向于选择最高的、难度最大的链，并称之为Best Chain，节点只认可Best Chain上的数据。</p>
+<p>首个Block称为Genesis Block，并设定高度为零，后续每新增一个Block，高度则递增一。目前是不允许花费Genesis Block中的比特币的。</p>
+<ul>
+<li>每个Block中的Tx在此Block中均唯一</li>
+<li>一个Tx通常只会在一个Block里，也可能会出现在多个Block中，但只会在Best Chain中的某一个Block出现一次</li>
+</ul>
+<h4 id="货币存储"><a href="#货币存储" class="headerlink" title="货币存储"></a>货币存储</h4><p>比特币是密码货币、纯数字化货币，没有看得见摸得着的硬币或纸币。一个人持有比特币意味着：</p>
+<ol>
+<li>其拥有一些地址的私钥</li>
+<li>这些地址是数笔交易的输出，且未花费</li>
+</ol>
+<p>所有货币记录均以交易形式存储在整个blockchain数据块中，<code>无交易无货币</code>。货币不会凭空产生，也不会凭空消失。遗失了某个地址的私钥，意味着该地址上的Tx无法签署，无法成为下一个Tx的输入，便认为该笔比特币永久消失了。</p>
+<h4 id="货币发行"><a href="#货币发行" class="headerlink" title="货币发行"></a>货币发行</h4><p>既然所有交易的输入源头都是来自CoinBase，产生CoinBase时即意味着货币发行。比特币采用衰减发行，每四年产量减半，第一个四年每个block的coinbase奖励50BTC，随后是25btc, 12.5btc, …并最终于2140年为零，此时总量达到极限为2100万个btc。</p>
+<p><img src="https://f.cloud.github.com/assets/514951/864426/153fcb3e-f621-11e2-8322-0b2f2f425ef7.png" alt="total_bitcoins_over_time_graph"></p>
+<p>减半周期，严格来说，并不是准确的四年，而是每生成210000个block。之所以俗称四年减半，是因为比特币系统会根据全网算力的大小自动调整难度系统，使得大约每两周产生2016个block，那么四年约21万块block。</p>
+<p>该函数<code>GetBlockValue()</code>用于计算挖得Block的奖励值：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">int64 <span class="keyword">static</span> <span class="title">GetBlockValue</span><span class="params">(<span class="keyword">int</span> nHeight, int64 nFees)</span></span></span><br><span class="line"><span class="function"></span>&#123;                            </span><br><span class="line">    int64 nSubsidy = <span class="number">50</span> * COIN;     </span><br><span class="line">                             </span><br><span class="line">    <span class="comment">// Subsidy is cut in half every 210000 blocks, which will occur approximately every 4 years</span></span><br><span class="line">    nSubsidy &gt;&gt;= (nHeight / <span class="number">210000</span>);</span><br><span class="line">                             </span><br><span class="line">    <span class="keyword">return</span> nSubsidy + nFees; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当达到2100万btc以后，不再有来自CoinBase的奖励了，矿工的收入来源仅剩下交易的矿工费。此时，每个block的收入绝对值btc很低，但此时比特币应当会非常繁荣，币值也会相当的高，使得矿工们依然有利可图。</p>
+<h4 id="杜绝多重支付"><a href="#杜绝多重支付" class="headerlink" title="杜绝多重支付"></a>杜绝多重支付</h4><p>传统货币存在多重支付(Double Spending)问题，典型的比如非数字时代的支票诈骗、数字时代的信用卡诈骗等。在比特币系统里，每笔交易的确认均需要得到全网广播，并收录进Block后才能得到真正确认。每笔钱的花销，均需要检测上次输入交易的状态。数据是带时间戳的、公开的，BlockChain由巨大的算力保障其安全性。所以比特币系统将货币的多重支付的风险极大降低，几近于零。通过等待多个Block确认，更是从概率上降低至零。一般得到6个确认后，可认为非常安全。但对于能影响你人生的重大支付，建议等待20~30个确认。</p>
+<h4 id="匿名性"><a href="#匿名性" class="headerlink" title="匿名性"></a>匿名性</h4><p>任何人均可以轻易生成大量的私钥、公钥、地址。地址本身是匿名的，通过多个地址交易可进一步提高匿名性。但该匿名性并不像媒体宣传的那样，是某种程度上的匿名。因为比特币的交易数据是公开的，所以任何一笔资金的流向均是可以追踪的。</p>
+<p>不了解比特币的人为它的匿名性产生一些担忧，比如担心更利于从事非法业务；了解比特币的人却因为它的伪匿名性而苦恼。传统货币在消费中也是匿名的，且是法律保障的，大部分国家都不允许个人涂画纸币。</p>
+<p>地址本身是匿名的，但你可以通过地址对应的私钥签名消息来向公众证明你拥有某个比特币地址。</p>
+<h3 id="其他名词"><a href="#其他名词" class="headerlink" title="其他名词"></a>其他名词</h3><h4 id="哈希"><a href="#哈希" class="headerlink" title="哈希"></a>哈希</h4><p>哈希(Hash)是一种函数，将一个数映射到另一个集合当中。不同的哈希函数映射的空间不同，反映到计算机上就是生成的值长度不一样。同一个哈希函数，相同的输入必然是相同的输出，但同一个输出却可能有不同的输入，这种情况称为哈希碰撞。</p>
+<p>常见的哈希函数有<code>CRC32</code>, <code>MD5</code>, <code>SHA1</code>, <code>SHA-256</code>, <code>SHA-512</code>, <code>RIPEMD-160</code>等，哈希函数在计算中有着非常广泛的用途。比特币里主要采用的是<code>SHA-256</code>和<code>RIPEMD-160</code>。</p>
+<h4 id="脑钱包-amp-纸钱包"><a href="#脑钱包-amp-纸钱包" class="headerlink" title="脑钱包&amp;纸钱包"></a>脑钱包&amp;纸钱包</h4><p>前面提到过的脑钱包与纸钱包，这其实不算是钱包的分类，只是生成、存储密钥的方式而已。脑钱包属于迷你私钥的产物。脑钱包就是记在脑袋里的密钥，纸钱包就是打印到纸上的密钥，仅此而已。</p>
+<p>有同学提到过，以一个计算机文件作为输入，例如一个数MB大小的照片，通过某种Hash运算后得到私钥的方法。这个方案的安全性还是不错的，同时可以防止盗私钥木马根据特征扫描私钥。文本形式存储私钥是有特征的，而一个照片文件却难以察觉，即使放在云盘等第三方存储空间中都是安全的。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://blog.biqu.io/2013/07/30/bitcoin-basic/" data-id="cjf6ypzo00003ut00lrg0exb6" class="article-share-link">Share</a>
+      
+        <a href="http://blog.biqu.io/2013/07/30/bitcoin-basic/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-bitcoin-clients" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/07/20/bitcoin-clients/" class="article-date">
+  <time datetime="2013-07-20T09:00:00.000Z" itemprop="datePublished">Jul 20 2013</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/07/20/bitcoin-clients/">比特币客户端与钱包</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>拥有和保存比特币，需要通过客户端，通常把该软件称为钱包。目前，整个比特币项目由<code>Bitcoin Foundation</code>来开发与维护，通常把他们称为官方团队。官方推出的客户端是<code>Bitcoin Qt</code>, 由C++编写核心功能，GUI界面由Python Qt完成。不含有GUI界面的被成为<code>bitcoind</code>，许多服务与核心功能均由其实现。运行bitcoind的通常称为节点(Bitcoin Node), 一个节点通常拥有完整的BlockChain数据，并实时与外界网络同步更新。</p>
+<p>钱包中通常含有：</p>
+<ul>
+<li>公钥、私钥、地址</li>
+<li>与钱包中地址相关的交易信息</li>
+<li>其他辅助数据</li>
+</ul>
+<p>最核心的数据就是密钥，拥有密钥便拥有一切，相关信息均可由其而来。钱包并不一定需要包含完整的BlockChain数据，不包含BlockChain数据的钱包称为轻钱包(Light Weight Wallet)。对于大部分日常使用来讲，轻钱包便足够了。</p>
+<h3 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h3><ul>
+<li>完全节点型(Full Node)：含有BlockChain所有完整数据</li>
+<li>简易节点型(SPV Node)：Header-Only Clients，仅有Block头部信息，无需交易数据</li>
+<li>CS型(Server-Client)：服务端-客户端模式，大部分数据存储在服务端</li>
+<li>BS型：所有数据均通过浏览器在线使用</li>
+</ul>
+<p>Bitcoin Qt，因为其是一款完整的钱包软件，需要下载大约超过<code>10GB</code>的BlockChain数据(24万个block)，对于大部分人来讲，是没有必要的。目前，官方主页上默认推荐的客户端已经不再是Bitcoin Qt, 而是<a href="https://multibit.org" target="_blank" rel="noopener">MultiBit</a>（支持Windows, MacOS和Linux的轻钱包）；移动端目前最好用的是<a href="https://play.google.com/store/apps/details?id=de.schildbach.wallet" target="_blank" rel="noopener">Bitcoin Wallet</a>(安卓平台)，iOS平台由于政策原因，一直未有出色的软件，Blockchain.Info为iOS提供了一个简单的钱包软件，<a href="http://itunes.com/apps/blockchain" target="_blank" rel="noopener">Blockchain for the iPhone</a>。还有就是在线钱包，如优秀的<a href="https://blockchain.info" target="_blank" rel="noopener">BlockChain.Info</a>，其安全性均超过自行保存管理，推荐使用之。</p>
+<p>最近还有一种流行的钱包：脑钱包。因其安全性较低，并不推荐大家使用，仅临时性场合使用之。其原理是由一串密码短语，通过Hash运算，得到密钥，只要记住这串密语即可使用钱包。因为密码短语符合大家习惯和记忆特点，可以通过计算大量常见组合来破解。除了暴力破解的问题外，失忆是最大的风险，比如摔个跟头跌成脑震荡，或长期不用自然忘得一干二净。</p>
+<h3 id="选择-amp-存储"><a href="#选择-amp-存储" class="headerlink" title="选择&amp;存储"></a>选择&amp;存储</h3><ul>
+<li><p>日常使用的额度通常小于10个币，可以存放在电脑或手机App中。通常存放1个币以下是比较保险的，丢了不太心疼嘛</p>
+</li>
+<li><p>持有几十、几百个币的，可以选择BlockChain.Info，Inputs.io等在线钱包。其也可以当做日常钱包使用。</p>
+</li>
+<li><p>持有上千甚至数万的，应该分开存储，并隔离存放。使用离线电脑生产密钥，打印出来托管至银行等高安全场所存储，并销毁现有密钥。同时还需要多份隔离存储，甚至对密钥进行加密。</p>
+</li>
+</ul>
+<p>密钥即一切，如不慎弄丢钱包，便永远失去这笔比特币。所以钱包需要小心妥善保管，不在自己的PC或者手机App中存储大量比特币，丢失的风险太高，病毒木马、硬件损坏、手机丢失等均造成无法挽救的损失。俗话讲鸡蛋不要搁在一个篮子里，多种方式存储也是降低风险的有效方式。目前丢失的比特币或有数百万BTC之巨。</p>
+<h3 id="常见钱包"><a href="#常见钱包" class="headerlink" title="常见钱包"></a>常见钱包</h3><ul>
+<li><a href="https://en.bitcoin.it/wiki/Bitcoin-Qt" target="_blank" rel="noopener">Bitcoin-Qt</a> - 官方客户端，基于C++/Qt，全平台，完全数据。</li>
+<li><a href="https://en.bitcoin.it/wiki/MultiBit" target="_blank" rel="noopener">MultiBit</a> - 全平台，轻钱包，官方推荐</li>
+<li><a href="https://en.bitcoin.it/wiki/Electrum" target="_blank" rel="noopener">Electrum</a> - 著名轻钱包</li>
+<li><a href="https://en.bitcoin.it/wiki/Armory" target="_blank" rel="noopener">Armory</a> - 基于Python，含有诸多特性的轻钱包</li>
+<li><a href="https://blockchain.info" target="_blank" rel="noopener">BlockChain.info</a> - 非常著名在线钱包</li>
+</ul>
+<h3 id="开发库"><a href="#开发库" class="headerlink" title="开发库"></a>开发库</h3><ul>
+<li><a href="https://en.bitcoin.it/wiki/Bitcoind" target="_blank" rel="noopener">bitcoind</a> - 官方客户端，无GUI，开发者必备</li>
+<li><a href="https://github.com/libcoin/libcoin" target="_blank" rel="noopener">libcoin</a> - libcoin</li>
+<li><a href="https://github.com/spesmilo/libbitcoin" target="_blank" rel="noopener">libbitcoin</a> - asynchronous C++ library for Bitcoin</li>
+<li><a href="https://github.com/MatthewLM/cbitcoin" target="_blank" rel="noopener">cbitcoin</a> - A low-level bitcoin library written in standard C</li>
+<li><a href="https://code.google.com/p/bitcoinj/" target="_blank" rel="noopener">Bitcoinj</a> - a Java implementation of the Bitcoin protocol</li>
+<li><a href="https://github.com/piotrnar/gocoin" target="_blank" rel="noopener">gocoin</a> - Bitcoin client library for Go / golang</li>
+<li><a href="https://github.com/jgarzik/pynode" target="_blank" rel="noopener">pynode</a> - Bitcoin P2P router, in python</li>
+<li><a href="https://github.com/gavinandresen/bitcointools" target="_blank" rel="noopener">bitcointools</a> - Python-based tools for the Bitcoin cryptocurrency system，By Gavin Andresen</li>
+<li><a href="https://github.com/jtobey/bitcoin-abe" target="_blank" rel="noopener">bitcoin-abe</a> - Abe: block browser for Bitcoin and similar currencies</li>
+</ul>
+<h3 id="数据检索"><a href="#数据检索" class="headerlink" title="数据检索"></a>数据检索</h3><ul>
+<li><a href="https://blockchain.info" target="_blank" rel="noopener">BlockChain.info</a></li>
+<li><a href="http://blockexplorer.com/" target="_blank" rel="noopener">Bitcoin Block Explorer</a></li>
+</ul>
+<hr>
+<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><ol>
+<li>Bitcoin Foundation： <a href="https://bitcoinfoundation.org/" target="_blank" rel="noopener">https://bitcoinfoundation.org/</a></li>
+<li>Why Apple Is Afraid Of Bitcoin: <a href="http://www.forbes.com/sites/jonmatonis/2012/06/13/why-apple-is-afraid-of-bitcoin/" target="_blank" rel="noopener">http://www.forbes.com/sites/jonmatonis/2012/06/13/why-apple-is-afraid-of-bitcoin/</a></li>
+<li>List of Bitcoin-related software： <a href="https://en.bitcoin.it/wiki/Software" target="_blank" rel="noopener">https://en.bitcoin.it/wiki/Software</a></li>
+<li>Bitcoin Clients: <a href="https://en.bitcoin.it/wiki/Clients" target="_blank" rel="noopener">https://en.bitcoin.it/wiki/Clients</a></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://blog.biqu.io/2013/07/20/bitcoin-clients/" data-id="cjf6ypzny0001ut00s1xxge6j" class="article-share-link">Share</a>
+      
+        <a href="http://blog.biqu.io/2013/07/20/bitcoin-clients/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+    <article id="post-what-is-bitcoin" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2013/07/20/what-is-bitcoin/" class="article-date">
+  <time datetime="2013-07-19T17:37:00.000Z" itemprop="datePublished">Jul 20 2013</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2013/07/20/what-is-bitcoin/">比特币是什么?</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>比特币是一个自由软件项目，是一种基于密码学的电子货币，同时也是一种协议。整个系统采用去中心化思想构建，基于P2P模式运行。<br>其特点有：</p>
+<ul>
+<li>去中心化发行与运作，无央行存在</li>
+<li>货币不可伪造，无法多重支付，交易不可逆转</li>
+<li>紧缩货币，总量固定，但可以无限分割</li>
+<li>全球无障碍流通，快速支付且成本极低</li>
+<li>账户匿名，且任何人均无法冻结，无法收税</li>
+<li>天然审计</li>
+</ul>
+<p>比特币由<em>Satoshi Nakamoto</em>创造（现已匿名消失），2008年11月1日，Satoshi在一个密码学的邮件列表中贴出了一篇论文：”<a href="http://www.mail-archive.com/cryptography@metzdowd.com/msg09959.html" target="_blank" rel="noopener">Bitcoin P2P e-cash paper</a>“：</p>
+<p><img src="https://f.cloud.github.com/assets/514951/827512/56e0e704-f09e-11e2-8957-573b9edbdafc.png" alt="qq20130720-1"></p>
+<h3 id="创世纪块"><a href="#创世纪块" class="headerlink" title="创世纪块"></a>创世纪块</h3><p>2009年1月3日，第一个数据块(Genesis‎ Block)的生成宣告比特币系统诞生。Satoshi在Genesis Block数据区中写入如下信息：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ hexdump -n 255 -C blk00000.dat</span><br><span class="line">00000000  f9 be b4 d9 1d 01 00 00  01 00 00 00 00 00 00 00  |................|</span><br><span class="line">00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|</span><br><span class="line">00000020  00 00 00 00 00 00 00 00  00 00 00 00 3b a3 ed fd  |............;...|</span><br><span class="line">00000030  7a 7b 12 b2 7a c7 2c 3e  67 76 8f 61 7f c8 1b c3  |z&#123;..z.,&gt;gv.a....|</span><br><span class="line">00000040  88 8a 51 32 3a 9f b8 aa  4b 1e 5e 4a 29 ab 5f 49  |..Q2:...K.^J)._I|</span><br><span class="line">00000050  ff ff 00 1d 1d ac 2b 7c  01 01 00 00 00 01 00 00  |......+|........|</span><br><span class="line">00000060  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|</span><br><span class="line">00000070  00 00 00 00 00 00 00 00  00 00 00 00 00 00 ff ff  |................|</span><br><span class="line">00000080  ff ff 4d 04 ff ff 00 1d  01 04 45 54 68 65 20 54  |..M.......EThe T|</span><br><span class="line">00000090  69 6d 65 73 20 30 33 2f  4a 61 6e 2f 32 30 30 39  |imes 03/Jan/2009|</span><br><span class="line">000000a0  20 43 68 61 6e 63 65 6c  6c 6f 72 20 6f 6e 20 62  | Chancellor on b|</span><br><span class="line">000000b0  72 69 6e 6b 20 6f 66 20  73 65 63 6f 6e 64 20 62  |rink of second b|</span><br><span class="line">000000c0  61 69 6c 6f 75 74 20 66  6f 72 20 62 61 6e 6b 73  |ailout for banks|</span><br><span class="line">000000d0  ff ff ff ff 01 00 f2 05  2a 01 00 00 00 43 41 04  |........*....CA.|</span><br><span class="line">000000e0  67 8a fd b0 fe 55 48 27  19 67 f1 a6 71 30 b7 10  |g....UH&apos;.g..q0..|</span><br><span class="line">000000f0  5c d6 a8 28 e0 39 09 a6  79 62 e0 ea 1f 61 de     |\..(.9..yb...a.|</span><br></pre></td></tr></table></figure>
+<p>还原出文本为：</p>
+<pre><code>The Times 03/Jan/2009 Chancellor on brink of second bailout for banks
+</code></pre><p>该段文字为英国《泰晤士报》2009年01月03日头版新闻标题：</p>
+<p><img src="https://f.cloud.github.com/assets/514951/828043/35469eca-f0aa-11e2-9726-f509586f4e7b.jpg" alt="twcach2"></p>
+<p>这段文字暗示了比特币的诞生时间，并从中可以看出Satoshi对现有货币系统的强烈不满。</p>
+<p>经过数年发展，已有大量计算机加入，形成了庞大的P2P网络，并构成巨大的算力屏障。除非小行星撞击地球，否则没有任何个人与组织能够关闭该系统。截止2013年7月19日，目前全网节点数约16万个：</p>
+<p><img src="https://f.cloud.github.com/assets/514951/827955/f049f2e2-f0a7-11e2-8229-0a85976f08ef.png" alt="qq20130720-2"></p>
+<h3 id="一切才刚刚开始"><a href="#一切才刚刚开始" class="headerlink" title="一切才刚刚开始"></a>一切才刚刚开始</h3><p>由于比特币的诸多颠覆特性，被人称为“史上最危险的自由软件项目”，现在经历数次大波折的比特币不仅没有衰落反而越来越繁荣，无数人正投身于这场伟大的社会实践中去，而比特币将开创出人类新的货币史。</p>
+<hr>
+<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><ol>
+<li>An open source P2P digital currency: <a href="http://bitcoin.org/" target="_blank" rel="noopener">http://bitcoin.org/</a></li>
+<li>Bitcoin: A Peer-to-Peer Electronic Cash System: <a href="http://bitcoin.org/bitcoin.pdf" target="_blank" rel="noopener">http://bitcoin.org/bitcoin.pdf</a></li>
+<li>Satoshi Nakamoto: <a href="https://en.bitcoin.it/wiki/Satoshi_Nakamoto" target="_blank" rel="noopener">https://en.bitcoin.it/wiki/Satoshi_Nakamoto</a></li>
+<li>Bitcoin P2P Currency: The Most Dangerous Project We’ve Ever Seen：<a href="http://launch3.squarespace.com/blog/l019-bitcoin-p2p-currency-the-most-dangerous-project-weve-ev.html" target="_blank" rel="noopener">http://launch3.squarespace.com/blog/l019-bitcoin-p2p-currency-the-most-dangerous-project-weve-ev.html</a></li>
+<li>Genesis Blcok: <a href="https://en.bitcoin.it/wiki/Genesis_block" target="_blank" rel="noopener">https://en.bitcoin.it/wiki/Genesis_block</a></li>
+<li>Chancellor Alistair Darling on brink of second bailout for banks: <a href="http://www.thetimes.co.uk/tto/business/industries/banking/article2160028.ece" target="_blank" rel="noopener">http://www.thetimes.co.uk/tto/business/industries/banking/article2160028.ece</a></li>
+<li>Bitnods: <a href="http://getaddr.bitnodes.io/" target="_blank" rel="noopener">http://getaddr.bitnodes.io/</a></li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://blog.biqu.io/2013/07/20/what-is-bitcoin/" data-id="cjf6ypznu0000ut00brpvnquw" class="article-share-link">Share</a>
+      
+        <a href="http://blog.biqu.io/2013/07/20/what-is-bitcoin/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
+  
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  
+    
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a><span class="archive-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recents</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/03/25/The-Significance-of-the-Lightning-Network/">闪电网络的伟大意义 The Significance of the Lightning Network</a>
+          </li>
+        
+          <li>
+            <a href="/2016/04/21/BIP9/">新的软分叉升级规范BIP9</a>
+          </li>
+        
+          <li>
+            <a href="/2016/04/08/understand-bitcoin-script/">理解比特币脚本</a>
+          </li>
+        
+          <li>
+            <a href="/2015/03/11/shadowsocks-add-bitcoin-support/">Shadowsocks 加入比特币的支持</a>
+          </li>
+        
+          <li>
+            <a href="/2014/06/15/safe-wallet-idea/">比特币安全钱包的想法</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Kevin Pan<br>
+      Powered by <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'bitkevin';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//go.disqus.com/count.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<script src="/js/script.js"></script>
+
+  </div>
+</body>
+</html>
