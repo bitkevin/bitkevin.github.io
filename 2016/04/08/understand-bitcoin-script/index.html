@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head><meta name="generator" content="Hexo 3.8.0">
   <meta charset="utf-8">
   
   <title>理解比特币脚本 | 比特币实验室</title>
@@ -8,9 +8,10 @@
   <meta name="description" content="作者：汪海波 其实我们可以这样看待比特币的交易：『交易的发起者悬赏若干比特币，在网络上贴出了一到数学题，谁解出了这道数学题，悬赏就归谁了』。 顺着这个思路，Alice对Bob的转账可以理解为『Alice把一道只有Bob才能解开的数学题发到网络上，Bob解出题并拿走了悬赏』。那么，每个交易数据中都会出现的『脚本』就是题和解，『脚本语言』就是用来描述题和解的工具。  『输入脚本』和『输出脚本』在这里我">
 <meta property="og:type" content="article">
 <meta property="og:title" content="理解比特币脚本">
-<meta property="og:url" content="http://blog.biqu.io/2016/04/08/understand-bitcoin-script/index.html">
+<meta property="og:url" content="http://panzhibiao.com/2016/04/08/understand-bitcoin-script/index.html">
 <meta property="og:site_name" content="比特币实验室">
 <meta property="og:description" content="作者：汪海波 其实我们可以这样看待比特币的交易：『交易的发起者悬赏若干比特币，在网络上贴出了一到数学题，谁解出了这道数学题，悬赏就归谁了』。 顺着这个思路，Alice对Bob的转账可以理解为『Alice把一道只有Bob才能解开的数学题发到网络上，Bob解出题并拿走了悬赏』。那么，每个交易数据中都会出现的『脚本』就是题和解，『脚本语言』就是用来描述题和解的工具。  『输入脚本』和『输出脚本』在这里我">
+<meta property="og:locale" content="default">
 <meta property="og:image" content="https://cloud.githubusercontent.com/assets/514951/14377566/e6d18d00-fda2-11e5-9c90-a237ca251bff.png">
 <meta property="og:image" content="https://cloud.githubusercontent.com/assets/514951/14377658/8eb0c22a-fda3-11e5-8d64-d6a6ab4d361a.png">
 <meta property="og:image" content="https://cloud.githubusercontent.com/assets/514951/14377680/9a8ac6b8-fda3-11e5-965e-80bda1aed8c6.png">
@@ -23,7 +24,7 @@
 <meta property="og:image" content="https://cloud.githubusercontent.com/assets/514951/14377678/9a7cee4e-fda3-11e5-8745-3cdf582a0b77.png">
 <meta property="og:image" content="https://cloud.githubusercontent.com/assets/514951/14377679/9a7ed808-fda3-11e5-887e-d2dd7d9c5143.png">
 <meta property="og:image" content="https://cloud.githubusercontent.com/assets/514951/14377682/9a9f8878-fda3-11e5-9de7-6c7544f12107.png">
-<meta property="og:updated_time" content="2018-03-25T15:08:43.569Z">
+<meta property="og:updated_time" content="2018-03-25T15:08:43.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="理解比特币脚本">
 <meta name="twitter:description" content="作者：汪海波 其实我们可以这样看待比特币的交易：『交易的发起者悬赏若干比特币，在网络上贴出了一到数学题，谁解出了这道数学题，悬赏就归谁了』。 顺着这个思路，Alice对Bob的转账可以理解为『Alice把一道只有Bob才能解开的数学题发到网络上，Bob解出题并拿走了悬赏』。那么，每个交易数据中都会出现的『脚本』就是题和解，『脚本语言』就是用来描述题和解的工具。  『输入脚本』和『输出脚本』在这里我">
@@ -38,7 +39,7 @@
   <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
   
 </head>
-
+</html>
 <body>
   <div id="container">
     <div id="wrap">
@@ -51,7 +52,7 @@
       </h1>
       
         <h2 id="subtitle-wrap">
-          <a href="/" id="subtitle">blog.biqu.io</a>
+          <a href="/" id="subtitle">panzhibiao.com</a>
         </h2>
       
     </div>
@@ -71,13 +72,13 @@
         <a id="nav-search-btn" class="nav-icon" title="Search"></a>
       </nav>
       <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://blog.biqu.io"></form>
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://panzhibiao.com"></form>
       </div>
     </div>
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-understand-bitcoin-script" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-understand-bitcoin-script" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2016/04/08/understand-bitcoin-script/" class="article-date">
   <time datetime="2016-04-08T04:00:00.000Z" itemprop="datePublished">Apr 8 2016</time>
@@ -164,9 +165,9 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://blog.biqu.io/2016/04/08/understand-bitcoin-script/" data-id="cjf6yvexj000a4x00a5unde3s" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2016/04/08/understand-bitcoin-script/" data-id="cjs06k7tv000akhs6jt6o1lry" class="article-share-link">Share</a>
       
-        <a href="http://blog.biqu.io/2016/04/08/understand-bitcoin-script/#disqus_thread" class="article-comment-link">Comments</a>
+        <a href="http://panzhibiao.com/2016/04/08/understand-bitcoin-script/#disqus_thread" class="article-comment-link">Comments</a>
       
       
     </footer>
@@ -259,7 +260,7 @@
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2018 Kevin Pan<br>
+      &copy; 2019 Kevin Pan<br>
       Powered by <a href="http://zespia.tw/hexo/" target="_blank">Hexo</a>
     </div>
   </div>
@@ -276,7 +277,7 @@
 <script>
   var disqus_shortname = 'bitkevin';
   
-  var disqus_url = 'http://blog.biqu.io/2016/04/08/understand-bitcoin-script/';
+  var disqus_url = 'http://panzhibiao.com/2016/04/08/understand-bitcoin-script/';
   
   (function(){
     var dsq = document.createElement('script');
