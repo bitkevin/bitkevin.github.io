@@ -79,6 +79,149 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-p2sh" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/12/p2sh/" class="article-date">
+  <time datetime="2019-02-12T09:25:36.000Z" itemprop="datePublished">Feb 12 2019</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/12/p2sh/">P2SH-为比特币赋能的脚本</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>P2SH即Pay to Script Key Hash，最常见的应用是多重签名，N把公钥，M人签名时才能花费这笔交易(M&lt;=N, N&lt;=16)，地址通常是以3开头的格式。当然，p2sh除了用来做多重签名之外，能做的事情简直无数。</p>
+<h2 id="P2PK"><a href="#P2PK" class="headerlink" title="P2PK"></a>P2PK</h2><p>比特币早期中本聪时期是P2PK(pay to public key)这种输出形式的，最早是直接放入一把公钥进去了，还是未压缩的，感受一下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f OP_CHECKSIG</span><br></pre></td></tr></table></figure>
+<ul>
+<li>0x04开头，表示是未压缩的</li>
+<li>0x04后面紧接这的是64字节是公钥内容</li>
+<li>OP_CHECKSIG：操作码，用于花费的时执行验证签名</li>
+</ul>
+<p>那么验证时（即花费这笔输出）堆栈内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">花费脚本为：</span><br><span class="line">&lt;signature&gt;</span><br><span class="line"></span><br><span class="line">连接前向的输出，完整的堆栈：</span><br><span class="line">&lt;signature&gt; &lt;pubkey&gt; OP_CHECKSIG</span><br></pre></td></tr></table></figure>
+<p>OP_CHECKSIG执行签名检查，并返回检查结果，true则通过签名检查，可以花费。</p>
+<h2 id="P2PKH"><a href="#P2PKH" class="headerlink" title="P2PKH"></a>P2PKH</h2><p>后来发现公钥其实用哈希就可以了，没必要放出公钥内容，被称为P2PKH(pay to public key hash)。于是输出脚本演化为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OP_DUP OP_HASH160 &lt;public_key_hash&gt; OP_EQUALVERIFY OP_CHECKSIG</span><br></pre></td></tr></table></figure>
+<ul>
+<li>OP_DUP: 操作码，复制栈顶元素</li>
+<li>OP_HASH160：操作码，计算栈顶元素Hash，即计算公钥的哈希</li>
+<li><code>public_key_hash</code>：公钥的哈希值，20字节</li>
+<li>OP_EQUALVERIFY：操作码，判断是否相等</li>
+<li>OP_CHECKSIG：操作码，用于花费的时执行验证签名</li>
+</ul>
+<p>此类型输出，就是最常见的1开头的地址输出。那么验证时的堆栈内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">花费脚本为：</span><br><span class="line">&lt;signature&gt; &lt;pubkey&gt; </span><br><span class="line"></span><br><span class="line">连接前向的输出，完整的堆栈：</span><br><span class="line">&lt;signature&gt; &lt;pubkey&gt; OP_DUP OP_HASH160 &lt;pubkey_hash&gt; OP_EQUALVERIFY OP_CHECKSIG</span><br></pre></td></tr></table></figure>
+<p>验证运算过程：</p>
+<ol>
+<li>从前往后找OP操作码，首先遇到<code>OP_DUP</code><ul>
+<li>执行后堆栈为：<code>&lt;signature&gt; &lt;pubkey&gt; &lt;pubkey&gt; OP_HASH160 &lt;pubkey_hash&gt; OP_EQUALVERIFY OP_CHECKSIG</code></li>
+</ul>
+</li>
+<li>执行<code>OP_HASH160</code><ul>
+<li>执行后堆栈为：<code>&lt;signature&gt; &lt;pubkey&gt; &lt;pubkey_hash&gt; &lt;pubkey_hash&gt; OP_EQUALVERIFY OP_CHECKSIG</code></li>
+</ul>
+</li>
+<li>执行<code>OP_EQUALVERIFY</code>，即验证该哈希是否与公钥匹配<ul>
+<li>执行后堆栈为：<code>&lt;signature&gt; &lt;pubkey&gt; OP_CHECKSIG</code></li>
+<li>到这里就与P2PKH一致了</li>
+</ul>
+</li>
+<li>执行<code>OP_CHECKSIG</code>，验证签名。</li>
+</ol>
+<p>这个过程汪海波写过文章详细的阐述过：<a href="https://panzhibiao.com/2016/04/08/understand-bitcoin-script/">理解比特币脚本</a>。p2pk改进为p2pkh后，输出长度缩小了一半多，同时隐私方面迈出了一小步：别人转给你的币在你未花费之前，别人是不知道你的公钥具体内容的。是不是很赞？</p>
+<h2 id="原始多重签名"><a href="#原始多重签名" class="headerlink" title="原始多重签名"></a>原始多重签名</h2><p>随着社区快速发展，人们发现需要多重签名，很快就出现了多重签名的输出格式，Gavin在BIP11里描述了这种输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">m &#123;pubkey&#125;...&#123;pubkey&#125; n OP_CHECKMULTISIG</span><br></pre></td></tr></table></figure>
+<p>2/2的一个原始多重签名示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">2</span><br><span class="line">04cc71eb30d653c0c3163990c47b976f3fb3f37cccdcbedb169a1dfef58bbfbfaff7d8a473e7e2e6d317b87bafe8bde97e3cf8f065dec022b51d11fcdd0d348ac4</span><br><span class="line">0461cbdcc5409fb4b4d42b51d33381354d80e550078cb532a34bfa2fcfdeb7d76519aecc62770f5b0e4ef8551946d8a540911abe3e7854a26f39f58b25c15342af</span><br><span class="line">2 OP_CHECKMULTISIG</span><br></pre></td></tr></table></figure>
+<p>验证时的堆栈内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">花费脚本为：</span><br><span class="line">0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt;</span><br><span class="line"></span><br><span class="line">连接前向的输出，完整的堆栈：</span><br><span class="line">0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt; M &lt;pubkey_1&gt; &lt;...&gt; &lt;pubkey_N&gt; N OP_CHECKMULTISIG</span><br></pre></td></tr></table></figure>
+<p>OP_CHECKMULTISIG的运行过程稍微复杂一些：</p>
+<ol>
+<li>弹出最后一个数，就是N，公钥总数。<ul>
+<li>执行后堆栈为：<code>0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt; M &lt;pubkey_1&gt; &lt;...&gt; &lt;pubkey_N&gt;</code></li>
+</ul>
+</li>
+<li>弹出N个堆栈元素，就是这N把公钥。<ul>
+<li>执行后堆栈为：<code>0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt; M</code></li>
+</ul>
+</li>
+<li>弹出签名数量M，即需要M个签名数量。<ul>
+<li>执行后堆栈为：<code>0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt;</code></li>
+</ul>
+</li>
+<li>弹出M个堆栈元素，即需要M个签名。同时对M个签名进行验证。<ul>
+<li>执行后堆栈为：<code>0</code></li>
+</ul>
+</li>
+<li>弹出最后一个元素<code>0</code>。<ul>
+<li><code>0</code>即<code>OP_0</code>，为啥多这么一个奇怪的元素呢，因为早期实现<code>OP_CHECKMULTISIG</code>时，存在一个BUG，导致必须多放入一个元素到堆栈里。为了保持兼容性，则不得不放入<code>OP_0</code>，否则就是造成硬分叉。</li>
+</ul>
+</li>
+</ol>
+<p>这种类型的输出存在时间很短，大部分人几乎不知道它的的存在，如果你哪天看见某个交易的一个输出里冒出好几个地址，那就是这种古老原始的多重签名。早期主要应用于2/3的担保交易中。</p>
+<h2 id="P2SH"><a href="#P2SH" class="headerlink" title="P2SH"></a>P2SH</h2><p>因为实在是又丑又笨，Gavin很快捣鼓出一个改进版本BIP16：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OP_HASH160 &lt;redeem_script_hash&gt; OP_EQUAL</span><br></pre></td></tr></table></figure>
+<p>其实不用把公钥放在输出里了，放入其HASH值即可，与早期P2PK进化为P2PKH一样，将这些公钥连接在一起并计算出其HASH160的值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">RedeemScript = OP_nRequired | PUBKEY_1 | ... | PUBKEY_N | N | OP_CHECKMULTISIG</span><br><span class="line"></span><br><span class="line">20-byte-hash-value = RIPEMD-160(RedeemScript)</span><br></pre></td></tr></table></figure>
+<p>RedeemScript就是把参与的公钥以及m/n的设置值等连接在一起的内容，RedeemScript其实就是前面提到的“原始多重签名”的输出，哈希后产生的这20个字节刚好可以转为普通地址显示，就是现在最常见的3开头的p2sh多重签名地址。N最大为16把公钥。</p>
+<p>验证时的堆栈内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">花费脚本为：</span><br><span class="line">OP_0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt; &lt;redeemScript&gt;</span><br><span class="line"></span><br><span class="line">连接前向的输出，完整的堆栈：</span><br><span class="line">OP_0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt; &lt;redeemScript&gt; OP_HASH160 &lt;redeemScriptHash&gt; OP_EQUAL</span><br></pre></td></tr></table></figure>
+<p>验证过程分为两大步骤，第一步骤：</p>
+<ol>
+<li>执行<code>OP_HASH160</code>，计算HASH值：<code>&lt;redeemScript&gt; OP_HASH160</code><ul>
+<li>执行后堆栈为：<code>OP_0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt; &lt;redeemScriptHash&gt;&lt;redeemScriptHash&gt; OP_EQUAL</code></li>
+</ul>
+</li>
+<li>执行<code>OP_EQUAL</code>，验证两个哈希值是否相等<ul>
+<li>执行后堆栈为：<code>OP_0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt;</code></li>
+</ul>
+</li>
+</ol>
+<p>第二步骤，将展开花费脚本中的RedeemScript展开得到子脚本，就得到与“原始多重签名”一致的堆栈数据格式，并执行类似的验证过程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OP_0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt; M &lt;pubkey_1&gt; &lt;...&gt; &lt;pubkey_N&gt; N OP_CHECKMULTISIG</span><br></pre></td></tr></table></figure>
+<p>当然，RedeemScript除了放多重签名脚本外，还可以放其他任何脚本，多重签名仅仅是一种应用而已，p2sh提供了无限可能性。</p>
+<h3 id="软分叉的关键点"><a href="#软分叉的关键点" class="headerlink" title="软分叉的关键点"></a>软分叉的关键点</h3><p>在第一步骤中，redeemScript是作为一个整体数据进栈的，而在第二步里，redeemScript会按照脚本进行解析得到N个栈元素，然后再依次进栈进行验证。这个过程是非常巧妙的，在第一步里，仅验证了脚本的哈希值是否一致，并没有验证签名。真正的签名信息是在第二步骤里进行验证的。因为这点，所以可以软分叉实施P2SH，老节点仅执行第一步骤，新节点执行两个步骤。</p>
+<p>当花费过一次后，redeemScript其实就公开了，那么对于老节点来说，任何人都可以用这个公开的redeemScript花掉相同地址的币（验证哈希值）。这就是被称为任何人可以花费（Anyone can spend）的原因。不过，特性激活后，新版全节点（出块节点必然是新版）会强制执行第二步验证，永远都不会被其他人偷花。</p>
+<h3 id="激活"><a href="#激活" class="headerlink" title="激活"></a>激活</h3><p>P2SH的激活，其实算是UASF或者是GASF（Gavin Actived Soft Fork），那时也没有规范的软分叉升级方案，如BIP9。升级代码就直接发布了，并设立了激活信号日2012年04月01日(测试网是2月15日)。支持的用户直接升级代码，不支持的用户不升级代码。</p>
+<p>为了防止潜在网络分叉，矿工在coinbase交易里打标识<code>/P2SH/</code>来标明支持P2SH。但这个仅供人为观察，并不是代码层面的。</p>
+<h3 id="影响深远"><a href="#影响深远" class="headerlink" title="影响深远"></a>影响深远</h3><p>P2SH是一个高度灵活的脚本方案，意义重大，影响深远，简直像打开了宝藏一样。其为后面的SegWit，MAST都铺平了道路。</p>
+<hr>
+<p>参考</p>
+<ul>
+<li><a href="https://github.com/bitcoin/bips/blob/master/bip-0011.mediawiki" target="_blank" rel="noopener">https://github.com/bitcoin/bips/blob/master/bip-0011.mediawiki</a></li>
+<li><a href="https://github.com/bitcoin/bips/blob/master/bip-0016.mediawiki" target="_blank" rel="noopener">https://github.com/bitcoin/bips/blob/master/bip-0016.mediawiki</a></li>
+<li><a href="https://github.com/bitcoin/bitcoin/blob/v0.6.0/src/main.cpp#L1281" target="_blank" rel="noopener">https://github.com/bitcoin/bitcoin/blob/v0.6.0/src/main.cpp#L1281</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://panzhibiao.com/2019/02/12/p2sh/" data-id="cjs4cas3w000d2ms60kmgzckd" class="article-share-link">Share</a>
+      
+        <a href="http://panzhibiao.com/2019/02/12/p2sh/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-bip8" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/02/11/bip8/" class="article-date">
@@ -170,7 +313,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/11/bip8/" data-id="cjs0kj5wd000bdt2px1iaxewy" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/11/bip8/" data-id="cjs4cas3x000e2ms6ol5dnghu" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/11/bip8/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -214,7 +357,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2018/03/25/The-Significance-of-the-Lightning-Network/" data-id="cjs0kj5wb000adt2pt9bg2t4x" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2018/03/25/The-Significance-of-the-Lightning-Network/" data-id="cjs4cas3v000c2ms6f2ady9u0" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2018/03/25/The-Significance-of-the-Lightning-Network/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -281,7 +424,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2016/04/21/BIP9/" data-id="cjs0kj5wa0009dt2p0ei7rxxv" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2016/04/21/BIP9/" data-id="cjs4cas3u000a2ms631i781gi" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2016/04/21/BIP9/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -383,7 +526,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2016/04/08/understand-bitcoin-script/" data-id="cjs0kj5wj000edt2p7kexcy53" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2016/04/08/understand-bitcoin-script/" data-id="cjs4cas3t00092ms6euxx6ebr" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2016/04/08/understand-bitcoin-script/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -452,7 +595,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2015/03/11/shadowsocks-add-bitcoin-support/" data-id="cjs0kj5w90008dt2p0ap2wvzs" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2015/03/11/shadowsocks-add-bitcoin-support/" data-id="cjs4cas3v000b2ms6iecn10zt" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2015/03/11/shadowsocks-add-bitcoin-support/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -534,7 +677,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2014/06/15/safe-wallet-idea/" data-id="cjs0kj5w80007dt2p9yvfvo3n" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2014/06/15/safe-wallet-idea/" data-id="cjs4cas3r00082ms6s7yax78r" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2014/06/15/safe-wallet-idea/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -575,7 +718,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2014/06/14/open-nodes-plan/" data-id="cjs0kj5w70005dt2p4ween2cq" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2014/06/14/open-nodes-plan/" data-id="cjs4cas3o00062ms6tn6vbu6k" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2014/06/14/open-nodes-plan/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -681,7 +824,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/10/27/bitcoin-transaction-02/" data-id="cjs0kj5we000cdt2pl8kek9yr" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/10/27/bitcoin-transaction-02/" data-id="cjs4cas3l00052ms64hhbbw27" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/10/27/bitcoin-transaction-02/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -819,121 +962,9 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/10/27/bitcoin-transaction-01/" data-id="cjs0kj5w80006dt2p117opgqo" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/10/27/bitcoin-transaction-01/" data-id="cjs4cas3r00072ms61j4iktf1" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/10/27/bitcoin-transaction-01/#disqus_thread" class="article-comment-link">Comments</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-timestamp-system-and-proof-of-existance" class="article article-type-post" itemscope="" itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2013/08/12/timestamp-system-and-proof-of-existance/" class="article-date">
-  <time datetime="2013-08-12T14:53:00.000Z" itemprop="datePublished">Aug 12 2013</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2013/08/12/timestamp-system-and-proof-of-existance/">时间戳服务与存在证明</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="存在证明"><a href="#存在证明" class="headerlink" title="存在证明"></a>存在证明</h3><p>存在证明就是向第三方证明某个物品/事件，在过去的某个时刻存在过。</p>
-<p>这是一件很简单的事情，提供票据、通信记录之类的就可以办到。但这些并不严格，因为这些证据都是非常易伪造或销毁。要完成证明，必须依赖强有力的证据链，这个必须是任何人都无法伪造与销毁的，或者说伪造成本极其高昂近乎不可能。</p>
-<p>回忆一下，电影里经常出现的绑匪镜头，他们为了证明在某个时间确实拥有人质，而不是事前拍摄的视频，通常会用当天的发行量很大的报纸来辅助证明。当香港媒体误报“成龙高楼坠亡”时，成龙也不得不拿报纸来证明自己的存在：</p>
-<p><img src="https://f.cloud.github.com/assets/514951/906787/0f6c4fcc-fcdc-11e2-8770-b72819e92915.jpg" alt="124897097_11n"></p>
-<p>报纸之所以能够成为有效的时间证明系统是因为：</p>
-<ol>
-<li>不可伪造性。新闻等信息是无法预测的，尤其是证券大盘数据，报纸上大量充满这样的信息，所以无人能够提前伪造。</li>
-<li>公开且不可销毁。报纸通常拥有很大的发行数量，受众广泛，一旦发布出去就分散到各个角落，很难再次收集齐全并全部销毁。通常图书馆也会存档数十年期限的报纸。</li>
-<li>具有时间特征。报纸具有很强时间特征，版面到处可见的是时间标记。</li>
-</ol>
-<p>借助报纸可以完成某个时间之后的存在证明，但无法完成某个时间之前的。例如，你拿9月1号的报纸拍摄进照片，那么仅能证明其在9月1号之后拍摄，可能是9月1号，也可能是9月15号。</p>
-<h3 id="时间戳服务"><a href="#时间戳服务" class="headerlink" title="时间戳服务"></a>时间戳服务</h3><p><code>比特币本质是构造了一个永不停息、无坚不摧的时间戳系统</code>。</p>
-<p><img src="https://f.cloud.github.com/assets/514951/906809/5281de94-fce1-11e2-83be-e80533cae1e9.png" alt="qq20130804-9"></p>
-<p>然后该系统上添加若干特性后使得具有货币的功能。报纸从另一个角度讲也是一种时间戳服务。</p>
-<p>比特币具有下列优良的特性可以更完美的用于存在证明：</p>
-<ul>
-<li>不可预测/伪造。因block的计算是随机事件，其hash值是一个32字节的随机大数(2^256)。想蒙对该数的概率实在是太低了。</li>
-<li>不可销毁/修改。Block Chain拥有巨大的算力在维护与延续，对于N个确认的block，想篡改是不可能的。</li>
-<li>block具有天然时间特性。timestamp是block meta字段之一。</li>
-<li>block可以存储信息。对于block meta信息，是无法控制的。但block会收录交易，而交易是可以”写入”自己的数据。</li>
-</ul>
-<h3 id="数字摘要"><a href="#数字摘要" class="headerlink" title="数字摘要"></a>数字摘要</h3><p>简单来说，对一串数据进行Hash运算，得到的Hash值称为数字摘要。除了Hash函数，还有其他方式，如密钥签名等也可以得到。Hash值通常是一个非常巨大的数，例如用SHA256时，Hash值区间非常大：1~2^256。数字摘要的计算过程不可逆，那么可以认为：</p>
-<pre><code>欲证明你拥有某个文件，提供该文件的Hash值（及Hash函数）即可。第三方可以轻易验证文件的Hash值来判断之。
-</code></pre><h3 id="比特币做存在证明"><a href="#比特币做存在证明" class="headerlink" title="比特币做存在证明"></a>比特币做存在证明</h3><h4 id="时间点后向证明"><a href="#时间点后向证明" class="headerlink" title="时间点后向证明"></a>时间点后向证明</h4><p>因为block hash的不可伪造性，能提供Block Hash即可证明存在于该Block时刻之后。例如，你在拍照的时候，拿着打印有block hash的纸即可证明：你在该block时刻之后进行的拍摄。</p>
-<h4 id="时间点前向证明"><a href="#时间点前向证明" class="headerlink" title="时间点前向证明"></a>时间点前向证明</h4><p>前向证明需要精心构造一个包含数字摘要的交易，待该交易进入block中。便可以证明你在该block时刻之前拥有该数字摘要。<code>前向证明的关键是能把信息写入时间戳服务载体</code>。</p>
-<h4 id="时间区间证明"><a href="#时间区间证明" class="headerlink" title="时间区间证明"></a>时间区间证明</h4><p>有时候，仅仅证明时间点之前或之后是不够的，需要能够确认到某一个时刻。将上述方式综合即可完成：</p>
-<ol>
-<li>将block A的hash值添入数据文件，并制作文件数字摘要。（时间点后向证明）</li>
-<li>将摘要信息构造至交易中，广播之。（时间点前向证明）</li>
-<li>当交易被block B收录进去，那么即可证明，该文件于block A与B的时间间隔中存在。</li>
-</ol>
-<p>如果交易给了足够的矿工费(Transaction Fee)，具有较高优先级的话，便很有可能被紧随其后的block收录。连续的block约10分钟，那么就在一个相对小的时间内作了证明，可以近似认为是时间点。</p>
-<h3 id="构造特殊交易"><a href="#构造特殊交易" class="headerlink" title="构造特殊交易"></a>构造特殊交易</h3><p>带有数字摘要的交易如何构造呢？下面以32字节的数字摘要为例，提出数个可行方法，其他长度的可变换得出。</p>
-<h4 id="方式一：交易额承载信息"><a href="#方式一：交易额承载信息" class="headerlink" title="方式一：交易额承载信息"></a>方式一：交易额承载信息</h4><p>32字节可以分割为16个双字节，每个双字节的数值范围是：0~65535。比特币的现行单位可以分割至小数点后八位，那么我们可以利用最后的5位来存放一个数值，一共需要16个输出(Tx output)即可完成32字节的信息存储。中间涉及比特币最大数量为: </p>
-<pre><code>.00065535 * 16 = .0104856 btc
-</code></pre><p>需要的比特币数量很少，约0.01Btc，且输出依然发回给自己的地址，唯一的代价就是付出矿工费(Tx Fee)。任何人都可以使用之。</p>
-<h5 id="SatoshiDice种子文件时间证明"><a href="#SatoshiDice种子文件时间证明" class="headerlink" title="SatoshiDice种子文件时间证明"></a>SatoshiDice种子文件时间证明</h5><p>著名站点SatoshiDice就是采用这种方式为其服务端种子文件做时间前向证明的。下面演示一下步骤。服务端的种子文件为<code>hash.keys</code>，我们对其做SHA256运算，得到hash值，32个字节。</p>
-<pre><code>$ sha256sum hash.keys
-# hash of file &quot;hash.keys&quot;, in hex:
-9b0d87ac871518cfd8601aa456b58fa74c01194cfeb25e7f3eecf43759d6ccb4  hash.keys
-</code></pre><p>将该hash转为16个10进制数值：</p>
-<pre><code>9b0d = 39693
-87ac = 34732
-8715 = 34581
-18cf = 6351
-d860 = 55392
-1aa4 = 6820
-56b5 = 22197
-8fa7 = 36775
-4c01 = 19457
-194c = 6476
-feb2 = 65202
-5e7f = 24191
-3eec = 16108
-f437 = 62519
-59d6 = 22998
-ccb4 = 52404
-</code></pre><p>将这16个数除以10^8，作为输出额度，构造<a href="http://blockchain.info/tx/428bcc630b00fe431623b4e1fb0f726493dc0a2ead86ace9f65cd51bc8092459" target="_blank" rel="noopener">交易</a>：</p>
-<p><img src="https://f.cloud.github.com/assets/514951/947402/555dc5de-0352-11e3-8cf9-c7d8de72adbe.png" alt="qq20130812-2"></p>
-<p>交易被收录，证明完成。</p>
-<h4 id="方式二：数字摘要的Hash作地址输入"><a href="#方式二：数字摘要的Hash作地址输入" class="headerlink" title="方式二：数字摘要的Hash作地址输入"></a>方式二：数字摘要的Hash作地址输入</h4><p>回顾一下地址的生成算法（下图是一个未压缩公钥生成地址的过程，公钥是否压缩对该证明过程没有影响）：</p>
-<p><img src="https://f.cloud.github.com/assets/514951/947559/47602d38-0356-11e3-8fa7-ba59e99eee85.png" alt="qq20130812-3"></p>
-<p>我们用数字摘要的Hash值代替图中红色框中的值，然后得到一个地址，我们把0.00000001 btc打入该地址，形成交易，收录后完成证明。验证时，需要首先得到数字摘要hash值，再生成对应的地址，核对地址是否一致即可。</p>
-<p>这个方法有个缺点，打入该地址的币永远消失了，因为没有其对应的私钥。虽然可以只需1聪，目前价值几乎忽略不计，但毕竟浪费了。该方法可以进一步衍生一些类似的方法。曾有个网站使用之，后来该网站关闭了。</p>
-<h4 id="方式三：数字摘要的Hash作私钥"><a href="#方式三：数字摘要的Hash作私钥" class="headerlink" title="方式三：数字摘要的Hash作私钥"></a>方式三：数字摘要的Hash作私钥</h4><p>大小介于<code>1 ~ 0xFFFF FFFF FFFF FFFF FFFF FFFF FFFF FFFE BAAE DCE6 AF48 A03B BFD2 5E8C D036 4141</code>之间的数，都可以认为是一个合法的私钥，其大小为32字节。那么，可以把数字摘要的Hash作私钥，并推算出公钥和地址。</p>
-<p>将任意币值输出至该地址构成交易，交易收录后，通过私钥再转移走即可。这样便在block chain里留下了这个地址。验证时重复该过程，检查地址是否一致即可。</p>
-<p>该方法不会像方法二那样形成浪费，也比较容易操作。我们依然SatoshiDice的种子文件为例，种子数字摘要的Hash为：<code>9b0d87ac871518cfd8601aa456b58fa74c01194cfeb25e7f3eecf43759d6ccb4</code>。</p>
-<p>借助<a href="https://www.bitaddress.org/" target="_blank" rel="noopener">bitaddress.org</a>，输入私钥（种子hash）后：</p>
-<p><img src="https://f.cloud.github.com/assets/514951/947730/30cc9c38-035a-11e3-98da-590a87880173.png" alt="qq20130812-5"></p>
-<p>得到两把公钥，分别对应两个地址。证明时将币打入任何一个地址即可，建议使用未压缩公钥地址，因为并不是所有客户端都对压缩公钥支持良好。然后将该私钥导入任何一个客户端，再把该地址的钱转移到一个安全的地方。最后，公开私钥和对应收录地址的交易。</p>
-<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>方法二浪费，应避免使用。方法一繁琐，需要工具辅助转换。方法三相对容易，门槛低一些，大部分客户端都支持，私钥公钥地址的推导也有很多工具支持。</p>
-<p>就这样比特币系统轻松的完成了存在证明，安全稳固，公信力远胜任何第三方、机构、政府。过程极其简单，使得任何一人都可以轻易地做出存在证明，其意义非常重大。可以预见，未来将比特币作为存在证明会得到广泛的应用。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/08/12/timestamp-system-and-proof-of-existance/" data-id="cjs0kj5w60004dt2psalwy98d" class="article-share-link">Share</a>
-      
-        <a href="http://panzhibiao.com/2013/08/12/timestamp-system-and-proof-of-existance/#disqus_thread" class="article-comment-link">Comments</a>
       
       
       
@@ -995,6 +1026,10 @@ ccb4 = 52404
       <ul>
         
           <li>
+            <a href="/2019/02/12/p2sh/">P2SH-为比特币赋能的脚本</a>
+          </li>
+        
+          <li>
             <a href="/2019/02/11/bip8/">谈谈软分叉升级规范BIP8-后矿工时代的软分叉方式</a>
           </li>
         
@@ -1008,10 +1043,6 @@ ccb4 = 52404
         
           <li>
             <a href="/2016/04/08/understand-bitcoin-script/">理解比特币脚本</a>
-          </li>
-        
-          <li>
-            <a href="/2015/03/11/shadowsocks-add-bitcoin-support/">Shadowsocks 加入比特币的支持</a>
           </li>
         
       </ul>

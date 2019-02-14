@@ -79,6 +79,149 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-p2sh" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/12/p2sh/" class="article-date">
+  <time datetime="2019-02-12T09:25:36.000Z" itemprop="datePublished">Feb 12 2019</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/12/p2sh/">P2SH-为比特币赋能的脚本</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>P2SH即Pay to Script Key Hash，最常见的应用是多重签名，N把公钥，M人签名时才能花费这笔交易(M&lt;=N, N&lt;=16)，地址通常是以3开头的格式。当然，p2sh除了用来做多重签名之外，能做的事情简直无数。</p>
+<h2 id="P2PK"><a href="#P2PK" class="headerlink" title="P2PK"></a>P2PK</h2><p>比特币早期中本聪时期是P2PK(pay to public key)这种输出形式的，最早是直接放入一把公钥进去了，还是未压缩的，感受一下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">04678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5f OP_CHECKSIG</span><br></pre></td></tr></table></figure>
+<ul>
+<li>0x04开头，表示是未压缩的</li>
+<li>0x04后面紧接这的是64字节是公钥内容</li>
+<li>OP_CHECKSIG：操作码，用于花费的时执行验证签名</li>
+</ul>
+<p>那么验证时（即花费这笔输出）堆栈内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">花费脚本为：</span><br><span class="line">&lt;signature&gt;</span><br><span class="line"></span><br><span class="line">连接前向的输出，完整的堆栈：</span><br><span class="line">&lt;signature&gt; &lt;pubkey&gt; OP_CHECKSIG</span><br></pre></td></tr></table></figure>
+<p>OP_CHECKSIG执行签名检查，并返回检查结果，true则通过签名检查，可以花费。</p>
+<h2 id="P2PKH"><a href="#P2PKH" class="headerlink" title="P2PKH"></a>P2PKH</h2><p>后来发现公钥其实用哈希就可以了，没必要放出公钥内容，被称为P2PKH(pay to public key hash)。于是输出脚本演化为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OP_DUP OP_HASH160 &lt;public_key_hash&gt; OP_EQUALVERIFY OP_CHECKSIG</span><br></pre></td></tr></table></figure>
+<ul>
+<li>OP_DUP: 操作码，复制栈顶元素</li>
+<li>OP_HASH160：操作码，计算栈顶元素Hash，即计算公钥的哈希</li>
+<li><code>public_key_hash</code>：公钥的哈希值，20字节</li>
+<li>OP_EQUALVERIFY：操作码，判断是否相等</li>
+<li>OP_CHECKSIG：操作码，用于花费的时执行验证签名</li>
+</ul>
+<p>此类型输出，就是最常见的1开头的地址输出。那么验证时的堆栈内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">花费脚本为：</span><br><span class="line">&lt;signature&gt; &lt;pubkey&gt; </span><br><span class="line"></span><br><span class="line">连接前向的输出，完整的堆栈：</span><br><span class="line">&lt;signature&gt; &lt;pubkey&gt; OP_DUP OP_HASH160 &lt;pubkey_hash&gt; OP_EQUALVERIFY OP_CHECKSIG</span><br></pre></td></tr></table></figure>
+<p>验证运算过程：</p>
+<ol>
+<li>从前往后找OP操作码，首先遇到<code>OP_DUP</code><ul>
+<li>执行后堆栈为：<code>&lt;signature&gt; &lt;pubkey&gt; &lt;pubkey&gt; OP_HASH160 &lt;pubkey_hash&gt; OP_EQUALVERIFY OP_CHECKSIG</code></li>
+</ul>
+</li>
+<li>执行<code>OP_HASH160</code><ul>
+<li>执行后堆栈为：<code>&lt;signature&gt; &lt;pubkey&gt; &lt;pubkey_hash&gt; &lt;pubkey_hash&gt; OP_EQUALVERIFY OP_CHECKSIG</code></li>
+</ul>
+</li>
+<li>执行<code>OP_EQUALVERIFY</code>，即验证该哈希是否与公钥匹配<ul>
+<li>执行后堆栈为：<code>&lt;signature&gt; &lt;pubkey&gt; OP_CHECKSIG</code></li>
+<li>到这里就与P2PKH一致了</li>
+</ul>
+</li>
+<li>执行<code>OP_CHECKSIG</code>，验证签名。</li>
+</ol>
+<p>这个过程汪海波写过文章详细的阐述过：<a href="https://panzhibiao.com/2016/04/08/understand-bitcoin-script/">理解比特币脚本</a>。p2pk改进为p2pkh后，输出长度缩小了一半多，同时隐私方面迈出了一小步：别人转给你的币在你未花费之前，别人是不知道你的公钥具体内容的。是不是很赞？</p>
+<h2 id="原始多重签名"><a href="#原始多重签名" class="headerlink" title="原始多重签名"></a>原始多重签名</h2><p>随着社区快速发展，人们发现需要多重签名，很快就出现了多重签名的输出格式，Gavin在BIP11里描述了这种输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">m &#123;pubkey&#125;...&#123;pubkey&#125; n OP_CHECKMULTISIG</span><br></pre></td></tr></table></figure>
+<p>2/2的一个原始多重签名示例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">2</span><br><span class="line">04cc71eb30d653c0c3163990c47b976f3fb3f37cccdcbedb169a1dfef58bbfbfaff7d8a473e7e2e6d317b87bafe8bde97e3cf8f065dec022b51d11fcdd0d348ac4</span><br><span class="line">0461cbdcc5409fb4b4d42b51d33381354d80e550078cb532a34bfa2fcfdeb7d76519aecc62770f5b0e4ef8551946d8a540911abe3e7854a26f39f58b25c15342af</span><br><span class="line">2 OP_CHECKMULTISIG</span><br></pre></td></tr></table></figure>
+<p>验证时的堆栈内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">花费脚本为：</span><br><span class="line">0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt;</span><br><span class="line"></span><br><span class="line">连接前向的输出，完整的堆栈：</span><br><span class="line">0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt; M &lt;pubkey_1&gt; &lt;...&gt; &lt;pubkey_N&gt; N OP_CHECKMULTISIG</span><br></pre></td></tr></table></figure>
+<p>OP_CHECKMULTISIG的运行过程稍微复杂一些：</p>
+<ol>
+<li>弹出最后一个数，就是N，公钥总数。<ul>
+<li>执行后堆栈为：<code>0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt; M &lt;pubkey_1&gt; &lt;...&gt; &lt;pubkey_N&gt;</code></li>
+</ul>
+</li>
+<li>弹出N个堆栈元素，就是这N把公钥。<ul>
+<li>执行后堆栈为：<code>0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt; M</code></li>
+</ul>
+</li>
+<li>弹出签名数量M，即需要M个签名数量。<ul>
+<li>执行后堆栈为：<code>0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt;</code></li>
+</ul>
+</li>
+<li>弹出M个堆栈元素，即需要M个签名。同时对M个签名进行验证。<ul>
+<li>执行后堆栈为：<code>0</code></li>
+</ul>
+</li>
+<li>弹出最后一个元素<code>0</code>。<ul>
+<li><code>0</code>即<code>OP_0</code>，为啥多这么一个奇怪的元素呢，因为早期实现<code>OP_CHECKMULTISIG</code>时，存在一个BUG，导致必须多放入一个元素到堆栈里。为了保持兼容性，则不得不放入<code>OP_0</code>，否则就是造成硬分叉。</li>
+</ul>
+</li>
+</ol>
+<p>这种类型的输出存在时间很短，大部分人几乎不知道它的的存在，如果你哪天看见某个交易的一个输出里冒出好几个地址，那就是这种古老原始的多重签名。早期主要应用于2/3的担保交易中。</p>
+<h2 id="P2SH"><a href="#P2SH" class="headerlink" title="P2SH"></a>P2SH</h2><p>因为实在是又丑又笨，Gavin很快捣鼓出一个改进版本BIP16：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OP_HASH160 &lt;redeem_script_hash&gt; OP_EQUAL</span><br></pre></td></tr></table></figure>
+<p>其实不用把公钥放在输出里了，放入其HASH值即可，与早期P2PK进化为P2PKH一样，将这些公钥连接在一起并计算出其HASH160的值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">RedeemScript = OP_nRequired | PUBKEY_1 | ... | PUBKEY_N | N | OP_CHECKMULTISIG</span><br><span class="line"></span><br><span class="line">20-byte-hash-value = RIPEMD-160(RedeemScript)</span><br></pre></td></tr></table></figure>
+<p>RedeemScript就是把参与的公钥以及m/n的设置值等连接在一起的内容，RedeemScript其实就是前面提到的“原始多重签名”的输出，哈希后产生的这20个字节刚好可以转为普通地址显示，就是现在最常见的3开头的p2sh多重签名地址。N最大为16把公钥。</p>
+<p>验证时的堆栈内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">花费脚本为：</span><br><span class="line">OP_0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt; &lt;redeemScript&gt;</span><br><span class="line"></span><br><span class="line">连接前向的输出，完整的堆栈：</span><br><span class="line">OP_0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt; &lt;redeemScript&gt; OP_HASH160 &lt;redeemScriptHash&gt; OP_EQUAL</span><br></pre></td></tr></table></figure>
+<p>验证过程分为两大步骤，第一步骤：</p>
+<ol>
+<li>执行<code>OP_HASH160</code>，计算HASH值：<code>&lt;redeemScript&gt; OP_HASH160</code><ul>
+<li>执行后堆栈为：<code>OP_0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt; &lt;redeemScriptHash&gt;&lt;redeemScriptHash&gt; OP_EQUAL</code></li>
+</ul>
+</li>
+<li>执行<code>OP_EQUAL</code>，验证两个哈希值是否相等<ul>
+<li>执行后堆栈为：<code>OP_0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt;</code></li>
+</ul>
+</li>
+</ol>
+<p>第二步骤，将展开花费脚本中的RedeemScript展开得到子脚本，就得到与“原始多重签名”一致的堆栈数据格式，并执行类似的验证过程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OP_0 &lt;sig_1&gt; &lt;...&gt; &lt;sig_M&gt; M &lt;pubkey_1&gt; &lt;...&gt; &lt;pubkey_N&gt; N OP_CHECKMULTISIG</span><br></pre></td></tr></table></figure>
+<p>当然，RedeemScript除了放多重签名脚本外，还可以放其他任何脚本，多重签名仅仅是一种应用而已，p2sh提供了无限可能性。</p>
+<h3 id="软分叉的关键点"><a href="#软分叉的关键点" class="headerlink" title="软分叉的关键点"></a>软分叉的关键点</h3><p>在第一步骤中，redeemScript是作为一个整体数据进栈的，而在第二步里，redeemScript会按照脚本进行解析得到N个栈元素，然后再依次进栈进行验证。这个过程是非常巧妙的，在第一步里，仅验证了脚本的哈希值是否一致，并没有验证签名。真正的签名信息是在第二步骤里进行验证的。因为这点，所以可以软分叉实施P2SH，老节点仅执行第一步骤，新节点执行两个步骤。</p>
+<p>当花费过一次后，redeemScript其实就公开了，那么对于老节点来说，任何人都可以用这个公开的redeemScript花掉相同地址的币（验证哈希值）。这就是被称为任何人可以花费（Anyone can spend）的原因。不过，特性激活后，新版全节点（出块节点必然是新版）会强制执行第二步验证，永远都不会被其他人偷花。</p>
+<h3 id="激活"><a href="#激活" class="headerlink" title="激活"></a>激活</h3><p>P2SH的激活，其实算是UASF或者是GASF（Gavin Actived Soft Fork），那时也没有规范的软分叉升级方案，如BIP9。升级代码就直接发布了，并设立了激活信号日2012年04月01日(测试网是2月15日)。支持的用户直接升级代码，不支持的用户不升级代码。</p>
+<p>为了防止潜在网络分叉，矿工在coinbase交易里打标识<code>/P2SH/</code>来标明支持P2SH。但这个仅供人为观察，并不是代码层面的。</p>
+<h3 id="影响深远"><a href="#影响深远" class="headerlink" title="影响深远"></a>影响深远</h3><p>P2SH是一个高度灵活的脚本方案，意义重大，影响深远，简直像打开了宝藏一样。其为后面的SegWit，MAST都铺平了道路。</p>
+<hr>
+<p>参考</p>
+<ul>
+<li><a href="https://github.com/bitcoin/bips/blob/master/bip-0011.mediawiki" target="_blank" rel="noopener">https://github.com/bitcoin/bips/blob/master/bip-0011.mediawiki</a></li>
+<li><a href="https://github.com/bitcoin/bips/blob/master/bip-0016.mediawiki" target="_blank" rel="noopener">https://github.com/bitcoin/bips/blob/master/bip-0016.mediawiki</a></li>
+<li><a href="https://github.com/bitcoin/bitcoin/blob/v0.6.0/src/main.cpp#L1281" target="_blank" rel="noopener">https://github.com/bitcoin/bitcoin/blob/v0.6.0/src/main.cpp#L1281</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://panzhibiao.com/2019/02/12/p2sh/" data-id="cjs4cas3w000d2ms60kmgzckd" class="article-share-link">Share</a>
+      
+        <a href="http://panzhibiao.com/2019/02/12/p2sh/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-bip8" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/02/11/bip8/" class="article-date">
@@ -170,7 +313,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/11/bip8/" data-id="cjs0kj5wd000bdt2px1iaxewy" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/11/bip8/" data-id="cjs4cas3x000e2ms6ol5dnghu" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/11/bip8/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -231,6 +374,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/02/12/p2sh/">P2SH-为比特币赋能的脚本</a>
+          </li>
+        
+          <li>
             <a href="/2019/02/11/bip8/">谈谈软分叉升级规范BIP8-后矿工时代的软分叉方式</a>
           </li>
         
@@ -244,10 +391,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2016/04/08/understand-bitcoin-script/">理解比特币脚本</a>
-          </li>
-        
-          <li>
-            <a href="/2015/03/11/shadowsocks-add-bitcoin-support/">Shadowsocks 加入比特币的支持</a>
           </li>
         
       </ul>
