@@ -79,6 +79,79 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-bip143" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/21/bip143/" class="article-date">
+  <time datetime="2019-02-21T10:43:27.000Z" itemprop="datePublished">Feb 21 2019</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/21/bip143/">bip143-新的交易签名摘要算法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>现有四种ECDSA签名的验证OP码: <code>OP_CHECKSIG</code>, <code>OP_CHECKSIGVERIFY</code>, <code>OP_CHECKMULTISIG</code>, <code>OP_CHECKMULTISIGVERIFY</code>。</p>
+<p>还有四种签名的种类：<code>ALL</code>, <code>NONE</code>, <code>SINGLE</code>, <code>ANYONECANPAY</code>。</p>
+<p>但是存在至少两个缺陷：</p>
+<ul>
+<li>现在的验证交易存在潜在过于复杂的问题，验证过程的时间度复杂是O(n^2)。构造一个1MB大小的交易，则需要花费2秒左右才能完成验证。</li>
+<li>交易签名时，在不访问前向输出的情况下，是无法知道输入的金额的。因为交易输入里记录的前向交易的哈希值以及位于前向交易的第几个输出位置，其中并不包含金额。导致冷钱包或者分离式的签名器无法安全的进行签名操作，被迫信任传入的交易数据金额。</li>
+</ul>
+<p>在原有的脚本上解决这个问题，并非易事。不过，在Segwit软分叉基础上，可以做到。</p>
+<h2 id="验证交易的时间复杂度缺陷"><a href="#验证交易的时间复杂度缺陷" class="headerlink" title="验证交易的时间复杂度缺陷"></a>验证交易的时间复杂度缺陷</h2><p>现有交易验证过程：</p>
+<ol>
+<li>剔除交易其他输入的签名数据</li>
+<li>替换当前输入的脚本<code>scriptSig</code>为前向交易对应输出的脚本<code>scriptPubKey</code></li>
+<li>对当前交易做哈希运算，double-SHA256后得到32字节的结果</li>
+<li>对32字节结果进行签名</li>
+<li>循环这个过程，直到遍历处理完所有输入</li>
+</ol>
+<p>为何上述过程的时间复杂度是O(n^2)呢？很容易，两个线性叠加了：1. 交易越大，输入数量越多 2. 交易越大，单次交易哈希计算过程越长。</p>
+<p>构建一个典型的交易：</p>
+<ul>
+<li>一个1MB的交易，输入3,300个，输出406,000 bytes，仅哈希计算则需要：3300 * 406,000，约1.34GB，需要时间10.9秒。</li>
+<li>一个8MB的交易，输入22,500个，输出3.95MB，仅哈希计算则需要：22500 * 3.95，大约是88.8GB，需要时间超过11分钟。</li>
+</ul>
+<p>也就是说随着交易体积的线性增大，验证交易的时间呈指数级增长。</p>
+<h2 id="实施细节"><a href="#实施细节" class="headerlink" title="实施细节"></a>实施细节</h2><p>重新定义一个交易哈希摘要算法，但新摘要算法仅与version为零的witness program一起工作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Double SHA256一下字段序列化后的数据:</span><br><span class="line">     1. 交易版本号，nVersion  (4-byte little endian)</span><br><span class="line">     2. 所有前向交易输出点(hash &amp; position)哈希，hashPrevouts (32-byte hash)</span><br><span class="line">     3. 所有输入的序列值哈希，hashSequence (32-byte hash)</span><br><span class="line">     4. 当前输入的前向交易输出点，outpoint (32-byte hash + 4-byte little endian) </span><br><span class="line">     5. 当前输入的前向交易输出脚本，scriptCode of the input (serialized as scripts inside CTxOuts)</span><br><span class="line">     6. 当前输入的前向交易输出金额，value of the output spent by this input (8-byte little endian)</span><br><span class="line">     7. 当前输入的序列值，nSequence of the input (4-byte little endian)</span><br><span class="line">     8. 交易所有输出的哈希，hashOutputs (32-byte hash)</span><br><span class="line">     9. 锁定时间值，nLocktime of the transaction (4-byte little endian)</span><br><span class="line">    10. 签名哈希类型值，sighash type of the signature (4-byte little endian)</span><br></pre></td></tr></table></figure>
+<p>若只有1，4，7，9，10，则与旧签名算法中的含义一致。</p>
+<p>对于解决复杂度问题，新摘要算法的解决办法很简单，把重复计算的数据先预计算为32字节的哈希值，那么整个新算法的序列化后数据长度则与交易大小基本没关系。</p>
+<p>其中5，6保证了签名时，签名者可确认签名金额和脚本，解决了输入金额盲签的问题。</p>
+<hr>
+<p>参考：</p>
+<ul>
+<li><a href="https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki" target="_blank" rel="noopener">https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://panzhibiao.com/2019/02/21/bip143/" data-id="cjsei4erp000go0s6b17e6cvc" class="article-share-link">Share</a>
+      
+        <a href="http://panzhibiao.com/2019/02/21/bip143/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-BIP141" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/02/21/BIP141/" class="article-date">
@@ -188,11 +261,16 @@ ga('send', 'pageview');
 <p>额外的数据可以采用commitment方式填入，借助软分叉升级。</p>
 <h3 id="新的脚本系统"><a href="#新的脚本系统" class="headerlink" title="新的脚本系统"></a>新的脚本系统</h3><p><code>scriptPubKey</code>采用的版本号，若老节点看不懂这个新版本号，但会认为是任何人都可以花费的(因为脚本堆栈执行总是True)，所以将来可以采用这种机制来新增脚本系统，并且都将是软分叉。</p>
 <p>而<code>witness</code>部分目前是没有任何限制的，也就是说可以完全绕开520字节的脚本大小限制。未来也可以轻松引入新的签名机制，例如Schnorr签名。</p>
+<hr>
+<p>参考：</p>
+<ul>
+<li><a href="https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki" target="_blank" rel="noopener">https://github.com/bitcoin/bips/blob/master/bip-0141.mediawiki</a></li>
+</ul>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/21/BIP141/" data-id="cjsehuqae000bg9s6r5sg8ktb" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/21/BIP141/" data-id="cjsei4ero000fo0s6zoqhn9kh" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/21/BIP141/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -335,7 +413,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/12/p2sh/" data-id="cjsehuqag000dg9s6988i2fvm" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/12/p2sh/" data-id="cjsei4ern000eo0s6qla5jq6s" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/12/p2sh/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -440,7 +518,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/11/bip8/" data-id="cjsehuqah000eg9s6ds3bx1qq" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/11/bip8/" data-id="cjsei4erm000do0s6ydl9s907" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/11/bip8/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -464,23 +542,9 @@ ga('send', 'pageview');
 
   
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tags</h3>
-    <div class="widget">
-      <ul class="tag-list"></ul>
-    </div>
-  </div>
-
 
   
     
-  <div class="widget-wrap">
-    <h3 class="widget-title">Tag Cloud</h3>
-    <div class="widget tagcloud">
-      
-    </div>
-  </div>
-
   
     
   <div class="widget-wrap">
@@ -499,6 +563,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/02/21/bip143/">bip143-新的交易签名摘要算法</a>
+          </li>
+        
+          <li>
             <a href="/2019/02/21/BIP141/">BIP141, Segregated Witness</a>
           </li>
         
@@ -512,10 +580,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2018/03/25/The-Significance-of-the-Lightning-Network/">闪电网络的伟大意义 The Significance of the Lightning Network</a>
-          </li>
-        
-          <li>
-            <a href="/2016/04/21/BIP9/">新的软分叉升级规范BIP9</a>
           </li>
         
       </ul>
