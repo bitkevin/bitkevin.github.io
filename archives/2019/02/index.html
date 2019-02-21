@@ -79,6 +79,133 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-BIP141" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/21/BIP141/" class="article-date">
+  <time datetime="2019-02-21T10:34:02.000Z" itemprop="datePublished">Feb 21 2019</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/21/BIP141/">BIP141, Segregated Witness</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Transaction-ID"><a href="#Transaction-ID" class="headerlink" title="Transaction ID"></a>Transaction ID</h2><p>在新的结构下，每个交易将有两个ID.</p>
+<p><code>txid</code>保持不变，Double SHA256哈希以下序列化的数据：</p>
+<p><code>[nVersion][txins][txouts][nLockTime]</code></p>
+<p>新定义一个<code>wtxid</code>，Double SHA256哈希含有witness数据的序列化数据：</p>
+<p><code>[nVersion][marker][flag][txins][txouts][witness][nLockTime]</code></p>
+<p>其中：</p>
+<ul>
+<li><code>nVersion</code>, <code>txins</code>, <code>txouts</code>, and <code>nLockTime</code>保持不变</li>
+<li><code>marker</code>必须为一个字节的零值：<code>0x00</code></li>
+<li><code>flag</code>必须为一个字节的非零值，目前使用<code>0x01</code></li>
+<li><code>witness</code>为交易的所有见证数据<ul>
+<li>起始用<code>var_int</code>表示有几个输入</li>
+<li>然后每个项的起始用<code>var_int</code>标识其数据长度</li>
+<li>Witness数据并不是脚本</li>
+</ul>
+</li>
+</ul>
+<p>如果一个交易输入不含有任何的witness program（可以视为不带OP操作码的<code>scriptPubKey</code>），则交易的<code>wtxid</code>等于<code>txid</code>。</p>
+<h2 id="Commitment"><a href="#Commitment" class="headerlink" title="Commitment"></a>Commitment</h2><p>新增一个规则，coinbase交易的wtxid认为是<code>0x0000...0000</code>。</p>
+<p>新增一个<code>witness root hash</code>，每个交易的<code>wtxid</code>作为叶子计算而来。类似原块头中的<code>merkle root hash</code>。</p>
+<p>这个Commitment存在在coinbase交易的某个输出<code>scriptPubKey</code>中，长度必须至少为38Bytes，前六个字节内容固定是<code>0x6a24aa21a9ed</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> 1-byte - OP_RETURN (0x6a)</span><br><span class="line"> 1-byte - Push the following 36 bytes (0x24)</span><br><span class="line"> 4-byte - Commitment header (0xaa21a9ed)</span><br><span class="line">32-byte - Commitment hash: Double-SHA256(witness root hash|witness reserved value)</span><br><span class="line">  </span><br><span class="line">39th byte onwards: Optional data with no consensus meaning</span><br></pre></td></tr></table></figure>
+<p>如果交易的多个输出符合六个字节前缀，则认为序列最大的输出项为Commitment。</p>
+<p>Coinbase交易5b298d2e51d996cf6f8f5b12f2c44fa3203b39e0514025268b55ddc46ac72e73，其Hex内容为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">010000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff4d03819a08045cda6c5c2f706f6f6c696e2e636f6d2ffabe6d6db24bb958ea51e4bb25e0975c5ff65071a38f81d6e65a447105e1340b24171bee01000000000000009e2268d82707000000000000ffffffff025cac6d4b0000000017a914b757c3e4653706dd01f7b8345a6d71d96a7b136b870000000000000000266a24aa21a9ed5586b81f398ff1a8f20da1405bc92e6bbd2dda466414ca90bbd8215f77fe0c340120000000000000000000000000000000000000000000000000000000000000000000000000</span><br></pre></td></tr></table></figure>
+<p>分解Coinbase TX：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">01000000 - version</span><br><span class="line">00 - marker</span><br><span class="line">01 - flag</span><br><span class="line"></span><br><span class="line">Inputs:</span><br><span class="line">01 - 1 input</span><br><span class="line">  input[0].prev-txout-hash 0000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line">  input[0].prev-txout-position ffffffff</span><br><span class="line">  input[0].sigScript:</span><br><span class="line">  4d - len, 0x4d=77Bytes</span><br><span class="line">  03819a08045cda6c5c2f706f6f6c696e2e636f6d2ffabe6d6db24bb958ea51e4bb25</span><br><span class="line">  e0975c5ff65071a38f81d6e65a447105e1340b24171bee01000000000000009e2268</span><br><span class="line">  d82707000000000000</span><br><span class="line">  input[0].sequence: ffffffff</span><br><span class="line"></span><br><span class="line">Outputs:</span><br><span class="line">02 - 2 outputs</span><br><span class="line">  output[0].value - 5cac6d4b00000000</span><br><span class="line">  output[0].scriptPubKey - 17a914b757c3e4653706dd01f7b8345a6d71d96a7b136b87</span><br><span class="line">  </span><br><span class="line">  output[1].value - 0000000000000000</span><br><span class="line">  output[1].scriptPubKey -</span><br><span class="line">  266a24aa21a9ed5586b81f398ff1a8f20da1405bc92e6bbd2dda466414ca90bbd821</span><br><span class="line">  5f77fe0c34</span><br><span class="line"></span><br><span class="line">Witness:</span><br><span class="line">01 - 1 witness item</span><br><span class="line">  witness[0].len - 20</span><br><span class="line">  witness[0].data - </span><br><span class="line">  0000000000000000000000000000000000000000000000000000000000000000</span><br><span class="line"></span><br><span class="line">00000000 - locktime</span><br></pre></td></tr></table></figure>
+<p>其实就是两套Merkle树，一套由<code>txid</code>作为叶子，一套由<code>wtxid</code>作为叶子。保持软分叉，块头不动，新的一套Merkle树根值，放入Coinbase交易里。Coinbase交易呢，走原来的Merkle树，根值放入块头。</p>
+<h2 id="Witness-Program"><a href="#Witness-Program" class="headerlink" title="Witness Program"></a>Witness Program</h2><h3 id="Native-Witness-Program"><a href="#Native-Witness-Program" class="headerlink" title="Native Witness Program"></a>Native Witness Program</h3><p>此时输出的<code>scriptPubKey</code>内容为：</p>
+<p><code>[version][witness_program]</code></p>
+<ul>
+<li><code>version</code> ：1 bytes，表示版本，值范围是：[0, 16]</li>
+<li><code>witness_program</code>: 数据，长度2~40 Bytes</li>
+</ul>
+<p>当前，version是<code>0x00</code>，<code>witness_program</code>的长度为20或32字节。</p>
+<h3 id="P2SH-Witness-Program"><a href="#P2SH-Witness-Program" class="headerlink" title="P2SH Witness Program"></a>P2SH Witness Program</h3><p>即通过P2SH进行包装一下：</p>
+<p><code>OP_HASH160 [20 BYTES HASH] OP_EQUAL</code></p>
+<p>其中：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">20_BYTES_HASH = HASH160(redeemScript)</span><br><span class="line"></span><br><span class="line">redeemScript = [version] + [witness_program]</span><br></pre></td></tr></table></figure>
+<h4 id="P2WPKH"><a href="#P2WPKH" class="headerlink" title="P2WPKH"></a>P2WPKH</h4><p>P2WPKH，即Pay to Witness Pubkey Hash。Witness Program长度为20字节。</p>
+<p>其中：</p>
+<ul>
+<li>version = 0</li>
+<li>witness_program = hash160(pubkey)</li>
+</ul>
+<p>脚本堆栈为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Witness:</span><br><span class="line">[signature] [pubkey]</span><br><span class="line"></span><br><span class="line">scriptSig:</span><br><span class="line">(empty)</span><br><span class="line"></span><br><span class="line">scriptPubKey:</span><br><span class="line">[0] [20_bytes]</span><br></pre></td></tr></table></figure>
+<p>通过执行<code>CHECKSIG</code>来完成签名验证：<code>&lt;signature&gt; &lt;pubkey&gt; CHECKSIG</code>。在验证脚本时，会先封装20bytes的数据为脚本：<code>OP_HASH160 &lt;20bytes&gt; OP_EQUAL</code>，并入栈执行。</p>
+<p>若采用P2SH来包装的话，则有：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">     witness: &lt;signature&gt; &lt;pubkey&gt;</span><br><span class="line">   scriptSig: &lt;redeem_script&gt;</span><br><span class="line">scriptPubKey: HASH160 &lt;20-byte-script-hash&gt; EQUAL</span><br><span class="line"></span><br><span class="line">redeem_script : [version] + [witness_program]</span><br></pre></td></tr></table></figure>
+<p>会先验证redeem_script的hash160，然后再分解redeem_script得到20Bytes，再包装为<code>OP_HASH160 &lt;20bytes&gt; OP_EQUAL</code>，并入栈执行。</p>
+<h4 id="P2WSH"><a href="#P2WSH" class="headerlink" title="P2WSH"></a>P2WSH</h4><p>P2WSH，即Pay to Witness Script Hash。Witness Program长度为32字节。</p>
+<p>其中：</p>
+<ul>
+<li>version = 0</li>
+<li>witness_program = sha256(witnessScript)</li>
+</ul>
+<p>脚本堆栈为（1/2多重签名）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">Witness:</span><br><span class="line">0 &lt;signature1&gt; &lt;witness_script&gt;</span><br><span class="line"></span><br><span class="line">scriptSig:</span><br><span class="line">(empty)</span><br><span class="line"></span><br><span class="line">scriptPubKey:</span><br><span class="line">[0] [32_bytes]</span><br><span class="line"></span><br><span class="line">其中：</span><br><span class="line">witness_script = 1 &lt;pubkey1&gt; &lt;pubkey2&gt; 2 CHECKMULTISIG</span><br></pre></td></tr></table></figure>
+<p>执行与P2SH的redeem_script一致，分为两步：</p>
+<ol>
+<li>验证witness_script的sha256哈希值。</li>
+<li>分解witness_script为子脚本，重新入栈并执行脚本。</li>
+</ol>
+<h2 id="其他共识规则"><a href="#其他共识规则" class="headerlink" title="其他共识规则"></a>其他共识规则</h2><h3 id="Block-size-区块大小"><a href="#Block-size-区块大小" class="headerlink" title="Block size 区块大小"></a>Block size 区块大小</h3><p>原来的规则是单个区块大小最大值为1,000,000 Bytes，因剥离出Witness数据，这里提出一个新的单位Weight进行改进：</p>
+<p><code>Block_Weight = Base_Size * 3 + Total_Size</code></p>
+<ul>
+<li><code>Base_Size</code>，基础大小，定义是：剥离witness相关数据后的大小，即未升级节点所看到的数据部分。</li>
+<li><code>Total_Size</code>，全大小，定义是：包含witness相关数据的所有数据大小。</li>
+<li><code>Base_Size &lt;= 4,000,000</code></li>
+</ul>
+<h3 id="Sigops-操作数"><a href="#Sigops-操作数" class="headerlink" title="Sigops 操作数"></a>Sigops 操作数</h3><p>Sigops当前单个区块限制是 20,000，修改为：</p>
+<p>用于pubkey script, signature script, 以及 P2SH check script的Sigops重新定义为原来的4倍。块限制亦同样的变为四倍 80,000.</p>
+<h2 id="Commitment结构可扩展性"><a href="#Commitment结构可扩展性" class="headerlink" title="Commitment结构可扩展性"></a>Commitment结构可扩展性</h2><p>现有commitment计算过程：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Commitment hash: Double-SHA256(witness root hash|witness reserved value)</span><br><span class="line"></span><br><span class="line">witness reserved value: 当前是32 bytes的零值，存在在coinbase交易的witness里</span><br></pre></td></tr></table></figure>
+<p>例如我们新加了一个特性，其也有数据的commitment值，那么可以将原来的<code>witness reserved value</code>更新为：<code>Hash(new commitment|witness reserved value)</code>，那么并不影响旧节点对commitment的校验。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Double-SHA256(Witness root hash|Hash(new commitment|witness reserved value))</span><br></pre></td></tr></table></figure>
+<p>这个方法可以扩展为多个commitment，未来可以用于其他的软分叉升级。</p>
+<h2 id="未来的扩展"><a href="#未来的扩展" class="headerlink" title="未来的扩展"></a>未来的扩展</h2><h3 id="减少SPV欺骗"><a href="#减少SPV欺骗" class="headerlink" title="减少SPV欺骗"></a>减少SPV欺骗</h3><p>SPV节点目前依然有几个问题无法验证：</p>
+<ul>
+<li>无法验证矿工是否在coinbase交易里增发币。不下载完整区块，就无法的得知所有交易的手续费，就无法得知块手续费。</li>
+<li>无法验证是否违反其他共识规则，例如块大小限制、sigops限制。</li>
+<li>无法验证输入交易是否存在，除非拿到直至coinbase交易的前向交易链条。</li>
+</ul>
+<p>额外的数据可以采用commitment方式填入，借助软分叉升级。</p>
+<h3 id="新的脚本系统"><a href="#新的脚本系统" class="headerlink" title="新的脚本系统"></a>新的脚本系统</h3><p><code>scriptPubKey</code>采用的版本号，若老节点看不懂这个新版本号，但会认为是任何人都可以花费的(因为脚本堆栈执行总是True)，所以将来可以采用这种机制来新增脚本系统，并且都将是软分叉。</p>
+<p>而<code>witness</code>部分目前是没有任何限制的，也就是说可以完全绕开520字节的脚本大小限制。未来也可以轻松引入新的签名机制，例如Schnorr签名。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://panzhibiao.com/2019/02/21/BIP141/" data-id="cjsehuqae000bg9s6r5sg8ktb" class="article-share-link">Share</a>
+      
+        <a href="http://panzhibiao.com/2019/02/21/BIP141/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-p2sh" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/02/12/p2sh/" class="article-date">
@@ -208,7 +335,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/12/p2sh/" data-id="cjs4cja7s000evvs64hhd9t81" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/12/p2sh/" data-id="cjsehuqag000dg9s6988i2fvm" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/12/p2sh/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -313,14 +440,12 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/11/bip8/" data-id="cjs4cja7r000dvvs6ow5m0hcw" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/11/bip8/" data-id="cjsehuqah000eg9s6ds3bx1qq" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/11/bip8/#disqus_thread" class="article-comment-link">Comments</a>
       
       
       
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/bip8-bip9-uasf-bip148-bip91/">bip8,bip9,uasf,bip148,bip91</a></li></ul>
-
     </footer>
   </div>
   
@@ -342,7 +467,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">Tags</h3>
     <div class="widget">
-      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/bip8-bip9-uasf-bip148-bip91/">bip8,bip9,uasf,bip148,bip91</a></li></ul>
+      <ul class="tag-list"></ul>
     </div>
   </div>
 
@@ -352,7 +477,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/bip8-bip9-uasf-bip148-bip91/" style="font-size: 10px;">bip8,bip9,uasf,bip148,bip91</a>
+      
     </div>
   </div>
 
@@ -374,6 +499,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/02/21/BIP141/">BIP141, Segregated Witness</a>
+          </li>
+        
+          <li>
             <a href="/2019/02/12/p2sh/">P2SH-为比特币赋能的脚本</a>
           </li>
         
@@ -387,10 +516,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2016/04/21/BIP9/">新的软分叉升级规范BIP9</a>
-          </li>
-        
-          <li>
-            <a href="/2016/04/08/understand-bitcoin-script/">理解比特币脚本</a>
           </li>
         
       </ul>

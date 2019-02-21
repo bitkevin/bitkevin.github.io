@@ -2,16 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://panzhibiao.com/2019/02/12/p2sh/</loc>
+    <loc>http://panzhibiao.com/2019/02/11/bip8/</loc>
     
-    <lastmod>2019-02-14T08:05:37.339Z</lastmod>
+    <lastmod>2019-02-21T10:41:38.504Z</lastmod>
     
   </url>
   
   <url>
-    <loc>http://panzhibiao.com/2019/02/11/bip8/</loc>
+    <loc>http://panzhibiao.com/2019/02/21/BIP141/</loc>
     
-    <lastmod>2019-02-12T03:41:42.065Z</lastmod>
+    <lastmod>2019-02-21T10:39:36.520Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://panzhibiao.com/2019/02/12/p2sh/</loc>
+    
+    <lastmod>2019-02-14T08:26:54.121Z</lastmod>
     
   </url>
   
@@ -23,7 +30,7 @@
   </url>
   
   <url>
-    <loc>http://panzhibiao.com/2013/08/03/proof-of-work-and-mining/</loc>
+    <loc>http://panzhibiao.com/2014/06/15/safe-wallet-idea/</loc>
     
     <lastmod>2018-03-25T15:08:43.000Z</lastmod>
     
@@ -37,28 +44,7 @@
   </url>
   
   <url>
-    <loc>http://panzhibiao.com/2013/10/27/bitcoin-transaction-01/</loc>
-    
-    <lastmod>2018-03-25T15:08:43.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://panzhibiao.com/2013/10/27/bitcoin-transaction-02/</loc>
-    
-    <lastmod>2018-03-25T15:08:43.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://panzhibiao.com/2013/07/20/what-is-bitcoin/</loc>
-    
-    <lastmod>2018-03-25T15:08:43.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://panzhibiao.com/2014/06/15/safe-wallet-idea/</loc>
     
     <lastmod>2018-03-25T15:08:43.000Z</lastmod>
     
@@ -72,7 +58,7 @@
   </url>
   
   <url>
-    <loc>http://panzhibiao.com/2016/04/08/understand-bitcoin-script/</loc>
+    <loc>http://panzhibiao.com/2013/07/20/what-is-bitcoin/</loc>
     
     <lastmod>2018-03-25T15:08:43.000Z</lastmod>
     
@@ -93,6 +79,20 @@
   </url>
   
   <url>
+    <loc>http://panzhibiao.com/2013/08/03/proof-of-work-and-mining/</loc>
+    
+    <lastmod>2018-03-25T15:08:43.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://panzhibiao.com/2016/04/08/understand-bitcoin-script/</loc>
+    
+    <lastmod>2018-03-25T15:08:43.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://panzhibiao.com/2013/07/30/bitcoin-basic/</loc>
     
     <lastmod>2018-03-25T15:08:43.000Z</lastmod>
@@ -101,6 +101,13 @@
   
   <url>
     <loc>http://panzhibiao.com/2014/06/14/open-nodes-plan/</loc>
+    
+    <lastmod>2018-03-25T15:08:43.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://panzhibiao.com/2013/10/27/bitcoin-transaction-01/</loc>
     
     <lastmod>2018-03-25T15:08:43.000Z</lastmod>
     
