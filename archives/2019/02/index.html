@@ -101,7 +101,15 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>比特币通过定义一系列OP码，将输入、输出的脚本压栈运行，根据运行结果判定花费行为是否合法。通常花费条件全部记录在交易的输出中。这个模式有一些缺点：</p>
+        <h2 id="写在前面的话"><a href="#写在前面的话" class="headerlink" title="写在前面的话"></a>写在前面的话</h2><p>个人认为比特币脚本发展有三个阶段：</p>
+<p>第一阶段，原始脚本阶段，仅有脚本。典型的有：P2PH, P2PKH。<code>Script = scriptSig + scriptPubKey</code>构成。所有数据都是显式的，有诸多限制的。脚本升级比较困难。</p>
+<p>第二阶段，半自由阶段：脚本+脚本哈希。脚本形式有所突破，变得更加灵活。从<a href="https://panzhibiao.com/2019/02/12/p2sh/">P2SH</a>开始，以及后面的<a href="https://panzhibiao.com/2019/02/21/BIP141/">Segwit</a>，都是采用这种形式构成，特征是输出里仅存放执行脚本的哈希。这一阶段的脚本依然受到一些限制，大小和OP操作数等，但灵活性已经大大增强，可轻松软分叉升级。脚本执行过程也变为两部：1. 验证哈希 2. 执行子脚本。</p>
+<ul>
+<li>P2SH: 输出中存放的是<code>RedeemScript</code>脚本哈希</li>
+<li>SegWit: 输出中存放的是<code>witness</code>脚本哈希</li>
+</ul>
+<p>第三阶段，自由阶段：脚本+脚本哈希+语法树。在第二阶段的基础上，发展为语法树。输出依然存储的是哈希，但进化为脚本语法树的根哈希值，即MAST结构。MAST突破了诸多限制，大小和OP限制等。灵活性，扩展性均极大增强，可衍生出丰富的应用场景。MAST目前依然是处于<code>提议</code>阶段，尚未实施。</p>
+<h2 id="比特币的脚本输出"><a href="#比特币的脚本输出" class="headerlink" title="比特币的脚本输出"></a>比特币的脚本输出</h2><p>比特币通过定义一系列OP码，将输入、输出的脚本压栈运行，根据运行结果判定花费行为是否合法。通常花费条件全部记录在交易的输出中。这个模式有一些缺点：</p>
 <ol>
 <li>接受者很难指定条件<ul>
 <li>当前主要是匹配公钥或者其哈希，然后花费时校验其签名</li>
@@ -114,9 +122,14 @@ ga('send', 'pageview');
 </ol>
 <p>P2SH的提出，解决了上述1、2、3三个问题。P2SH分离出RedeemScript，将其20字节Hash值放入输出，花费时提供出RedeemScript并执行。但依然有520字节限制，并需要公开完整的RedeemScript。</p>
 <p>在Segwit里，定义了一个新的脚本输出格式，P2WSH，pay to witness script hash。与P2SH非常类似，但hash是32字节的，script存放在witness字段中（而不是原来的scriptSig字段）。</p>
-<h2 id="Merkelized-Abstract-Syntax-Tree"><a href="#Merkelized-Abstract-Syntax-Tree" class="headerlink" title="Merkelized Abstract Syntax Tree"></a>Merkelized Abstract Syntax Tree</h2><p>MAST采用Merkle树将各个分支编码进脚本(Script)。花费时，仅需要提供执行的分支脚本和相关层的hash进行验证，不执行的分支脚本无需公开。需要验证的哈希层数是O(log N)复杂度，假设可执行的脚本分支多达1024个，那么层数也仅有10层，依然可以保持很小的体积。因无需展示出所有的脚本，实际也突破了脚本大小的520字节硬限制。</p>
+<h2 id="Merkelized-Abstract-Syntax-Tree"><a href="#Merkelized-Abstract-Syntax-Tree" class="headerlink" title="Merkelized Abstract Syntax Tree"></a>Merkelized Abstract Syntax Tree</h2><h3 id="抽象语法树，-Abstract-Syntax-Tree"><a href="#抽象语法树，-Abstract-Syntax-Tree" class="headerlink" title="抽象语法树， Abstract Syntax Tree"></a>抽象语法树， Abstract Syntax Tree</h3><p>抽象语法树，或语法树，计算里非常常见。通过树形来表达编程语言的一种结构。</p>
+<p>例如这段的代码展开后的语法树：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">while b ≠ 0</span><br><span class="line">    if a &gt; b</span><br><span class="line">        a := a − b</span><br><span class="line">    else</span><br><span class="line">        b := b − a</span><br><span class="line">    return a</span><br></pre></td></tr></table></figure>
+<p><img src="https://user-images.githubusercontent.com/514951/53312467-1a88f300-38f0-11e9-9403-18a6ab033000.png" alt="400px-abstract_syntax_tree_for_euclidean_algorithm svg"></p>
+<p>MAST也是采用树状结构的一种语法树，但更加精简：去掉条件判断，每个独立脚本就是一个叶子节点，每一个叶子节点就是一个执行分支。</p>
+<h3 id="MAST"><a href="#MAST" class="headerlink" title="MAST"></a>MAST</h3><p>MAST采用Merkle树将各个分支编码进脚本(Script)。花费时，仅需要提供执行的分支脚本和相关层的hash进行验证，不执行的分支脚本无需公开。需要验证的哈希层数是O(log N)复杂度，假设可执行的脚本分支多达1024个，那么层数也仅有10层，依然可以保持很小的体积。因无需展示出所有的脚本，实际也突破了脚本大小的520字节硬限制。</p>
 <p>值得注意的是：MAST是二叉树，但无需平衡构造，形状任意。</p>
-<p>在BIP141里，设定了交易输出witness program的格式：</p>
+<p>在BIP141（Segregated Witness）里，设定了交易输出witness program的格式：</p>
 <p><code>[version][program]</code></p>
 <p>这里我们设定MAST类型输出的version为1，program的大小为32字节，其中witness program即为<code>MAST Root</code>。</p>
 <p>欲花费这种的输入，则输入witness为：</p>
@@ -195,7 +208,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/24/MAST/" data-id="cjshpnm17000fca2pkj79hzkn" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/24/MAST/" data-id="cjsjukf0o000dn0s6ipj3uyk1" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/24/MAST/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -268,7 +281,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/21/bip143/" data-id="cjshpnm18000gca2pcb3x4yrr" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/21/bip143/" data-id="cjsjukf0s000hn0s66zaq1ow5" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/21/bip143/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -402,7 +415,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/21/BIP141/" data-id="cjshpnm16000eca2py841mjhr" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/21/BIP141/" data-id="cjsjukf0r000gn0s6qhpkw2lb" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/21/BIP141/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -545,7 +558,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/12/p2sh/" data-id="cjshpnm19000hca2pc8fqafaw" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/12/p2sh/" data-id="cjsjukf0q000fn0s6t40jsq0v" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/12/p2sh/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -650,7 +663,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/11/bip8/" data-id="cjshpnm15000dca2pt88m0fvl" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/11/bip8/" data-id="cjsjukf0p000en0s6hluwkro4" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/11/bip8/#disqus_thread" class="article-comment-link">Comments</a>
       
