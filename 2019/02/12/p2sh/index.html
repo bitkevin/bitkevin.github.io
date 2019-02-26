@@ -27,10 +27,13 @@ ga('send', 'pageview');
 <meta property="og:site_name" content="比特币实验室">
 <meta property="og:description" content="P2SH即Pay to Script Key Hash，最常见的应用是多重签名，N把公钥，M人签名时才能花费这笔交易(M&amp;lt;=N, N&amp;lt;=16)，地址通常是以3开头的格式。当然，p2sh除了用来做多重签名之外，能做的事情简直无数。 P2PK比特币早期中本聪时期是P2PK(pay to public key)这种输出形式的，最早是直接放入一把公钥进去了，还是未压缩的，感受一下： 10467">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-02-14T08:26:54.121Z">
+<meta property="og:image" content="https://user-images.githubusercontent.com/514951/53393132-7ded5080-39d6-11e9-8dc9-9a859be381d2.png">
+<meta property="og:image" content="https://user-images.githubusercontent.com/514951/53393138-834a9b00-39d6-11e9-895c-3c0d2aa1abf4.png">
+<meta property="og:updated_time" content="2019-02-26T07:11:27.056Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="P2SH-为比特币赋能的脚本">
 <meta name="twitter:description" content="P2SH即Pay to Script Key Hash，最常见的应用是多重签名，N把公钥，M人签名时才能花费这笔交易(M&amp;lt;=N, N&amp;lt;=16)，地址通常是以3开头的格式。当然，p2sh除了用来做多重签名之外，能做的事情简直无数。 P2PK比特币早期中本聪时期是P2PK(pay to public key)这种输出形式的，最早是直接放入一把公钥进去了，还是未压缩的，感受一下： 10467">
+<meta name="twitter:image" content="https://user-images.githubusercontent.com/514951/53393132-7ded5080-39d6-11e9-8dc9-9a859be381d2.png">
   
     <link rel="alternate" href="/atom.xml" title="比特币实验室" type="application/atom+xml">
   
@@ -199,6 +202,11 @@ ga('send', 'pageview');
 <h3 id="激活"><a href="#激活" class="headerlink" title="激活"></a>激活</h3><p>P2SH的激活，其实算是UASF或者是GASF（Gavin Actived Soft Fork），那时也没有规范的软分叉升级方案，如BIP9。升级代码就直接发布了，并设立了激活信号日2012年04月01日(测试网是2月15日)。支持的用户直接升级代码，不支持的用户不升级代码。</p>
 <p>为了防止潜在网络分叉，矿工在coinbase交易里打标识<code>/P2SH/</code>来标明支持P2SH。但这个仅供人为观察，并不是代码层面的。</p>
 <h3 id="影响深远"><a href="#影响深远" class="headerlink" title="影响深远"></a>影响深远</h3><p>P2SH是一个高度灵活的脚本方案，意义重大，影响深远，简直像打开了宝藏一样。其为后面的SegWit，MAST都铺平了道路。</p>
+<h3 id="发展状况"><a href="#发展状况" class="headerlink" title="发展状况"></a>发展状况</h3><p>数据来源：<a href="https://p2sh.info" target="_blank" rel="noopener">https://p2sh.info</a></p>
+<p>截止2019年2月，全网大约32%的币存储在P2SH的输出里。</p>
+<p><img src="https://user-images.githubusercontent.com/514951/53393132-7ded5080-39d6-11e9-8dc9-9a859be381d2.png" alt="p2sh-values"></p>
+<p>P2SH的输出类型统计：</p>
+<p><img src="https://user-images.githubusercontent.com/514951/53393138-834a9b00-39d6-11e9-895c-3c0d2aa1abf4.png" alt="p2sh-types"></p>
 <hr>
 <p>参考</p>
 <ul>
@@ -210,7 +218,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/12/p2sh/" data-id="cjsk043oo000g9fs6gad3y9dv" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/12/p2sh/" data-id="cjslfndx5000ca5s624wl99g3" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/12/p2sh/#disqus_thread" class="article-comment-link">Comments</a>
       
