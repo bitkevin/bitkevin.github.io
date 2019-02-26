@@ -29,7 +29,7 @@ ga('send', 'pageview');
 <meta property="og:locale" content="default">
 <meta property="og:image" content="https://user-images.githubusercontent.com/514951/53312467-1a88f300-38f0-11e9-9403-18a6ab033000.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/bitcoin/bips/master/bip-0114/mastexample.png">
-<meta property="og:updated_time" content="2019-02-25T07:09:33.236Z">
+<meta property="og:updated_time" content="2019-02-26T07:18:34.721Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MAST, Merkelized Abstract Syntax Tree">
 <meta name="twitter:description" content="写在前面的话个人认为比特币脚本发展有三个阶段： 第一阶段，原始脚本阶段，仅有脚本。典型的有：P2PH, P2PKH。Script = scriptSig + scriptPubKey构成。所有数据都是显式的，有诸多限制的。脚本升级比较困难。 第二阶段，半自由阶段：脚本+脚本哈希。脚本形式有所突破，变得更加灵活。从P2SH开始，以及后面的Segwit，都是采用这种形式构成，特征是输出里仅存放执行脚本">
@@ -108,7 +108,7 @@ ga('send', 'pageview');
       
         <h2 id="写在前面的话"><a href="#写在前面的话" class="headerlink" title="写在前面的话"></a>写在前面的话</h2><p>个人认为比特币脚本发展有三个阶段：</p>
 <p>第一阶段，原始脚本阶段，仅有脚本。典型的有：P2PH, P2PKH。<code>Script = scriptSig + scriptPubKey</code>构成。所有数据都是显式的，有诸多限制的。脚本升级比较困难。</p>
-<p>第二阶段，半自由阶段：脚本+脚本哈希。脚本形式有所突破，变得更加灵活。从<a href="https://panzhibiao.com/2019/02/12/p2sh/">P2SH</a>开始，以及后面的<a href="https://panzhibiao.com/2019/02/21/BIP141/">Segwit</a>，都是采用这种形式构成，特征是输出里仅存放执行脚本的哈希。这一阶段的脚本依然受到一些限制，大小和OP操作数等，但灵活性已经大大增强，可轻松软分叉升级。脚本执行过程也变为两部：1. 验证哈希 2. 执行子脚本。</p>
+<p>第二阶段，半自由阶段：脚本+脚本哈希。脚本形式有所突破，变得更加灵活。从<a href="https://panzhibiao.com/2019/02/12/p2sh/">P2SH</a>开始，以及后面的<a href="https://panzhibiao.com/2019/02/21/BIP141/">Segwit</a>，都是采用这种形式构成，特征是输出里仅存放执行脚本的哈希。这一阶段的脚本依然受到一些限制，大小和OP操作数等，但灵活性已经大大增强，可轻松软分叉升级。脚本执行过程也变为两步：1. 验证哈希 2. 执行子脚本。</p>
 <ul>
 <li>P2SH: 输出中存放的是<code>RedeemScript</code>脚本哈希</li>
 <li>SegWit: 输出中存放的是<code>witness</code>脚本哈希</li>
@@ -168,11 +168,12 @@ ga('send', 'pageview');
 <p><code>MAST Root</code>是<code>H(MAST Version|Script Root)</code>，数据长度是固定的36字节：前4字节表示版本，后32字节是脚本树的根哈希值。执行脚本前，需要验证<code>MAST Root</code>值，不相等则执行失败。</p>
 <p>若<code>MAST Root</code>哈希值验证相等，<code>MAST Version</code>大于零，则脚本无需执行便直接返回成功。<code>SigOpsCost</code>为零，这个设定可以用于未来的脚本升级。</p>
 <h2 id="约定"><a href="#约定" class="headerlink" title="约定"></a>约定</h2><p>在BIP114中所表述的MAST，其实是限制版本。广义的MAST，可以自由选择脚本组合，构成更加复杂的情况。</p>
-<p>假设一个花费条件可以设定为：</p>
+<p>我们先看看在“广义MAST”下的情况，假设一个花费条件可以设定为：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(A or B) and (C or D or E) and (F or G)</span><br></pre></td></tr></table></figure>
 <p>A~G一共七个脚本，构成三个主要条件（本例都是与运算），每个条件由各子脚本再布尔运算后返回结果。七个可构成一个三层的Merkle树，2^2=4 &lt; 7 &lt; 2^3=8。</p>
 <p>在BIP114里，则限定为仅可执行单一脚本分支，那么欲实现上面的花费条件，则需要展开每个可能性，一共<code>2*3*2=12</code>个分支，则需要构造一个四层树，2^3=8 &lt; 12 &lt; 2^4=16。</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">A and C and F</span><br><span class="line">B and C and F</span><br><span class="line">A and D and F</span><br><span class="line">.</span><br><span class="line">.</span><br><span class="line">B and E and G</span><br></pre></td></tr></table></figure>
+<p>也就是说，即使不允许脚本之间进行组合逻辑运算，通常也不过就是树多了一层深度而已。</p>
 <p>实现广义MAST的一个方法是组合使用几个操作码：<code>OP_EVAL</code>, <code>OP_CAT</code>, <code>OP_HASH256</code>。不过，<code>OP_EVAL</code>的引入会带来诸多问题，例如可能陷入死循环、无法做静态程序分析。</p>
 <p>当前设计方案的一些优点：</p>
 <ul>
@@ -214,7 +215,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/24/MAST/" data-id="cjslfndx8000fa5s6jcgz6720" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/24/MAST/" data-id="cjslfx5xo000hfbs6xjj77dbg" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/24/MAST/#disqus_thread" class="article-comment-link">Comments</a>
       
