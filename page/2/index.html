@@ -79,6 +79,88 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-safe-wallet-idea" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2014/06/15/safe-wallet-idea/" class="article-date">
+  <time datetime="2014-06-15T11:40:21.000Z" itemprop="datePublished">Jun 15 2014</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2014/06/15/safe-wallet-idea/">比特币安全钱包的想法</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>从财富不可侵犯角度讲，比特币是人类史上最安全的货币。但令人郁闷的是，安全地存储比特币却遇到诸多麻烦。私钥机制使得其神圣不可侵犯，也使其资金安全遇到麻烦。</p>
+<p>个人存储管理比特币非常不现实，安全性差，丢币概率高。在线钱包显得更加安全可靠一些，主要分两类：</p>
+<ul>
+<li>链下(Off-Chain)，链下钱包服务即银行模式，若服务商出现任何问题，储户资金即出问题</li>
+<li>链上(On-Chain)，链上钱包“理论上”安全，因其不掌握用户私钥（仅保存私钥的密文），但也不绝对，例如服务器被入侵后，钱包关键代码被恶意修改，导致能够恢复出用户私钥，无论多少币，均瞬间被转移</li>
+</ul>
+<p>没有绝对安全的方案，只有相对安全实现，就是把出问题的概率降低得非常非常低。程序发生严重Bug、服务器被入侵这些都不能认为是极低概率事件，只是小概率而已，时间足够长的话几乎都会发生，回溯比特币这几年历史，发生过很多小概率、黑天鹅事件。</p>
+<p>这里提出一种钱包的实现方案，尝试去解决一些安全隐患问题。方案分为服务端，客户端两个部分。</p>
+<h4 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h4><ul>
+<li>数据服务。只读模式，包括不限于：<ul>
+<li>balance by address</li>
+<li>unspent outputs</li>
+<li>tx/block query</li>
+</ul>
+</li>
+<li>广播服务。输入是公开的数据，协助将交易(Raw Tx)广播至比特币网络</li>
+</ul>
+<h4 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h4><ul>
+<li>硬件部分<ul>
+<li>支持如ECDSA, SHA256、Ripemd160等</li>
+<li>支持硬件隔离技术，存储敏感数据，如私钥数据</li>
+</ul>
+</li>
+<li>APP部分<ul>
+<li>与硬件部分进行通信</li>
+<li>提供功能界面，实现钱包操作交互</li>
+</ul>
+</li>
+</ul>
+<p>客户端硬件部分像拉卡拉类似的一个东西，可以通过耳机等音频设备与手机APP通信。</p>
+<ul>
+<li>收款：当用户使用钱包时，插入硬件部分，启动APP，从硬件读取比特币地址列表，并去服务端查询地址数据，更新余额</li>
+<li>发款：APP根据比特币地址从服务端获取相关未花费交易，用户设置转出地址和金额，APP根据未花费交易构建待签名的空交易，将空交易传输至硬件并通知其签名。硬件从隔离区读取数据并由加密芯片完成签名后，将完整交易放入普通数据区，APP从普通数据区读取签名后的交易并提交至服务端广播</li>
+<li>数据备份：硬件支持AES双向加密算法，用户在APP输入备份密码，传至硬件，硬件从隔离区读取数据并由加密芯片完成AES加密，将加密后的数据放入普通数据区，由APP传输至手机、云盘等完成备份</li>
+<li>硬件遗失：为了防止遗失导致硬件破解丢币，敏感数据在隔离区中平时即以加密形式存在，每次使用时，输入进入密码，才能使用</li>
+</ul>
+<p>安全点：</p>
+<ul>
+<li>服务端必须是只读模式的。只读的设计，保障客户端不会提交敏感数据，即使服务端被黑，也无法截获用户私钥</li>
+<li>客户端必须实现硬件隔离，保护私钥等敏感数据，使得操作系统无法读取敏感信息，木马、恶意软件就没有办法盗取</li>
+</ul>
+<p>这只是一个初步的想法，可能存在重大缺陷，也许有团队已经在实现了，贴出来希望大家一起讨论。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://panzhibiao.com/2014/06/15/safe-wallet-idea/" data-id="cjso6qji00008qfs6wrjjb2ks" class="article-share-link">Share</a>
+      
+        <a href="http://panzhibiao.com/2014/06/15/safe-wallet-idea/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-open-nodes-plan" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2014/06/14/open-nodes-plan/" class="article-date">
@@ -106,7 +188,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2014/06/14/open-nodes-plan/" data-id="cjslfx5xf0006fbs62hyeu9yy" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2014/06/14/open-nodes-plan/" data-id="cjso6qjhy0005qfs6tlaar1sb" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2014/06/14/open-nodes-plan/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -212,7 +294,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/10/27/bitcoin-transaction-02/" data-id="cjslfx5xg0007fbs628yhre92" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/10/27/bitcoin-transaction-02/" data-id="cjso6qjhz0006qfs6b1m2guf5" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/10/27/bitcoin-transaction-02/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -350,7 +432,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/10/27/bitcoin-transaction-01/" data-id="cjslfx5xe0005fbs6fi6khxre" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/10/27/bitcoin-transaction-01/" data-id="cjso6qji00007qfs6qhgfj5y0" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/10/27/bitcoin-transaction-01/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -462,7 +544,7 @@ ccb4 = 52404
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/08/12/timestamp-system-and-proof-of-existance/" data-id="cjslfx5xd0004fbs6p3kg7kw8" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/08/12/timestamp-system-and-proof-of-existance/" data-id="cjso6qjhx0004qfs61b2ciiyk" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/08/12/timestamp-system-and-proof-of-existance/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -644,7 +726,7 @@ ccb4 = 52404
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/08/03/proof-of-work-and-mining/" data-id="cjslfx5xc0003fbs6lp9qwowv" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/08/03/proof-of-work-and-mining/" data-id="cjso6qjhu0003qfs69dm40xbn" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/08/03/proof-of-work-and-mining/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -750,7 +832,7 @@ OP_EQUALVERIFY OP_CHECKSIG
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/07/30/bitcoin-basic/" data-id="cjslfx5xb0002fbs6z7uqztho" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/07/30/bitcoin-basic/" data-id="cjso6qjhs0002qfs608q40o3x" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/07/30/bitcoin-basic/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -844,7 +926,7 @@ OP_EQUALVERIFY OP_CHECKSIG
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/07/20/bitcoin-clients/" data-id="cjslfx5x50000fbs6cup68ep8" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/07/20/bitcoin-clients/" data-id="cjso6qjhr0001qfs6ux81p1pz" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/07/20/bitcoin-clients/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -915,7 +997,7 @@ OP_EQUALVERIFY OP_CHECKSIG
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/07/20/what-is-bitcoin/" data-id="cjslfx5x90001fbs6opom12en" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/07/20/what-is-bitcoin/" data-id="cjso6qjhn0000qfs6wxsou74q" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/07/20/what-is-bitcoin/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -965,6 +1047,10 @@ OP_EQUALVERIFY OP_CHECKSIG
       <ul>
         
           <li>
+            <a href="/2019/02/28/schnorr-sigature/">Schnorr签名介绍</a>
+          </li>
+        
+          <li>
             <a href="/2019/02/24/MAST/">MAST, Merkelized Abstract Syntax Tree</a>
           </li>
         
@@ -978,10 +1064,6 @@ OP_EQUALVERIFY OP_CHECKSIG
         
           <li>
             <a href="/2019/02/12/p2sh/">P2SH-为比特币赋能的脚本</a>
-          </li>
-        
-          <li>
-            <a href="/2019/02/11/bip8/">谈谈软分叉升级规范BIP8-后矿工时代的软分叉方式</a>
           </li>
         
       </ul>

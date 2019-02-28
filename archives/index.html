@@ -79,6 +79,106 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-schnorr-sigature" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/28/schnorr-sigature/" class="article-date">
+  <time datetime="2019-02-28T05:24:52.000Z" itemprop="datePublished">Feb 28 2019</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/28/schnorr-sigature/">Schnorr签名介绍</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Schnorr签名算法是由德国数学家、密码学家Claus Schnorr提出。并于1990年申请了专利，<a href="https://www.google.com/patents/US4995082" target="_blank" rel="noopener">U.S. Patent 4,995,082</a>，该专利与2008年2月失效。目前该算法可以自由使用。</p>
+<p>Schnorr签名算法几乎在各个层面均优于比特币现有的签名算法ECDSA：性能，安全，体积，扩展性等方面。</p>
+<p>Schnorr Sig可以与ECDSA使用同一个椭圆曲线：<a href="http://www.secg.org/sec2-v2.pdf" target="_blank" rel="noopener">secp256k1 curve</a>，升级起来的改动非常小。</p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>我们定义几个变量：</p>
+<ul>
+<li>G：椭圆曲线。</li>
+<li>m：待签名的数据，通常是一个32字节的哈希值。</li>
+<li>x：私钥。<code>P = xG</code>，P为x对应的公钥。</li>
+<li>H()：哈希函数。<ul>
+<li>示例：写法<code>H(m || R || P)</code>可理解为：将m, R, P三个字段拼接在一起然后再做哈希运算。</li>
+</ul>
+</li>
+</ul>
+<h3 id="生成签名"><a href="#生成签名" class="headerlink" title="生成签名"></a>生成签名</h3><p>签名者已知的是：G-椭圆曲线, H()-哈希函数，m-待签名消息, x-私钥。</p>
+<ol>
+<li>选择一个随机数<code>k</code>, 令 <code>R = kG</code></li>
+<li>令 <code>s = k + H(m || R || P)*x</code></li>
+</ol>
+<p>那么，公钥P对消息m的签名就是：<code>(R, s)</code>，这一对值即为Schnorr签名。</p>
+<h3 id="验证签名"><a href="#验证签名" class="headerlink" title="验证签名"></a>验证签名</h3><p>验证者已知的是：G-椭圆曲线, H()-哈希函数，m-待签名消息, P-公钥，(R, s)-Schnorr签名。验证如下等式：</p>
+<p><code>sG = R + H(m || R || P)P</code></p>
+<p>若等式成立，则可证明签名合法。</p>
+<p>我们推演一下，此过程包含了一个极其重要的理论：椭圆曲线无法进行除法运算。</p>
+<ol>
+<li>s值的定义：<code>s = k + H(m || R || P)*x</code>，等式两边都乘以椭圆曲线G，则有：</li>
+<li><code>sG = kG + H(m || R || P)*x*G</code>，又因<code>R = kG, P = xG</code>，则有：</li>
+<li><code>sG = R + H(m || R || P)P</code>，椭圆曲线无法进行除法运算，所以第3步的等式，无法向前反推出第1步，就不会暴露k值以及x私钥。同时，也完成了等式验证。</li>
+</ol>
+<h3 id="组签-Group-Signature"><a href="#组签-Group-Signature" class="headerlink" title="组签, Group Signature"></a>组签, Group Signature</h3><p>一组公钥，N把，签名后得到N个签名。这个N个签名是可以相加的，最终得到一个签名。这个签名的验证通过，则代表N把公钥的签名全部验证通过。</p>
+<p>有：</p>
+<ul>
+<li>椭圆曲线：G</li>
+<li>待签名的数据：m</li>
+<li>哈希函数：H()</li>
+<li>私钥：x1，x2，公钥：P1=x1*G, P2=x2*G</li>
+<li>随机数：k1, k2，并有 R1=k1*G, R2=k2*G</li>
+<li>组公钥：P = P1 + P2</li>
+</ul>
+<p>则有：</p>
+<ul>
+<li>私钥x1和x2的签名为：(R1, s1), (R2, s2)。</li>
+<li>两个签名相加得到组签名：(R, s)。其中：<code>R = R1 + R2, s = s1 + s2</code>。</li>
+</ul>
+<p>推演过程：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">1. 令 R = R1 + R2, s = s1 + s2</span><br><span class="line"></span><br><span class="line">2. 已知：s1 = k1 + H(m || R || P)*x1，s2 = k2 + H(m || R || P)*x2</span><br><span class="line"></span><br><span class="line">3. s = s1 + s2</span><br><span class="line">     = k1 + H(m || R || P)*x1 +</span><br><span class="line">       k2 + H(m || R || P)*x2</span><br><span class="line">     = (k1 + k2) + H(m || R || P)(x1 + x2)</span><br><span class="line"></span><br><span class="line">4. 两边同时乘以G，则有：</span><br><span class="line">    sG = (k1  + k2)G + H(m || R || P)(x1  + x2)G</span><br><span class="line">       = (k1G + k2G) + H(m || R || P)(x1G + x2G)</span><br><span class="line">       = (R1 + R2) + H(m || R || P)(P1 + P2)</span><br><span class="line">       = R + H(m || R || P)P</span><br><span class="line"></span><br><span class="line">5. 完成证明，并从两个合作方推演至N个合作方</span><br></pre></td></tr></table></figure></p>
+<p>组公钥(Group Key)，是N把公钥进行相加后的值，又称聚合公钥(Aggregation Key)。需要指出的是，参与方需要先知道聚合公钥，才能进行各自的签名。</p>
+<h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>若使用在比特币上，相比ECDSA会有一些额外的显著优势：</p>
+<ul>
+<li>更安全。目前Schnorr签名有<a href="https://www.di.ens.fr/david.pointcheval/Documents/Papers/2000_joc.pdf" target="_blank" rel="noopener">安全证明</a>，而ECDSA目前并没有类似的证明。</li>
+<li>无延展性困扰。ECDSA签名是可延展性的，第三方无需知道私钥，可以直接修改既有签名，依然能够保持该签名对于此交易是有效的。比特币一直存在延展性攻击，直到SegWit激活后才修复，前提是使用segwit交易，而不是传统交易。<a href="https://github.com/bitcoin/bips/blob/master/bip-0062.mediawiki" target="_blank" rel="noopener">BIP62</a> 和 <a href="https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki" target="_blank" rel="noopener">BIP66</a> 对此有详细描述。</li>
+<li>线性。Schnorr签名算法是线性的！这点非常牛逼，基于这点可衍生出许多应用。例如，N个公钥进行签名，采用ECDSA的话，则有N个签名，验证同样需要做N次。若使用Schnorr，由于线性特性，则可以进行签名叠加，仅保留最终的叠加签名。例如同一个交易无论输入数量多少，其均可叠加为一个签名，一次验证即可。以及GMaxwell提出的Taproot/Grafroot也是基于其线性特性。</li>
+</ul>
+<hr>
+<p>参考：</p>
+<ul>
+<li><p>Schnorr signature，<a href="https://en.wikipedia.org/wiki/Schnorr_signature" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Schnorr_signature</a></p>
+</li>
+<li><p>BIP-Schnorr,Pieter Wuille，<a href="https://github.com/sipa/bips/blob/bip-schnorr/bip-schnorr.mediawiki" target="_blank" rel="noopener">https://github.com/sipa/bips/blob/bip-schnorr/bip-schnorr.mediawiki</a></p>
+</li>
+<li>Simple Schnorr Multi-Signatures with Applications to Bitcoin，<a href="https://eprint.iacr.org/2018/068" target="_blank" rel="noopener">https://eprint.iacr.org/2018/068</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://panzhibiao.com/2019/02/28/schnorr-sigature/" data-id="cjso6qji7000fqfs6patpwdro" class="article-share-link">Share</a>
+      
+        <a href="http://panzhibiao.com/2019/02/28/schnorr-sigature/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-MAST" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/02/24/MAST/" class="article-date">
@@ -210,7 +310,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/24/MAST/" data-id="cjslfx5xo000hfbs6xjj77dbg" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/24/MAST/" data-id="cjso6qji9000iqfs6farf2otu" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/24/MAST/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -283,7 +383,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/21/bip143/" data-id="cjslfx5xo000gfbs62v5dhhz7" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/21/bip143/" data-id="cjso6qji8000hqfs6mgbvwgvu" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/21/bip143/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -417,7 +517,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/21/BIP141/" data-id="cjslfx5xn000ffbs6esxbix9b" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/21/BIP141/" data-id="cjso6qji6000eqfs6exannysd" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/21/BIP141/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -565,7 +665,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/12/p2sh/" data-id="cjslfx5xm000efbs6zp6qkhxy" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/12/p2sh/" data-id="cjso6qji7000gqfs6t22r9f8z" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/12/p2sh/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -670,7 +770,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/11/bip8/" data-id="cjslfx5xl000dfbs6zhwzspoq" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/11/bip8/" data-id="cjso6qji5000dqfs6tihl6xoh" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/11/bip8/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -712,7 +812,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2018/03/25/The-Significance-of-the-Lightning-Network/" data-id="cjslfx5xk000cfbs6pjhdjtyb" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2018/03/25/The-Significance-of-the-Lightning-Network/" data-id="cjso6qji10009qfs6bkxnijpg" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2018/03/25/The-Significance-of-the-Lightning-Network/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -779,7 +879,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2016/04/21/BIP9/" data-id="cjslfx5xi000afbs6kb9vlx76" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2016/04/21/BIP9/" data-id="cjso6qji2000aqfs62gbaeo5s" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2016/04/21/BIP9/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -881,7 +981,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2016/04/08/understand-bitcoin-script/" data-id="cjslfx5xk000bfbs624ebgmfe" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2016/04/08/understand-bitcoin-script/" data-id="cjso6qji4000cqfs6431vcv8o" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2016/04/08/understand-bitcoin-script/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -950,91 +1050,9 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2015/03/11/shadowsocks-add-bitcoin-support/" data-id="cjslfx5xh0009fbs6csugswex" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2015/03/11/shadowsocks-add-bitcoin-support/" data-id="cjso6qji3000bqfs6gr2stqdo" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2015/03/11/shadowsocks-add-bitcoin-support/#disqus_thread" class="article-comment-link">Comments</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-safe-wallet-idea" class="article article-type-post" itemscope="" itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2014/06/15/safe-wallet-idea/" class="article-date">
-  <time datetime="2014-06-15T11:40:21.000Z" itemprop="datePublished">Jun 15 2014</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2014/06/15/safe-wallet-idea/">比特币安全钱包的想法</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>从财富不可侵犯角度讲，比特币是人类史上最安全的货币。但令人郁闷的是，安全地存储比特币却遇到诸多麻烦。私钥机制使得其神圣不可侵犯，也使其资金安全遇到麻烦。</p>
-<p>个人存储管理比特币非常不现实，安全性差，丢币概率高。在线钱包显得更加安全可靠一些，主要分两类：</p>
-<ul>
-<li>链下(Off-Chain)，链下钱包服务即银行模式，若服务商出现任何问题，储户资金即出问题</li>
-<li>链上(On-Chain)，链上钱包“理论上”安全，因其不掌握用户私钥（仅保存私钥的密文），但也不绝对，例如服务器被入侵后，钱包关键代码被恶意修改，导致能够恢复出用户私钥，无论多少币，均瞬间被转移</li>
-</ul>
-<p>没有绝对安全的方案，只有相对安全实现，就是把出问题的概率降低得非常非常低。程序发生严重Bug、服务器被入侵这些都不能认为是极低概率事件，只是小概率而已，时间足够长的话几乎都会发生，回溯比特币这几年历史，发生过很多小概率、黑天鹅事件。</p>
-<p>这里提出一种钱包的实现方案，尝试去解决一些安全隐患问题。方案分为服务端，客户端两个部分。</p>
-<h4 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h4><ul>
-<li>数据服务。只读模式，包括不限于：<ul>
-<li>balance by address</li>
-<li>unspent outputs</li>
-<li>tx/block query</li>
-</ul>
-</li>
-<li>广播服务。输入是公开的数据，协助将交易(Raw Tx)广播至比特币网络</li>
-</ul>
-<h4 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h4><ul>
-<li>硬件部分<ul>
-<li>支持如ECDSA, SHA256、Ripemd160等</li>
-<li>支持硬件隔离技术，存储敏感数据，如私钥数据</li>
-</ul>
-</li>
-<li>APP部分<ul>
-<li>与硬件部分进行通信</li>
-<li>提供功能界面，实现钱包操作交互</li>
-</ul>
-</li>
-</ul>
-<p>客户端硬件部分像拉卡拉类似的一个东西，可以通过耳机等音频设备与手机APP通信。</p>
-<ul>
-<li>收款：当用户使用钱包时，插入硬件部分，启动APP，从硬件读取比特币地址列表，并去服务端查询地址数据，更新余额</li>
-<li>发款：APP根据比特币地址从服务端获取相关未花费交易，用户设置转出地址和金额，APP根据未花费交易构建待签名的空交易，将空交易传输至硬件并通知其签名。硬件从隔离区读取数据并由加密芯片完成签名后，将完整交易放入普通数据区，APP从普通数据区读取签名后的交易并提交至服务端广播</li>
-<li>数据备份：硬件支持AES双向加密算法，用户在APP输入备份密码，传至硬件，硬件从隔离区读取数据并由加密芯片完成AES加密，将加密后的数据放入普通数据区，由APP传输至手机、云盘等完成备份</li>
-<li>硬件遗失：为了防止遗失导致硬件破解丢币，敏感数据在隔离区中平时即以加密形式存在，每次使用时，输入进入密码，才能使用</li>
-</ul>
-<p>安全点：</p>
-<ul>
-<li>服务端必须是只读模式的。只读的设计，保障客户端不会提交敏感数据，即使服务端被黑，也无法截获用户私钥</li>
-<li>客户端必须实现硬件隔离，保护私钥等敏感数据，使得操作系统无法读取敏感信息，木马、恶意软件就没有办法盗取</li>
-</ul>
-<p>这只是一个初步的想法，可能存在重大缺陷，也许有团队已经在实现了，贴出来希望大家一起讨论。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2014/06/15/safe-wallet-idea/" data-id="cjslfx5xh0008fbs6d6pozdrk" class="article-share-link">Share</a>
-      
-        <a href="http://panzhibiao.com/2014/06/15/safe-wallet-idea/#disqus_thread" class="article-comment-link">Comments</a>
       
       
       
@@ -1082,6 +1100,10 @@ ga('send', 'pageview');
       <ul>
         
           <li>
+            <a href="/2019/02/28/schnorr-sigature/">Schnorr签名介绍</a>
+          </li>
+        
+          <li>
             <a href="/2019/02/24/MAST/">MAST, Merkelized Abstract Syntax Tree</a>
           </li>
         
@@ -1095,10 +1117,6 @@ ga('send', 'pageview');
         
           <li>
             <a href="/2019/02/12/p2sh/">P2SH-为比特币赋能的脚本</a>
-          </li>
-        
-          <li>
-            <a href="/2019/02/11/bip8/">谈谈软分叉升级规范BIP8-后矿工时代的软分叉方式</a>
           </li>
         
       </ul>
