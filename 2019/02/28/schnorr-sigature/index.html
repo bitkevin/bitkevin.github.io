@@ -27,7 +27,7 @@ ga('send', 'pageview');
 <meta property="og:site_name" content="比特币实验室">
 <meta property="og:description" content="Schnorr签名算法是由德国数学家、密码学家Claus Schnorr提出。并于1990年申请了专利，U.S. Patent 4,995,082，该专利与2008年2月失效。目前该算法可以自由使用。 Schnorr签名算法几乎在各个层面均优于比特币现有的签名算法ECDSA：性能，安全，体积，扩展性等方面。 Schnorr Sig可以与ECDSA使用同一个椭圆曲线：secp256k1 curve，">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-02-28T05:31:31.837Z">
+<meta property="og:updated_time" content="2019-03-01T03:02:33.992Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Schnorr签名介绍">
 <meta name="twitter:description" content="Schnorr签名算法是由德国数学家、密码学家Claus Schnorr提出。并于1990年申请了专利，U.S. Patent 4,995,082，该专利与2008年2月失效。目前该算法可以自由使用。 Schnorr签名算法几乎在各个层面均优于比特币现有的签名算法ECDSA：性能，安全，体积，扩展性等方面。 Schnorr Sig可以与ECDSA使用同一个椭圆曲线：secp256k1 curve，">
@@ -154,6 +154,9 @@ ga('send', 'pageview');
 <li>无延展性困扰。ECDSA签名是可延展性的，第三方无需知道私钥，可以直接修改既有签名，依然能够保持该签名对于此交易是有效的。比特币一直存在延展性攻击，直到SegWit激活后才修复，前提是使用segwit交易，而不是传统交易。<a href="https://github.com/bitcoin/bips/blob/master/bip-0062.mediawiki" target="_blank" rel="noopener">BIP62</a> 和 <a href="https://github.com/bitcoin/bips/blob/master/bip-0066.mediawiki" target="_blank" rel="noopener">BIP66</a> 对此有详细描述。</li>
 <li>线性。Schnorr签名算法是线性的！这点非常牛逼，基于这点可衍生出许多应用。例如，N个公钥进行签名，采用ECDSA的话，则有N个签名，验证同样需要做N次。若使用Schnorr，由于线性特性，则可以进行签名叠加，仅保留最终的叠加签名。例如同一个交易无论输入数量多少，其均可叠加为一个签名，一次验证即可。以及GMaxwell提出的Taproot/Grafroot也是基于其线性特性。</li>
 </ul>
+<h2 id="Q-amp-A"><a href="#Q-amp-A" class="headerlink" title="Q&amp;A"></a>Q&amp;A</h2><p>Q: Schnorr签名是否可以用在m of n多重签名上？<br>A: 当然可以。多重签名只是m of n的签名数量的模式。与签名算法无关。</p>
+<p>Q: Schnorr的组签名特性是否可以做或模拟出m of n式的签名？<br>A: 无法做到。组内有N把公钥，则必须对应有N个签名，缺一不可。每个人在生成签名的时候，在哈希函数里都代入的都是组公钥P。</p>
+<p>Q: 签名机制的安全性如何衡量？<br>A: 主要取决于两个：1. 签名算法本身 2. 椭圆曲线。目前，Schnorr与ECDSA都用的是曲线secp256k1，这个层面一样。至于签名算法本身安全性，Schnorr目前有安全证明，安全优于ECDSA。</p>
 <hr>
 <p>参考：</p>
 <ul>
@@ -167,7 +170,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/28/schnorr-sigature/" data-id="cjso6qji7000fqfs6patpwdro" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/28/schnorr-sigature/" data-id="cjsph31w7000h7os6drcq6z9f" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/28/schnorr-sigature/#disqus_thread" class="article-comment-link">Comments</a>
       
