@@ -79,6 +79,75 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-shadowsocks-add-bitcoin-support" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2015/03/11/shadowsocks-add-bitcoin-support/" class="article-date">
+  <time datetime="2015-03-11T08:30:19.000Z" itemprop="datePublished">Mar 11 2015</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2015/03/11/shadowsocks-add-bitcoin-support/">Shadowsocks 加入比特币的支持</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>加入比特币后达到的效果：只需知道服务提供方的比特币地址，就可以使用其服务。</p>
+<p>假定<code>17J3FrhsiHr6bJTkbV4avLURxtC35b7J1E</code>是服务提供方的比特币地址，那么有如下约定：</p>
+<ul>
+<li><em>17J3FrhsiHr6bJTkbV4avLURxtC35b7J1E</em> 即为服务方的比特币收款地址</li>
+<li><em>17J3FrhsiHr6bJTkbV4avLURxtC35b7J1E</em> 即为共享密钥（配置参数password）</li>
+<li><em>17J3FrhsiHr6bJTkbV4avLURxtC35b7J1E</em><strong>.com</strong> 即为服务方的域名</li>
+</ul>
+<p>假定客户端拥有地址 <code>1CntTWhxxxxxxxxxxxxxxxxxxxxxx</code> 及其私钥。首先保障该地址有一定数量的比特币，然后从该地址支付比特币至服务端地址，当服务方地址收到比特币后，将该客户地址添加到列表文件中，此时，客户即可使用对方的服务。</p>
+<p>项目GitHub: <a href="https://github.com/bitkevin/shadowsocks-libev" target="_blank" rel="noopener">https://github.com/bitkevin/shadowsocks-libev</a>，如果shadowsocks接收的话会pull request回原来分支。</p>
+<p>为了学习测试，可以使用测试服务器 <code>17J3FrhsiHr6bJTkbV4avLURxtC35b7J1E.com</code>，费用是每天 0.00015 btc。服务端每分钟更新一次支付记录。</p>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><p>编译步骤没有变化，主要是配置文件的差异。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># build shadowsocks</span><br><span class="line">apt-get install build-essential autoconf libtool libssl-dev</span><br><span class="line">./configure &amp;&amp; make</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+<h2 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h2><p>写入付款地址的记录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /var/ss</span><br><span class="line">echo &quot;1CntTWhxxxxxxxxxxxxxxxxxxxxxx&quot; &gt;&gt; /var/ss/list-ss-server.txt</span><br></pre></td></tr></table></figure>
+<p><code>ss-server</code> 启动时，指定参数 <code>--bitcoin-list</code> 即可：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ss-server -s 0.0.0.0 -p 443 -k 17J3FrhsiHr6bJTkbV4avLURxtC35b7J1E -m aes-256-cfb -t 60 --workers 10 --fast-open --bitcoin-list /var/ss/list-ss-server.txt</span><br></pre></td></tr></table></figure>
+<p>同时，注册域名 <code>17J3FrhsiHr6bJTkbV4avLURxtC35b7J1E.com</code>，并将其A记录指向到提供服务的IP地址上。</p>
+<h2 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h2><p>示例配置文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;server&quot;:&quot;17J3FrhsiHr6bJTkbV4avLURxtC35b7J1E.com&quot;,</span><br><span class="line">    &quot;server_port&quot;:443,</span><br><span class="line">    &quot;local_port&quot;:8999,</span><br><span class="line">    &quot;password&quot;:&quot;17J3FrhsiHr6bJTkbV4avLURxtC35b7J1E&quot;,</span><br><span class="line">    &quot;timeout&quot;:300,</span><br><span class="line">    &quot;method&quot;:&quot;aes-256-cfb&quot;,</span><br><span class="line">    &quot;bitcoin_address&quot;:&quot;1CntTWhxxxxxxxxxxxxxxxxxxxxxx&quot;,</span><br><span class="line">    &quot;bitcoin_privkey&quot;:&quot;L5eixxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>bitcoin_address</code> 支付地址，推荐新生成一个地址单独用于此，并保证该地址是你个人控制的</li>
+<li><code>bitcoin_privkey</code> 支付地址对应的私钥，base58格式，大部分钱包导出就是此格式。该私钥不会暴露至网络</li>
+</ul>
+<p>保障地址 <code>1CntTWhxxxxxxxxxxxxxxxxxxxxxx</code> 有一定数量的比特币，然后从该地址付款至服务端地址 <code>17J3FrhsiHr6bJTkbV4avLURxtC35b7J1E</code>，付款比特币数量尽量以天为整数即可，例如付款30天的费用：0.0045 btc = 0.00015 * 30。</p>
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h2><p>为了方便，提供了一个自动生成付款地址记录的脚本。安装至目录 <code>/var/ss</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">apt-get install php5-cli php5-curl</span><br><span class="line">mkdir -p /var/ss</span><br><span class="line">cp scripts/generate.php /var/ss</span><br></pre></td></tr></table></figure>
+<p>拷贝后，需要修改其配置，generate.php 中的配置参数说明：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// 由于使用了 chain.com 的API，所以到 chain.com 注册一个账户，并免费获得一个API KEY。</span><br><span class="line">$_CFG[&apos;API-KEY-ID&apos;] = &quot;DEMO-4a5e1e4&quot;;</span><br><span class="line"></span><br><span class="line">// 服务端的地址，该地址用于收款等。</span><br><span class="line">$_CFG[&apos;server_baddress&apos;] = &quot;17J3FrhsiHr6bJTkbV4avLURxtC35b7J1E&quot;;</span><br><span class="line"></span><br><span class="line">// 每天的价格，单位是聪。 15000 Satoshi = 0.00015 Btc。</span><br><span class="line">$_CFG[&apos;satoshi_per_day&apos;] = 15000;</span><br></pre></td></tr></table></figure>
+<p>若 <code>ss-local</code>/<code>ss-server</code> 的配置文件中去掉 <code>--bitcoin-xxx</code> 参数，则与不带bitcoin支持的shadowsocks行为一致。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://panzhibiao.com/2015/03/11/shadowsocks-add-bitcoin-support/" data-id="cjspj67ft0009obs63g1652wv" class="article-share-link">Share</a>
+      
+        <a href="http://panzhibiao.com/2015/03/11/shadowsocks-add-bitcoin-support/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-safe-wallet-idea" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2014/06/15/safe-wallet-idea/" class="article-date">
@@ -147,7 +216,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2014/06/15/safe-wallet-idea/" data-id="cjsph31vy00087os652zp2kwo" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2014/06/15/safe-wallet-idea/" data-id="cjspj67ft0008obs6b3mnm60d" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2014/06/15/safe-wallet-idea/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -188,7 +257,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2014/06/14/open-nodes-plan/" data-id="cjsph31vx00077os6jrirklsw" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2014/06/14/open-nodes-plan/" data-id="cjspj67fp0005obs685qbobr1" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2014/06/14/open-nodes-plan/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -294,7 +363,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/10/27/bitcoin-transaction-02/" data-id="cjsph31vv00057os6rvl7se8h" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/10/27/bitcoin-transaction-02/" data-id="cjspj67fn0003obs6ju6bxjkq" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/10/27/bitcoin-transaction-02/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -432,7 +501,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/10/27/bitcoin-transaction-01/" data-id="cjsph31vw00067os6p66r3tw6" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/10/27/bitcoin-transaction-01/" data-id="cjspj67fr0007obs6jdxppq59" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/10/27/bitcoin-transaction-01/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -544,7 +613,7 @@ ccb4 = 52404
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/08/12/timestamp-system-and-proof-of-existance/" data-id="cjsph31vu00047os67n8qo6hy" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/08/12/timestamp-system-and-proof-of-existance/" data-id="cjspj67fq0006obs6sp7g5kyh" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/08/12/timestamp-system-and-proof-of-existance/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -726,7 +795,7 @@ ccb4 = 52404
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/08/03/proof-of-work-and-mining/" data-id="cjsph31vt00037os6qtcm75om" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/08/03/proof-of-work-and-mining/" data-id="cjspj67fm0002obs6x09unrqd" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/08/03/proof-of-work-and-mining/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -832,7 +901,7 @@ OP_EQUALVERIFY OP_CHECKSIG
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/07/30/bitcoin-basic/" data-id="cjsph31vr00017os6ujifwqqz" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/07/30/bitcoin-basic/" data-id="cjspj67fo0004obs6l306iafw" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/07/30/bitcoin-basic/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -926,7 +995,7 @@ OP_EQUALVERIFY OP_CHECKSIG
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/07/20/bitcoin-clients/" data-id="cjsph31vn00007os6lih3ndwp" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/07/20/bitcoin-clients/" data-id="cjspj67fh0000obs6rxlbgwib" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/07/20/bitcoin-clients/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -997,7 +1066,7 @@ OP_EQUALVERIFY OP_CHECKSIG
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/07/20/what-is-bitcoin/" data-id="cjsph31vs00027os6mjuty0oa" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/07/20/what-is-bitcoin/" data-id="cjspj67fl0001obs6r5if0fq6" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/07/20/what-is-bitcoin/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -1034,7 +1103,7 @@ OP_EQUALVERIFY OP_CHECKSIG
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li></ul>
     </div>
   </div>
 
@@ -1045,6 +1114,10 @@ OP_EQUALVERIFY OP_CHECKSIG
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/03/01/Taproot/">Taproot简介</a>
+          </li>
         
           <li>
             <a href="/2019/02/28/schnorr-sigature/">Schnorr签名介绍</a>
@@ -1060,10 +1133,6 @@ OP_EQUALVERIFY OP_CHECKSIG
         
           <li>
             <a href="/2019/02/21/BIP141/">BIP141, Segregated Witness</a>
-          </li>
-        
-          <li>
-            <a href="/2019/02/12/p2sh/">P2SH-为比特币赋能的脚本</a>
           </li>
         
       </ul>
