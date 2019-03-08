@@ -27,7 +27,7 @@ ga('send', 'pageview');
 <meta property="og:site_name" content="比特币实验室">
 <meta property="og:description" content="Schnorr签名算法是由德国数学家、密码学家Claus Schnorr提出。并于1990年申请了专利，U.S. Patent 4,995,082，该专利与2008年2月失效。目前该算法可以自由使用。 Schnorr签名算法几乎在各个层面均优于比特币现有的签名算法ECDSA：性能，安全，体积，扩展性等方面。 Schnorr Sig可以与ECDSA使用同一个椭圆曲线：secp256k1 curve，">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-03-01T03:02:33.992Z">
+<meta property="og:updated_time" content="2019-03-08T03:09:14.306Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Schnorr签名介绍">
 <meta name="twitter:description" content="Schnorr签名算法是由德国数学家、密码学家Claus Schnorr提出。并于1990年申请了专利，U.S. Patent 4,995,082，该专利与2008年2月失效。目前该算法可以自由使用。 Schnorr签名算法几乎在各个层面均优于比特币现有的签名算法ECDSA：性能，安全，体积，扩展性等方面。 Schnorr Sig可以与ECDSA使用同一个椭圆曲线：secp256k1 curve，">
@@ -147,7 +147,7 @@ ga('send', 'pageview');
 <li>两个签名相加得到组签名：(R, s)。其中：<code>R = R1 + R2, s = s1 + s2</code>。</li>
 </ul>
 <p>推演过程：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">1. 令 R = R1 + R2, s = s1 + s2</span><br><span class="line"></span><br><span class="line">2. 已知：s1 = k1 + H(m || R || P)*x1，s2 = k2 + H(m || R || P)*x2</span><br><span class="line"></span><br><span class="line">3. s = s1 + s2</span><br><span class="line">     = k1 + H(m || R || P)*x1 +</span><br><span class="line">       k2 + H(m || R || P)*x2</span><br><span class="line">     = (k1 + k2) + H(m || R || P)(x1 + x2)</span><br><span class="line"></span><br><span class="line">4. 两边同时乘以G，则有：</span><br><span class="line">    sG = (k1  + k2)G + H(m || R || P)(x1  + x2)G</span><br><span class="line">       = (k1G + k2G) + H(m || R || P)(x1G + x2G)</span><br><span class="line">       = (R1 + R2) + H(m || R || P)(P1 + P2)</span><br><span class="line">       = R + H(m || R || P)P</span><br><span class="line"></span><br><span class="line">5. 完成证明，并从两个合作方推演至N个合作方</span><br></pre></td></tr></table></figure></p>
-<p>组公钥(Group Key)，是N把公钥进行相加后的值，又称聚合公钥(Aggregation Key)。需要指出的是，参与方需要先知道聚合公钥，才能进行各自的签名。</p>
+<p>组公钥(Group Key)，是N把公钥进行相加后的值，又称聚合公钥(Aggregation Key)。需要指出的是，参与方需要先相互交换公钥和R值，然后再进行各自的签名。</p>
 <h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>若使用在比特币上，相比ECDSA会有一些额外的显著优势：</p>
 <ul>
 <li>更安全。目前Schnorr签名有<a href="https://www.di.ens.fr/david.pointcheval/Documents/Papers/2000_joc.pdf" target="_blank" rel="noopener">安全证明</a>，而ECDSA目前并没有类似的证明。</li>
@@ -170,7 +170,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/28/schnorr-sigature/" data-id="cjspja2z4000ir6s695o5rdeg" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/28/schnorr-sigature/" data-id="cjszhfpgq000g5ds6vfmy2vlp" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/28/schnorr-sigature/#disqus_thread" class="article-comment-link">Comments</a>
       

@@ -178,7 +178,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/03/01/Taproot/" data-id="cjspja2z5000jr6s62nvjakwo" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/03/01/Taproot/" data-id="cjszhfpgr000h5ds6po20zony" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/03/01/Taproot/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -258,7 +258,7 @@ ga('send', 'pageview');
 <li>两个签名相加得到组签名：(R, s)。其中：<code>R = R1 + R2, s = s1 + s2</code>。</li>
 </ul>
 <p>推演过程：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">1. 令 R = R1 + R2, s = s1 + s2</span><br><span class="line"></span><br><span class="line">2. 已知：s1 = k1 + H(m || R || P)*x1，s2 = k2 + H(m || R || P)*x2</span><br><span class="line"></span><br><span class="line">3. s = s1 + s2</span><br><span class="line">     = k1 + H(m || R || P)*x1 +</span><br><span class="line">       k2 + H(m || R || P)*x2</span><br><span class="line">     = (k1 + k2) + H(m || R || P)(x1 + x2)</span><br><span class="line"></span><br><span class="line">4. 两边同时乘以G，则有：</span><br><span class="line">    sG = (k1  + k2)G + H(m || R || P)(x1  + x2)G</span><br><span class="line">       = (k1G + k2G) + H(m || R || P)(x1G + x2G)</span><br><span class="line">       = (R1 + R2) + H(m || R || P)(P1 + P2)</span><br><span class="line">       = R + H(m || R || P)P</span><br><span class="line"></span><br><span class="line">5. 完成证明，并从两个合作方推演至N个合作方</span><br></pre></td></tr></table></figure></p>
-<p>组公钥(Group Key)，是N把公钥进行相加后的值，又称聚合公钥(Aggregation Key)。需要指出的是，参与方需要先知道聚合公钥，才能进行各自的签名。</p>
+<p>组公钥(Group Key)，是N把公钥进行相加后的值，又称聚合公钥(Aggregation Key)。需要指出的是，参与方需要先相互交换公钥和R值，然后再进行各自的签名。</p>
 <h2 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h2><p>若使用在比特币上，相比ECDSA会有一些额外的显著优势：</p>
 <ul>
 <li>更安全。目前Schnorr签名有<a href="https://www.di.ens.fr/david.pointcheval/Documents/Papers/2000_joc.pdf" target="_blank" rel="noopener">安全证明</a>，而ECDSA目前并没有类似的证明。</li>
@@ -281,7 +281,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/28/schnorr-sigature/" data-id="cjspja2z4000ir6s695o5rdeg" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/28/schnorr-sigature/" data-id="cjszhfpgq000g5ds6vfmy2vlp" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/28/schnorr-sigature/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -426,7 +426,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/24/MAST/" data-id="cjspja2z3000hr6s6cboeybj5" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/24/MAST/" data-id="cjszhfpgp000e5ds6tzu18c0q" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/24/MAST/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -499,7 +499,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/21/bip143/" data-id="cjspja2z2000fr6s6dndj5xl4" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/21/bip143/" data-id="cjszhfpgr000i5ds6j03i8km9" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/21/bip143/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -633,7 +633,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/21/BIP141/" data-id="cjspja2z0000dr6s6mw66mbef" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/21/BIP141/" data-id="cjszhfpgs000j5ds6fp53lboy" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/21/BIP141/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -781,7 +781,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/12/p2sh/" data-id="cjspja2z2000gr6s60bjflddm" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/12/p2sh/" data-id="cjszhfpgp000f5ds67illf5vb" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/12/p2sh/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -886,7 +886,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/11/bip8/" data-id="cjspja2z1000er6s6gzorfhc2" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/11/bip8/" data-id="cjszhfpgo000d5ds6jwitik0q" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/11/bip8/#disqus_thread" class="article-comment-link">Comments</a>
       
