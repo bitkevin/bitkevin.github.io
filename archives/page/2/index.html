@@ -79,6 +79,108 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-understand-bitcoin-script" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2016/04/08/understand-bitcoin-script/" class="article-date">
+  <time datetime="2016-04-08T04:00:00.000Z" itemprop="datePublished">Apr 8 2016</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2016/04/08/understand-bitcoin-script/">理解比特币脚本</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>作者：<a href="http://weibo.com/highball" target="_blank" rel="noopener">汪海波</a></p>
+<p>其实我们可以这样看待比特币的交易：『交易的发起者悬赏若干比特币，在网络上贴出了一到数学题，谁解出了这道数学题，悬赏就归谁了』。 顺着这个思路，Alice对Bob的转账可以理解为『Alice把一道只有Bob才能解开的数学题发到网络上，Bob解出题并拿走了悬赏』。那么，每个交易数据中都会出现的『脚本』就是题和解，『脚本语言』就是用来描述题和解的工具。</p>
+<p><img src="https://cloud.githubusercontent.com/assets/514951/14377566/e6d18d00-fda2-11e5-9c90-a237ca251bff.png" alt="图01"></p>
+<h2 id="『输入脚本』和『输出脚本』"><a href="#『输入脚本』和『输出脚本』" class="headerlink" title="『输入脚本』和『输出脚本』"></a>『输入脚本』和『输出脚本』</h2><p>在这里我们先讨论单输入单输出的比特币交易，因为这样描述起来更方便且不影响对『脚本』的理解。<br><a href="https://blockchain.info/zh-cn/tx/9c50cee8d50e273100987bb12ec46208cb04a1d5b68c9bea84fd4a04854b5eb1" target="_blank" rel="noopener">9c50cee8d50e273100987bb12ec46208cb04a1d5b68c9bea84fd4a04854b5eb1</a> 这是一个单输入单输出交易，看下我们要关注的数据：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Hash:</span><br><span class="line">9c50cee8d50e273100987bb12ec46208cb04a1d5b68c9bea84fd4a04854b5eb1</span><br><span class="line"></span><br><span class="line">输入交易:</span><br><span class="line">  前导输入的Hash:</span><br><span class="line">  437b95ae15f87c7a8ab4f51db5d3c877b972ef92f26fbc6d3c4663d1bc750149</span><br><span class="line">  </span><br><span class="line">  输入脚本 scriptSig:</span><br><span class="line">  3045022100efe12e2584bbd346bccfe67fd50a54191e4f45f945e3853658284358d9c062ad02200121e00b6297c0874650d00b786971f5b4601e32b3f81afa9f9f8108e93c752201</span><br><span class="line">  038b29d4fbbd12619d45c84c83cb4330337ab1b1a3737250f29cec679d7551148a</span><br><span class="line"></span><br><span class="line">输出交易:</span><br><span class="line">  转账值:</span><br><span class="line">  0.05010000 btc</span><br><span class="line"></span><br><span class="line">  输出脚本 scriptPubKey:</span><br><span class="line">  OP_DUP OP_HASH160 be10f0a78f5ac63e8746f7f2e62a5663eed05788 OP_EQUALVERIFY OP_CHECKSIG</span><br></pre></td></tr></table></figure>
+<p>假设Alice是转账发送者，Bob是接受者。那么『输入交易』表明了Alice要动用的比特币的来源，『输出交易』表明了Alice要转账的数额和转账对象——Bob。那么，你可能要问，数据中的『输入脚本』和『输出脚本』是不是就是题和解？对了一半！</p>
+<p>在<a href="http://www.8btc.com/bitcoin_scripts" target="_blank" rel="noopener">Bitcoin Wiki</a>中提到：</p>
+<blockquote>
+<p>原先发送币的一方，控制脚本运行，以便比特币在下一个交易中使用。想花掉币的另一方必须把以前记录的运行为真的脚本，放到输入区。</p>
+</blockquote>
+<p>换句话说，在一个交易中，『输出脚本』是数学题，『输入脚本』是题解，<strong>但不是这道数学题的题解。</strong>我开始看Wiki的时候，在这里遇到了一些障碍，没法理解『输入脚本』和『输出脚本』的联系。但是在考虑交易间的关系后，就明白了。</p>
+<p>假设有这么一系列交易：</p>
+<p><img src="https://cloud.githubusercontent.com/assets/514951/14377658/8eb0c22a-fda3-11e5-8d64-d6a6ab4d361a.png" alt="图02"></p>
+<ol>
+<li>上图的三个交易都是单输入单输出交易</li>
+<li>每个『输入交易』『输出交易』中，都包含对应的『脚本』</li>
+<li><strong>交易a</strong>，Alice转账给Bob；<strong>交易b</strong>，Bob转账给Carol；<strong>交易c</strong>，Carol转账给Dave</li>
+<li>当前交易的『输入』都引用前一个交易的『输出』，如交易b的『输入』引用交易a的『输出』</li>
+</ol>
+<p>按照之前的说法，<strong>交易a</strong>中的『输出脚本』就是Alice为Bob出的数学题。那么，Bob想要引用<strong>交易a</strong>『输出交易』的比特币，就要解开这道数学题。题解是在<strong>交易b</strong>的『输入脚本』里给出的！Bob解开了这道题，获得了奖金，然后在<strong>交易b</strong>中为Carol出一道数学题，等待Carol来解…</p>
+<p>所以说，下图中相同颜色的『输出』和『输入』才是一对题和解：</p>
+<p><img src="https://cloud.githubusercontent.com/assets/514951/14377680/9a8ac6b8-fda3-11e5-965e-80bda1aed8c6.png" alt="图03"></p>
+<h2 id="脚本语言"><a href="#脚本语言" class="headerlink" title="脚本语言"></a>脚本语言</h2><p><a href="http://www.8btc.com/bitcoin_scripts" target="_blank" rel="noopener">Bitcoin Wiki</a>给出的对脚本的解释:</p>
+<blockquote>
+<p>比特币在交易中使用脚本系统，与FORTH(一种编译语言)一样，脚本是简单的、基于堆栈的、并且从左向右处理，它特意设计成非图灵完整，没有LOOP语句。</p>
+</blockquote>
+<p>要理解比特币脚本，先要了解『堆栈』，这是一个后进先出(Last In First Out )的容器，脚本系统对数据的操作都是通过它完成的。比特币脚本系统中有两个堆栈：主堆栈和副堆栈，一般来说主要使用主堆栈。举几个简单的例子，看下指令是如何对堆栈操作的（完整的指令集在<a href="http://www.8btc.com/bitcoin_scripts" target="_blank" rel="noopener">Wiki</a>里可以找到）:</p>
+<ul>
+<li><p>常数入栈：把一段常数压入到堆栈中，这个常数成为了栈顶元素<br><img src="https://cloud.githubusercontent.com/assets/514951/14377676/9a6d1d16-fda3-11e5-9f83-275c6f95bd61.png" alt="图04"></p>
+</li>
+<li><p>OP_DUP：复制栈顶元素<br><img src="https://cloud.githubusercontent.com/assets/514951/14377672/9a4d5b5c-fda3-11e5-8365-72ff3034ec4d.png" alt="图05"></p>
+</li>
+<li><p>OP_EQUALVERIFY：检查栈顶两个元素是否相等<br><img src="https://cloud.githubusercontent.com/assets/514951/14377674/9a4db156-fda3-11e5-9fbc-74c6119ddb58.png" alt="图06"></p>
+</li>
+</ul>
+<h2 id="标准交易脚本"><a href="#标准交易脚本" class="headerlink" title="标准交易脚本"></a>标准交易脚本</h2><p>也就是P2PKH(Pay To Public Key Hash)，我们常用的转账方式。Alice在转账给Bob的时候，『输出交易』中给出了Bob的『钱包地址』(等价于『公钥哈希』)；当Bob想要转账给Carol的时候，他要证明自己拥有这个『钱包地址』对应的『私钥』，所以在『输入交易』中给出了自己的『公钥』以及使用『私钥』对交易的签名。看个实例：</p>
+<ul>
+<li>交易a: <a href="https://blockchain.info/zh-cn/tx/9c50cee8d50e273100987bb12ec46208cb04a1d5b68c9bea84fd4a04854b5eb1" target="_blank" rel="noopener">9c50cee8d50e273100987bb12ec46208cb04a1d5b68c9bea84fd4a04854b5eb1</a></li>
+<li>交易b: <a href="https://blockchain.info/tx/62fadb313b74854a818de4b4c0dc2e2049282b28ec88091a9497321203fb016e" target="_blank" rel="noopener">62fadb313b74854a818de4b4c0dc2e2049282b28ec88091a9497321203fb016e</a></li>
+</ul>
+<p>交易b中有一个『输入交易』引用了交易a的『输出交易』，它们的脚本是一对题与解：</p>
+<p><strong>题：</strong>交易a的『输出脚本』，若干个脚本指令和转账接收方的『公钥哈希』<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OP_DUP OP_HASH160 be10f0a78f5ac63e8746f7f2e62a5663eed05788 OP_EQUALVERIFY OP_CHECKSIG</span><br></pre></td></tr></table></figure></p>
+<p><strong>解：</strong>交易b的『输入脚本』，这么一长串只是两个元素，『签名』和『公钥』（sig &amp; pubkey）<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">3046022100ba1427639c9f67f2ca1088d0140318a98cb1e84f604dc90ae00ed7a5f9c61cab02210094233d018f2f014a5864c9e0795f13735780cafd51b950f503534a6af246aca301</span><br><span class="line">03a63ab88e75116b313c6de384496328df2656156b8ac48c75505cd20a4890f5ab</span><br></pre></td></tr></table></figure></p>
+<p>下面来看下这两段脚本是如何执行，来完成『解题』过程的。</p>
+<ol>
+<li><p>首先执行的是『输入脚本』。因为脚本是从左向右执行的，那么先入栈的是『签名』，随后是『公钥』<br><img src="https://cloud.githubusercontent.com/assets/514951/14377675/9a4ecf50-fda3-11e5-88b3-4bb3d5bdb538.png" alt="图07"></p>
+</li>
+<li><p>接着，执行的是『输出脚本』。从左向右执行，第一个指令是<code>OP_DUP</code>——复制栈顶元素<br><img src="https://cloud.githubusercontent.com/assets/514951/14377673/9a4d4734-fda3-11e5-8ff3-ab099274fe1e.png" alt="图08"></p>
+</li>
+<li><p><code>OP_HASH160</code>: 计算栈顶元素Hash，得到<code>pubkeyhash</code><br><img src="https://cloud.githubusercontent.com/assets/514951/14377677/9a7c5538-fda3-11e5-82ee-7cbb5789e62f.png" alt="图09"></p>
+</li>
+<li><p>将『输出脚本』中的『公钥哈希』入栈，为了和前面计算得到的哈希区别，称它为<code>pubkeyhash</code><br><img src="https://cloud.githubusercontent.com/assets/514951/14377678/9a7cee4e-fda3-11e5-8745-3cdf582a0b77.png" alt="图10"></p>
+</li>
+<li><p><code>OP_EQUALVERIFY</code>: 检查栈顶前两元素是否相等，如果相等继续执行，否则中断执行，返回失败<br><img src="https://cloud.githubusercontent.com/assets/514951/14377679/9a7ed808-fda3-11e5-887e-d2dd7d9c5143.png" alt="图11"></p>
+</li>
+<li><p><code>OP_CHECKSIG</code>: 使用栈顶前两元素执行签名校验操作，如果相等，返回成功，否则返回失败<br><img src="https://cloud.githubusercontent.com/assets/514951/14377682/9a9f8878-fda3-11e5-9de7-6c7544f12107.png" alt="图12"></p>
+</li>
+</ol>
+<p>这样一串指令执行下来，就可以验证这道数学题是否做对了，也就是说验明了想要花费『钱包地址』中比特币的人是否拥有对应的『私钥』。上面的执行过程是可以在<a href="http://webbtc.com/script" target="_blank" rel="noopener">脚本模拟器</a>中执行的，能够看到每一步执行的状态，感兴趣的童鞋可以尝试一下。</p>
+<p>其实除了标准的P2PKH交易脚本，还有P2SH的Multi-Sig脚本以及真正的『解谜交易』脚本，我们可以在今后接着讨论。</p>
+<hr>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p> [1] <a href="http://www.8btc.com/bitcoin_scripts" target="_blank" rel="noopener">比特币脚本</a><br> [2] <a href="http://weibo.com/MyBitcoin" target="_blank" rel="noopener">申屠青春(我看比特币</a><br> [3] <a href="https://en.bitcoin.it/wiki/Script" target="_blank" rel="noopener">Bitcoin Wiki, Script</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://panzhibiao.com/2016/04/08/understand-bitcoin-script/" data-id="cjt6wp6fu000a7hs6hg7k0mwu" class="article-share-link">Share</a>
+      
+        <a href="http://panzhibiao.com/2016/04/08/understand-bitcoin-script/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-shadowsocks-add-bitcoin-support" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2015/03/11/shadowsocks-add-bitcoin-support/" class="article-date">
@@ -134,7 +236,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2015/03/11/shadowsocks-add-bitcoin-support/" data-id="cjszhfpgk00095ds6ctj8y4m3" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2015/03/11/shadowsocks-add-bitcoin-support/" data-id="cjt6wp6ft00097hs6fs67lxdk" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2015/03/11/shadowsocks-add-bitcoin-support/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -216,7 +318,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2014/06/15/safe-wallet-idea/" data-id="cjszhfpgj00085ds6nn6wdicx" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2014/06/15/safe-wallet-idea/" data-id="cjt6wp6fs00087hs6cf23qo6h" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2014/06/15/safe-wallet-idea/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -257,7 +359,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2014/06/14/open-nodes-plan/" data-id="cjszhfpgg00055ds6bstu0ij9" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2014/06/14/open-nodes-plan/" data-id="cjt6wp6fr00077hs61z859la7" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2014/06/14/open-nodes-plan/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -363,7 +465,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/10/27/bitcoin-transaction-02/" data-id="cjszhfpgh00065ds65uhg4n9h" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/10/27/bitcoin-transaction-02/" data-id="cjt6wp6fq00067hs6kgbgd8sa" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/10/27/bitcoin-transaction-02/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -501,7 +603,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/10/27/bitcoin-transaction-01/" data-id="cjszhfpgi00075ds6rfte0va9" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/10/27/bitcoin-transaction-01/" data-id="cjt6wp6fp00057hs6sxkai856" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/10/27/bitcoin-transaction-01/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -613,7 +715,7 @@ ccb4 = 52404
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/08/12/timestamp-system-and-proof-of-existance/" data-id="cjszhfpgd00045ds6810a9t97" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/08/12/timestamp-system-and-proof-of-existance/" data-id="cjt6wp6fo00047hs6jv6cswgb" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/08/12/timestamp-system-and-proof-of-existance/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -795,7 +897,7 @@ ccb4 = 52404
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/08/03/proof-of-work-and-mining/" data-id="cjszhfpgc00035ds6d1nm4fck" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/08/03/proof-of-work-and-mining/" data-id="cjt6wp6fm00037hs6dko2uz5b" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/08/03/proof-of-work-and-mining/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -901,7 +1003,7 @@ OP_EQUALVERIFY OP_CHECKSIG
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/07/30/bitcoin-basic/" data-id="cjszhfpgb00025ds6b3yqqana" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/07/30/bitcoin-basic/" data-id="cjt6wp6fl00027hs6sfkq2t40" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/07/30/bitcoin-basic/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -995,80 +1097,9 @@ OP_EQUALVERIFY OP_CHECKSIG
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/07/20/bitcoin-clients/" data-id="cjszhfpg500005ds67o4tp5bd" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2013/07/20/bitcoin-clients/" data-id="cjt6wp6fg00007hs6pbrul21l" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2013/07/20/bitcoin-clients/#disqus_thread" class="article-comment-link">Comments</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-what-is-bitcoin" class="article article-type-post" itemscope="" itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2013/07/20/what-is-bitcoin/" class="article-date">
-  <time datetime="2013-07-19T17:37:00.000Z" itemprop="datePublished">Jul 20 2013</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2013/07/20/what-is-bitcoin/">比特币是什么?</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>比特币是一个自由软件项目，是一种基于密码学的电子货币，同时也是一种协议。整个系统采用去中心化思想构建，基于P2P模式运行。<br>其特点有：</p>
-<ul>
-<li>去中心化发行与运作，无央行存在</li>
-<li>货币不可伪造，无法多重支付，交易不可逆转</li>
-<li>紧缩货币，总量固定，但可以无限分割</li>
-<li>全球无障碍流通，快速支付且成本极低</li>
-<li>账户匿名，且任何人均无法冻结，无法收税</li>
-<li>天然审计</li>
-</ul>
-<p>比特币由<em>Satoshi Nakamoto</em>创造（现已匿名消失），2008年11月1日，Satoshi在一个密码学的邮件列表中贴出了一篇论文：”<a href="http://www.mail-archive.com/cryptography@metzdowd.com/msg09959.html" target="_blank" rel="noopener">Bitcoin P2P e-cash paper</a>“：</p>
-<p><img src="https://f.cloud.github.com/assets/514951/827512/56e0e704-f09e-11e2-8957-573b9edbdafc.png" alt="qq20130720-1"></p>
-<h3 id="创世纪块"><a href="#创世纪块" class="headerlink" title="创世纪块"></a>创世纪块</h3><p>2009年1月3日，第一个数据块(Genesis‎ Block)的生成宣告比特币系统诞生。Satoshi在Genesis Block数据区中写入如下信息：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">$ hexdump -n 255 -C blk00000.dat</span><br><span class="line">00000000  f9 be b4 d9 1d 01 00 00  01 00 00 00 00 00 00 00  |................|</span><br><span class="line">00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|</span><br><span class="line">00000020  00 00 00 00 00 00 00 00  00 00 00 00 3b a3 ed fd  |............;...|</span><br><span class="line">00000030  7a 7b 12 b2 7a c7 2c 3e  67 76 8f 61 7f c8 1b c3  |z&#123;..z.,&gt;gv.a....|</span><br><span class="line">00000040  88 8a 51 32 3a 9f b8 aa  4b 1e 5e 4a 29 ab 5f 49  |..Q2:...K.^J)._I|</span><br><span class="line">00000050  ff ff 00 1d 1d ac 2b 7c  01 01 00 00 00 01 00 00  |......+|........|</span><br><span class="line">00000060  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|</span><br><span class="line">00000070  00 00 00 00 00 00 00 00  00 00 00 00 00 00 ff ff  |................|</span><br><span class="line">00000080  ff ff 4d 04 ff ff 00 1d  01 04 45 54 68 65 20 54  |..M.......EThe T|</span><br><span class="line">00000090  69 6d 65 73 20 30 33 2f  4a 61 6e 2f 32 30 30 39  |imes 03/Jan/2009|</span><br><span class="line">000000a0  20 43 68 61 6e 63 65 6c  6c 6f 72 20 6f 6e 20 62  | Chancellor on b|</span><br><span class="line">000000b0  72 69 6e 6b 20 6f 66 20  73 65 63 6f 6e 64 20 62  |rink of second b|</span><br><span class="line">000000c0  61 69 6c 6f 75 74 20 66  6f 72 20 62 61 6e 6b 73  |ailout for banks|</span><br><span class="line">000000d0  ff ff ff ff 01 00 f2 05  2a 01 00 00 00 43 41 04  |........*....CA.|</span><br><span class="line">000000e0  67 8a fd b0 fe 55 48 27  19 67 f1 a6 71 30 b7 10  |g....UH&apos;.g..q0..|</span><br><span class="line">000000f0  5c d6 a8 28 e0 39 09 a6  79 62 e0 ea 1f 61 de     |\..(.9..yb...a.|</span><br></pre></td></tr></table></figure>
-<p>还原出文本为：</p>
-<pre><code>The Times 03/Jan/2009 Chancellor on brink of second bailout for banks
-</code></pre><p>该段文字为英国《泰晤士报》2009年01月03日头版新闻标题：</p>
-<p><img src="https://f.cloud.github.com/assets/514951/828043/35469eca-f0aa-11e2-9726-f509586f4e7b.jpg" alt="twcach2"></p>
-<p>这段文字暗示了比特币的诞生时间，并从中可以看出Satoshi对现有货币系统的强烈不满。</p>
-<p>经过数年发展，已有大量计算机加入，形成了庞大的P2P网络，并构成巨大的算力屏障。除非小行星撞击地球，否则没有任何个人与组织能够关闭该系统。截止2013年7月19日，目前全网节点数约16万个：</p>
-<p><img src="https://f.cloud.github.com/assets/514951/827955/f049f2e2-f0a7-11e2-8229-0a85976f08ef.png" alt="qq20130720-2"></p>
-<h3 id="一切才刚刚开始"><a href="#一切才刚刚开始" class="headerlink" title="一切才刚刚开始"></a>一切才刚刚开始</h3><p>由于比特币的诸多颠覆特性，被人称为“史上最危险的自由软件项目”，现在经历数次大波折的比特币不仅没有衰落反而越来越繁荣，无数人正投身于这场伟大的社会实践中去，而比特币将开创出人类新的货币史。</p>
-<hr>
-<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><ol>
-<li>An open source P2P digital currency: <a href="http://bitcoin.org/" target="_blank" rel="noopener">http://bitcoin.org/</a></li>
-<li>Bitcoin: A Peer-to-Peer Electronic Cash System: <a href="http://bitcoin.org/bitcoin.pdf" target="_blank" rel="noopener">http://bitcoin.org/bitcoin.pdf</a></li>
-<li>Satoshi Nakamoto: <a href="https://en.bitcoin.it/wiki/Satoshi_Nakamoto" target="_blank" rel="noopener">https://en.bitcoin.it/wiki/Satoshi_Nakamoto</a></li>
-<li>Bitcoin P2P Currency: The Most Dangerous Project We’ve Ever Seen：<a href="http://launch3.squarespace.com/blog/l019-bitcoin-p2p-currency-the-most-dangerous-project-weve-ev.html" target="_blank" rel="noopener">http://launch3.squarespace.com/blog/l019-bitcoin-p2p-currency-the-most-dangerous-project-weve-ev.html</a></li>
-<li>Genesis Blcok: <a href="https://en.bitcoin.it/wiki/Genesis_block" target="_blank" rel="noopener">https://en.bitcoin.it/wiki/Genesis_block</a></li>
-<li>Chancellor Alistair Darling on brink of second bailout for banks: <a href="http://www.thetimes.co.uk/tto/business/industries/banking/article2160028.ece" target="_blank" rel="noopener">http://www.thetimes.co.uk/tto/business/industries/banking/article2160028.ece</a></li>
-<li>Bitnods: <a href="http://getaddr.bitnodes.io/" target="_blank" rel="noopener">http://getaddr.bitnodes.io/</a></li>
-</ol>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2013/07/20/what-is-bitcoin/" data-id="cjszhfpg900015ds694qyctgm" class="article-share-link">Share</a>
-      
-        <a href="http://panzhibiao.com/2013/07/20/what-is-bitcoin/#disqus_thread" class="article-comment-link">Comments</a>
       
       
       
@@ -1084,7 +1115,7 @@ OP_EQUALVERIFY OP_CHECKSIG
 
   <nav id="page-nav">
     
-    <a class="extend prev" rel="prev" href="/archives/">&laquo; Prev</a><a class="page-number" href="/archives/">1</a><span class="page-number current">2</span>
+    <a class="extend prev" rel="prev" href="/archives/">&laquo; Prev</a><a class="page-number" href="/archives/">1</a><span class="page-number current">2</span><a class="page-number" href="/archives/page/3/">3</a><a class="extend next" rel="next" href="/archives/page/3/">Next &raquo;</a>
   </nav>
 
 </section>
@@ -1116,6 +1147,10 @@ OP_EQUALVERIFY OP_CHECKSIG
       <ul>
         
           <li>
+            <a href="/2019/03/13/important-random-k-and-fake-signatures/">随机数对签名的重要性与伪签名的构造</a>
+          </li>
+        
+          <li>
             <a href="/2019/03/01/Taproot/">Taproot简介</a>
           </li>
         
@@ -1129,10 +1164,6 @@ OP_EQUALVERIFY OP_CHECKSIG
         
           <li>
             <a href="/2019/02/21/bip143/">bip143-新的交易签名摘要算法</a>
-          </li>
-        
-          <li>
-            <a href="/2019/02/21/BIP141/">BIP141, Segregated Witness</a>
           </li>
         
       </ul>
