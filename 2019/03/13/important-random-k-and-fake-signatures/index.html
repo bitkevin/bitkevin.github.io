@@ -27,7 +27,7 @@ ga('send', 'pageview');
 <meta property="og:site_name" content="比特币实验室">
 <meta property="og:description" content="关于签名算法的一些基本变量定义：  G为椭圆曲线 随机值k，R=kG m，待签名消息哈希值 私钥x，公钥P=xG H()，哈希函数 r = R.x，表示r为R的x坐标值  Schnorr 签名：(R, s) 生成签名：s = k + H(R||P||m)*x 验证签名：sG = R + H(R||P||m)P  ECDSA 签名：(r, s) 生成签名：s = m/k + r/k*x 验证签名：s">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-03-13T07:45:17.017Z">
+<meta property="og:updated_time" content="2019-03-13T09:39:23.763Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="随机数对签名的重要性与伪签名的构造">
 <meta name="twitter:description" content="关于签名算法的一些基本变量定义：  G为椭圆曲线 随机值k，R=kG m，待签名消息哈希值 私钥x，公钥P=xG H()，哈希函数 r = R.x，表示r为R的x坐标值  Schnorr 签名：(R, s) 生成签名：s = k + H(R||P||m)*x 验证签名：sG = R + H(R||P||m)P  ECDSA 签名：(r, s) 生成签名：s = m/k + r/k*x 验证签名：s">
@@ -142,11 +142,24 @@ ga('send', 'pageview');
 <li>若尝试随机等式右侧值（随机生成R和m值），<code>sG</code>是椭圆曲线乘法，曲线除法不可逆的情况下是无法找到对应的s’值</li>
 </ul>
 <p>因此Schnorr签名算法是无法构造出能验证通过的伪签名的。</p>
+<hr>
+<p>参考：</p>
+<ul>
+<li><a href="https://github.com/sipa/bips/blob/bip-schnorr/bip-schnorr.mediawiki" target="_blank" rel="noopener">https://github.com/sipa/bips/blob/bip-schnorr/bip-schnorr.mediawiki</a></li>
+<li>How Perfect Offline Wallets Can Still Leak Bitcoin Private Keys<ul>
+<li><a href="https://bitcointalk.org/index.php?topic=883793.0" target="_blank" rel="noopener">https://bitcointalk.org/index.php?topic=883793.0</a><ul>
+<li><a href="https://bitcointalk.org/index.php?topic=285142.msg3077694#msg3077694" target="_blank" rel="noopener">https://bitcointalk.org/index.php?topic=285142.msg3077694#msg3077694</a></li>
+<li><a href="https://www.mail-archive.com/bitcoin-development@lists.sourceforge.net/msg02721.html" target="_blank" rel="noopener">https://www.mail-archive.com/bitcoin-development@lists.sourceforge.net/msg02721.html</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/03/13/important-random-k-and-fake-signatures/" data-id="cjt6wp6g3000k7hs6dx9u7j6f" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/03/13/important-random-k-and-fake-signatures/" data-id="cjt70jbuq000i52s6lf3250j4" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/03/13/important-random-k-and-fake-signatures/#disqus_thread" class="article-comment-link">Comments</a>
       
