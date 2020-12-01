@@ -79,6 +79,105 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
+    <article id="post-Taproot2" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/12/01/Taproot2/" class="article-date">
+  <time datetime="2020-12-01T14:55:43.000Z" itemprop="datePublished">Dec 1 2020</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2020/12/01/Taproot2/">Taproot简介二</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>之前写过一篇从技术层面解读Taproot：《Taproot简介》，这次再多啰嗦解读几句（不带公式的）。</p>
+<p>生活中的合约、合同通常有以下一些特征：</p>
+<ul>
+<li>通常，合约是双方或多方的。</li>
+<li>合约的双方并不绝对信任对方，如果可以绝对信任对方，则不需要合约。</li>
+<li>合约的双方一般假设对方大概率会履约：如果还没交易就已经认为对方不会履约，可能会选择不交易，或使用一些合约条款（如惩罚）保证对方履约。</li>
+<li>设计正确的合约，应该让双方在履约的情况下均会得到较大利益（或较少损失）</li>
+<li>因此在绝大部份情况下，合约都不会有争议，双方都会合作实行合约条款。在这种情况下，合约条款一般会得到保密，不为第三方所知。</li>
+<li>若过程中出现争议（不合作）的情况，需要由第三方机构（如法院）进行仲裁。在这种情况下，合约条款需要公开，提供给律师、法官等。</li>
+</ul>
+<p>比特币链上是可以写简单合约的，例如n/m式的多重签名机制、闪电网络等。区块链的合约通常称为智能合约。</p>
+<ul>
+<li>所有合约的特性都适用于智能合约，只是区块链规则担当了仲裁的角色，换言之Code is Law。</li>
+<li>但现在比特币的智能合约，不论是2009年中本聪的原始设计，2012年出现的P2SH，还是2017年的隔离见证(P2WSH)，都有一个共同的问题：无论立约双方是否合作，合约内容必须完全公开，即合约脚本必须公开。当花费时必须提供合约脚本全部内容才能进行校验。</li>
+<li>公开合约内容主要带来两个问题<ul>
+<li>交易成本：智能合约一般都需要多个签名，加上合约内容本身，占用更多区块空间，令交易手续费上升。</li>
+<li>隐私问题：第三方可以监察区块链，通过合约内容的特征，追踪资金的流向和推断合约参与者的身份。</li>
+</ul>
+</li>
+</ul>
+<p>ECDSA</p>
+<p>ECDSA是比特币诞生到现在唯一的签名验证机制。</p>
+<ul>
+<li>数字签名是比特币认证交易合法性的最重要手段，确权的唯一标准。</li>
+<li>自2009年以来，比特币均使用ECDSA为数字签名标准（包括P2PK, P2PKH, 2012年的P2SH, 2017年的P2WPKH和P2WSH）。</li>
+<li>比特币的公/私钥系统是线性的，因此我们可以把多个私钥相加，也可以把对应的多个公钥相加，这样产生的新私钥和新公钥仍然是一对。这是HD钱包的理论基础。</li>
+<li>但ECDSA的签名是非线性的，因此简单的把多个签名结果加起来，则不再是有效的签名</li>
+<li>因此一直以来，比特币的多签署交易均需要在区块链公开多个签署，问题和智能合约相同（交易成本，隐私问题）。</li>
+<li>201方的多方签署人数的理论极限（P2SH大概只容许最多16方）。</li>
+</ul>
+<p>Schnorr</p>
+<p>再说一下Schnorr签名算法。</p>
+<ul>
+<li>Schnorr签署的专利于2008年才失效，当时没有广泛的开源实现及应用，所以2009年诞生的比特币也没有使用。签名算法通常是需要深厚的数学理论基础才能设计。一个小的理解偏差，编码错误则可能导致严重问题。</li>
+<li>Schnorr 签署使用的公/私钥系统和ECDSA相同，因此现有的私钥管理(如BIP32)可以继续使用</li>
+<li>Schnorr和ECDSA的区别在于：Schnorr签名是线性的。对于同一内容X，如果用多个私钥各自签名，然后把对应的多个公钥相加，再把多个签名相加，得出的新签名会是新公钥对内容X的有效签名。<ul>
+<li>利用这个特性，签名人数没有理论极限。只要各方一致合作，就可以把签名相加起来，看起来和单方签名无异。</li>
+</ul>
+</li>
+<li>Schnorr签名算法的安全性于2012年得到数学证明。</li>
+</ul>
+<p>Taproot</p>
+<p>Taproot解决的问题</p>
+<ul>
+<li>Taproot以Schnorr签名算法为基础</li>
+<li>以Taproot进行的智能合约，如果双方合作，不但无需公开合约内容，而且交易会和最简单普遍的单方签名交易看起来没有分别。即交易成本极小化及隐私极大化。</li>
+<li>如果双方不合作，申诉方仍需要公开合约脚本内容以供区块链仲裁。<ul>
+<li>但通过使用MAST（Merklized Alternative Script Trees），申诉方只需要公开合约的相关部份，而非所有合约条款，也因此尽量降低交易成本和对隐私的影响。即合约可能有多条执行路径，仅公布即将执行的路径即可。</li>
+</ul>
+</li>
+</ul>
+<p>Taproot没有解决的问题</p>
+<ul>
+<li>Taproot没有把交易金额隐藏，因此仍可以通过分析输入和输出金额估计资金流向。</li>
+<li>Taproot地址和旧式地址一样，会在区块链公开。如果使用者重覆使用Taproot地址，那和重覆使用旧式地址有相同的隐私问题。</li>
+</ul>
+<p>总结</p>
+<p>比特币在隐私方向上，有两大待攻克的难题。一是流向隐匿，这在UTXO系统里是比较棘手的；二是金额隐匿，可以通过类似Grin的技术来解决，需要扩展区块或分叉来实现。</p>
+<p>即使上述两大难点并没有解决掉，但Taproot对于比特币合约来说，即实现了交易成本极小化，又使得隐私极大化。还是一个显著的小小进步。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://panzhibiao.com/2020/12/01/Taproot2/" data-id="cki63v4ww000cdn8zc21f0cqh" class="article-share-link">Share</a>
+      
+        <a href="http://panzhibiao.com/2020/12/01/Taproot2/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-important-random-k-and-fake-signatures" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/03/13/important-random-k-and-fake-signatures/" class="article-date">
@@ -157,7 +256,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/03/13/important-random-k-and-fake-signatures/" data-id="cjt70jbuq000i52s6lf3250j4" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/03/13/important-random-k-and-fake-signatures/" data-id="cki63v4wp000bdn8zut53whm1" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/03/13/important-random-k-and-fake-signatures/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -270,7 +369,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/03/01/Taproot/" data-id="cjt70jbus000k52s6z32fj1wm" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/03/01/Taproot/" data-id="cki63v4x5000ddn8znnnlndzg" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/03/01/Taproot/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -373,7 +472,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/28/schnorr-sigature/" data-id="cjt70jbur000j52s6797fk0qq" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/28/schnorr-sigature/" data-id="cki63v4wn000adn8z9mexiqpj" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/28/schnorr-sigature/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -518,7 +617,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/24/MAST/" data-id="cjt70jbup000h52s6a9ahluax" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/24/MAST/" data-id="cki63v4yu000kdn8zct3yqgmg" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/24/MAST/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -591,7 +690,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/21/bip143/" data-id="cjt70jbum000e52s6dn9r43gp" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/21/bip143/" data-id="cki63v4wh0009dn8zq14cz39p" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/21/bip143/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -725,7 +824,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/21/BIP141/" data-id="cjt70jbuo000f52s6luyxtrs5" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/21/BIP141/" data-id="cki63v4w80008dn8zav27hoxa" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/21/BIP141/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -873,7 +972,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/12/p2sh/" data-id="cjt70jbuo000g52s6a27dgdft" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/12/p2sh/" data-id="cki63v4yu000jdn8zwhjqwyy7" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/12/p2sh/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -978,7 +1077,7 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2019/02/11/bip8/" data-id="cjt70jbul000d52s6jhw6h6u0" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2019/02/11/bip8/" data-id="cki63v4w50007dn8zvz9ap14h" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2019/02/11/bip8/#disqus_thread" class="article-comment-link">Comments</a>
       
@@ -1020,76 +1119,9 @@ ga('send', 'pageview');
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2018/03/25/The-Significance-of-the-Lightning-Network/" data-id="cjt70jbul000c52s6stglunm0" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2018/03/25/The-Significance-of-the-Lightning-Network/" data-id="cki63v4vz0006dn8zfuybrh6o" class="article-share-link">Share</a>
       
         <a href="http://panzhibiao.com/2018/03/25/The-Significance-of-the-Lightning-Network/#disqus_thread" class="article-comment-link">Comments</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-BIP9" class="article article-type-post" itemscope="" itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2016/04/21/BIP9/" class="article-date">
-  <time datetime="2016-04-21T05:09:52.000Z" itemprop="datePublished">Apr 21 2016</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2016/04/21/BIP9/">新的软分叉升级规范BIP9</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>比特币的软/硬分叉升级一直采用块的<code>version</code>字段来完成。由于是一个分布式系统，必然需要采用灰度发布模式。</p>
-<h3 id="传统的升级过程"><a href="#传统的升级过程" class="headerlink" title="传统的升级过程"></a>传统的升级过程</h3><p>在实施<a href="https://github.com/bitcoin/bips/blob/master/bip-0009.mediawiki" target="_blank" rel="noopener">BIP9</a>前是这样升级的，当前块版本为<code>version</code>，那么新块版本是<code>version + 1</code>，当近1000个块中的版本超过95%都是新版本时，则触发启用新特性，同时不再接收旧版本号的块。由于中间存在1000个块的窗口期，大约一周，所以给出足够的时间给当前网络中的节点实施升级。</p>
-<p><img src="https://cloud.githubusercontent.com/assets/514951/14696861/4a75b116-07b1-11e6-99da-0b28e3408614.png" alt="图1.0"></p>
-<p>上图是来自<a href="https://chain.btc.com/stats/block-ver?history_mode=all#versionTrend" target="_blank" rel="noopener">BTC.COM</a>统计的比特币历史上几个升级过程，最近的v3升级v4的过程大约花费了一个半月左右。前面几次的升级时间更长。</p>
-<p>这种依次递增版本号的方法，有一个明显的弊端：每次仅能进行一个特性升级。当需要同时进行多个升级时，则无法完成。BIP9的诞生就是为了解决这个问题的，同时把向下兼容性升级过程制定了规范。</p>
-<h3 id="BIP9特征"><a href="#BIP9特征" class="headerlink" title="BIP9特征"></a>BIP9特征</h3><ol>
-<li>支持多个特性同时升级</li>
-<li>新增投票时间区间</li>
-<li>新增锁定期</li>
-</ol>
-<p>块的<code>version</code>字段是4字节，意味着有32位比特，前三位目前固定为<code>001</code>，那么剩余29个比特可以用于特性设置，与激发某个特性，则将其对应的位设置为<code>1</code>。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">二进制格式：</span><br><span class="line"></span><br><span class="line">   001   0 0000 0000 0000 0000 0000 0000 0000</span><br><span class="line">------   ------------------------------------</span><br><span class="line">固定保留  29个特性标识位</span><br></pre></td></tr></table></figure>
-<h3 id="状态变迁"><a href="#状态变迁" class="headerlink" title="状态变迁"></a>状态变迁</h3><p>BIP9某个特性的状态有：</p>
-<ul>
-<li>DEFINED <code>定义</code>。每个特性的升级设定会写到某一个版本的bitcoind中，并部署下去。</li>
-<li>STARTED <code>启动</code>。启动后会有两个可能的变迁状态：<code>LOCKED_IN</code>, <code>FAILED</code>。</li>
-<li>LOCKED_IN <code>锁定</code>。一旦进入锁定态，则必然会激活。锁定期为2016个块。</li>
-<li>ACTIVE <code>激活</code></li>
-<li>FAILED <code>失败</code></li>
-</ul>
-<p><img src="https://cloud.githubusercontent.com/assets/514951/14697672/a19038d4-07b8-11e6-9101-a20b009e102f.png" alt="图1.1"></p>
-<p><code>MTP</code>是最近11个块的时间戳中位数。区块链上的块时间并不是按照高度递增而严格递增的，但<code>MTP</code>时间是严格递增的(早期可能不能严格遵守)。</p>
-<p>能够进入锁定期（即得到全网同意）的条件是在2016个块中，支持的块数量达到95%，在测试网络上是75%。窗口期从之前的1000提升至2016个块，即一个难度周期，约两周。同时，还增加了2016个块的锁定期，之后才能正式激活特性。这比之前的升级，变得更加稳健，预留出充分的时间，同时意味着特性的落地周期变长。</p>
-<h3 id="首个采用BIP9的软分叉"><a href="#首个采用BIP9的软分叉" class="headerlink" title="首个采用BIP9的软分叉"></a>首个采用BIP9的软分叉</h3><p><code>BIP68/112/113</code>是首个采用BIP9方式进行升级的软分叉，随<code>bitcoind-v0.12.1</code>发布。使能位采用最右侧位，起始时间(<em>starttime</em>)是<code>2016-05-01 00:00:00</code>，终止时间(<em>timeout</em>)是<code>2017-05-01 00:00:00</code>。</p>
-<p>若要支持<code>BIP68/112/113</code>软分叉，那么版本号应该是: <code>0x20000001</code>，二进制为：<code>0010 0000 0000 0000 0000 0000 0000 0001</code>。</p>
-<p>另外<code>BIP109</code>(Classic 2MB HardFork)也是采用的是BIP9规范，使能位是最左侧位，但触发窗口期与锁定期的设定均未采用BIP9的定义。其版本号是：<code>0x30000000</code>，二进制为：<code>0011 0000 0000 0000 0000 0000 0000 0000</code>。</p>
-<p>如果版本号为：<code>0x30000001</code>，二进制为：<code>0011 0000 0000 0000 0000 0000 0000 0001</code>，则意味着同时支持<code>BIP68/112/113</code>和<code>BIP109</code>。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2016/04/21/BIP9/" data-id="cjt70jbuk000b52s6aevblk0p" class="article-share-link">Share</a>
-      
-        <a href="http://panzhibiao.com/2016/04/21/BIP9/#disqus_thread" class="article-comment-link">Comments</a>
       
       
       
@@ -1124,7 +1156,7 @@ ga('send', 'pageview');
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li></ul>
     </div>
   </div>
 
@@ -1135,6 +1167,10 @@ ga('send', 'pageview');
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2020/12/01/Taproot2/">Taproot简介二</a>
+          </li>
         
           <li>
             <a href="/2019/03/13/important-random-k-and-fake-signatures/">随机数对签名的重要性与伪签名的构造</a>
@@ -1152,10 +1188,6 @@ ga('send', 'pageview');
             <a href="/2019/02/24/MAST/">MAST, Merkelized Abstract Syntax Tree</a>
           </li>
         
-          <li>
-            <a href="/2019/02/21/bip143/">bip143-新的交易签名摘要算法</a>
-          </li>
-        
       </ul>
     </div>
   </div>
@@ -1168,7 +1200,7 @@ ga('send', 'pageview');
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2019 Kevin Pan<br>
+      &copy; 2020 Kevin Pan<br>
       Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>

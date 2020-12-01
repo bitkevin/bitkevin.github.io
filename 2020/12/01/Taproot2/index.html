@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="utf-8">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-42912223-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  
+  <title>Taproot简介二 | 比特币实验室</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="之前写过一篇从技术层面解读Taproot：《Taproot简介》，这次再多啰嗦解读几句（不带公式的）。 生活中的合约、合同通常有以下一些特征：  通常，合约是双方或多方的。 合约的双方并不绝对信任对方，如果可以绝对信任对方，则不需要合约。 合约的双方一般假设对方大概率会履约：如果还没交易就已经认为对方不会履约，可能会选择不交易，或使用一些合约条款（如惩罚）保证对方履约。 设计正确的合约，应该让双方">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Taproot简介二">
+<meta property="og:url" content="http://panzhibiao.com/2020/12/01/Taproot2/index.html">
+<meta property="og:site_name" content="比特币实验室">
+<meta property="og:description" content="之前写过一篇从技术层面解读Taproot：《Taproot简介》，这次再多啰嗦解读几句（不带公式的）。 生活中的合约、合同通常有以下一些特征：  通常，合约是双方或多方的。 合约的双方并不绝对信任对方，如果可以绝对信任对方，则不需要合约。 合约的双方一般假设对方大概率会履约：如果还没交易就已经认为对方不会履约，可能会选择不交易，或使用一些合约条款（如惩罚）保证对方履约。 设计正确的合约，应该让双方">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2020-12-01T14:57:18.269Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Taproot简介二">
+<meta name="twitter:description" content="之前写过一篇从技术层面解读Taproot：《Taproot简介》，这次再多啰嗦解读几句（不带公式的）。 生活中的合约、合同通常有以下一些特征：  通常，合约是双方或多方的。 合约的双方并不绝对信任对方，如果可以绝对信任对方，则不需要合约。 合约的双方一般假设对方大概率会履约：如果还没交易就已经认为对方不会履约，可能会选择不交易，或使用一些合约条款（如惩罚）保证对方履约。 设计正确的合约，应该让双方">
+  
+    <link rel="alternate" href="/atom.xml" title="比特币实验室" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+</html>
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">比特币实验室</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">panzhibiao.com</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://panzhibiao.com"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Taproot2" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2020/12/01/Taproot2/" class="article-date">
+  <time datetime="2020-12-01T14:55:43.000Z" itemprop="datePublished">Dec 1 2020</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Taproot简介二
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>之前写过一篇从技术层面解读Taproot：《Taproot简介》，这次再多啰嗦解读几句（不带公式的）。</p>
+<p>生活中的合约、合同通常有以下一些特征：</p>
+<ul>
+<li>通常，合约是双方或多方的。</li>
+<li>合约的双方并不绝对信任对方，如果可以绝对信任对方，则不需要合约。</li>
+<li>合约的双方一般假设对方大概率会履约：如果还没交易就已经认为对方不会履约，可能会选择不交易，或使用一些合约条款（如惩罚）保证对方履约。</li>
+<li>设计正确的合约，应该让双方在履约的情况下均会得到较大利益（或较少损失）</li>
+<li>因此在绝大部份情况下，合约都不会有争议，双方都会合作实行合约条款。在这种情况下，合约条款一般会得到保密，不为第三方所知。</li>
+<li>若过程中出现争议（不合作）的情况，需要由第三方机构（如法院）进行仲裁。在这种情况下，合约条款需要公开，提供给律师、法官等。</li>
+</ul>
+<p>比特币链上是可以写简单合约的，例如n/m式的多重签名机制、闪电网络等。区块链的合约通常称为智能合约。</p>
+<ul>
+<li>所有合约的特性都适用于智能合约，只是区块链规则担当了仲裁的角色，换言之Code is Law。</li>
+<li>但现在比特币的智能合约，不论是2009年中本聪的原始设计，2012年出现的P2SH，还是2017年的隔离见证(P2WSH)，都有一个共同的问题：无论立约双方是否合作，合约内容必须完全公开，即合约脚本必须公开。当花费时必须提供合约脚本全部内容才能进行校验。</li>
+<li>公开合约内容主要带来两个问题<ul>
+<li>交易成本：智能合约一般都需要多个签名，加上合约内容本身，占用更多区块空间，令交易手续费上升。</li>
+<li>隐私问题：第三方可以监察区块链，通过合约内容的特征，追踪资金的流向和推断合约参与者的身份。</li>
+</ul>
+</li>
+</ul>
+<p>ECDSA</p>
+<p>ECDSA是比特币诞生到现在唯一的签名验证机制。</p>
+<ul>
+<li>数字签名是比特币认证交易合法性的最重要手段，确权的唯一标准。</li>
+<li>自2009年以来，比特币均使用ECDSA为数字签名标准（包括P2PK, P2PKH, 2012年的P2SH, 2017年的P2WPKH和P2WSH）。</li>
+<li>比特币的公/私钥系统是线性的，因此我们可以把多个私钥相加，也可以把对应的多个公钥相加，这样产生的新私钥和新公钥仍然是一对。这是HD钱包的理论基础。</li>
+<li>但ECDSA的签名是非线性的，因此简单的把多个签名结果加起来，则不再是有效的签名</li>
+<li>因此一直以来，比特币的多签署交易均需要在区块链公开多个签署，问题和智能合约相同（交易成本，隐私问题）。</li>
+<li>201方的多方签署人数的理论极限（P2SH大概只容许最多16方）。</li>
+</ul>
+<p>Schnorr</p>
+<p>再说一下Schnorr签名算法。</p>
+<ul>
+<li>Schnorr签署的专利于2008年才失效，当时没有广泛的开源实现及应用，所以2009年诞生的比特币也没有使用。签名算法通常是需要深厚的数学理论基础才能设计。一个小的理解偏差，编码错误则可能导致严重问题。</li>
+<li>Schnorr 签署使用的公/私钥系统和ECDSA相同，因此现有的私钥管理(如BIP32)可以继续使用</li>
+<li>Schnorr和ECDSA的区别在于：Schnorr签名是线性的。对于同一内容X，如果用多个私钥各自签名，然后把对应的多个公钥相加，再把多个签名相加，得出的新签名会是新公钥对内容X的有效签名。<ul>
+<li>利用这个特性，签名人数没有理论极限。只要各方一致合作，就可以把签名相加起来，看起来和单方签名无异。</li>
+</ul>
+</li>
+<li>Schnorr签名算法的安全性于2012年得到数学证明。</li>
+</ul>
+<p>Taproot</p>
+<p>Taproot解决的问题</p>
+<ul>
+<li>Taproot以Schnorr签名算法为基础</li>
+<li>以Taproot进行的智能合约，如果双方合作，不但无需公开合约内容，而且交易会和最简单普遍的单方签名交易看起来没有分别。即交易成本极小化及隐私极大化。</li>
+<li>如果双方不合作，申诉方仍需要公开合约脚本内容以供区块链仲裁。<ul>
+<li>但通过使用MAST（Merklized Alternative Script Trees），申诉方只需要公开合约的相关部份，而非所有合约条款，也因此尽量降低交易成本和对隐私的影响。即合约可能有多条执行路径，仅公布即将执行的路径即可。</li>
+</ul>
+</li>
+</ul>
+<p>Taproot没有解决的问题</p>
+<ul>
+<li>Taproot没有把交易金额隐藏，因此仍可以通过分析输入和输出金额估计资金流向。</li>
+<li>Taproot地址和旧式地址一样，会在区块链公开。如果使用者重覆使用Taproot地址，那和重覆使用旧式地址有相同的隐私问题。</li>
+</ul>
+<p>总结</p>
+<p>比特币在隐私方向上，有两大待攻克的难题。一是流向隐匿，这在UTXO系统里是比较棘手的；二是金额隐匿，可以通过类似Grin的技术来解决，需要扩展区块或分叉来实现。</p>
+<p>即使上述两大难点并没有解决掉，但Taproot对于比特币合约来说，即实现了交易成本极小化，又使得隐私极大化。还是一个显著的小小进步。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://panzhibiao.com/2020/12/01/Taproot2/" data-id="cki63v4ww000cdn8zc21f0cqh" class="article-share-link">Share</a>
+      
+        <a href="http://panzhibiao.com/2020/12/01/Taproot2/#disqus_thread" class="article-comment-link">Comments</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2019/03/13/important-random-k-and-fake-signatures/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">随机数对签名的重要性与伪签名的构造</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<section id="comments">
+  <div id="disqus_thread">
+    <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+  </div>
+</section>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/12/">December 2020</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/03/">March 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2016/04/">April 2016</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2015/03/">March 2015</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2014/06/">June 2014</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/07/">July 2013</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2020/12/01/Taproot2/">Taproot简介二</a>
+          </li>
+        
+          <li>
+            <a href="/2019/03/13/important-random-k-and-fake-signatures/">随机数对签名的重要性与伪签名的构造</a>
+          </li>
+        
+          <li>
+            <a href="/2019/03/01/Taproot/">Taproot简介</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/28/schnorr-sigature/">Schnorr签名介绍</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/24/MAST/">MAST, Merkelized Abstract Syntax Tree</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2020 Kevin Pan<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+<script>
+  var disqus_shortname = 'bitkevin';
+  
+  var disqus_url = 'http://panzhibiao.com/2020/12/01/Taproot2/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+  </div>
+</body>
+</html>

@@ -18,11 +18,11 @@ ga('send', 'pageview');
 
 
   
-  <title>Archives: 2014/6 | 比特币实验室</title>
+  <title>Archives: 2020 | 比特币实验室</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta property="og:type" content="website">
 <meta property="og:title" content="比特币实验室">
-<meta property="og:url" content="http://panzhibiao.com/archives/2014/06/index.html">
+<meta property="og:url" content="http://panzhibiao.com/archives/2020/index.html">
 <meta property="og:site_name" content="比特币实验室">
 <meta property="og:locale" content="default">
 <meta name="twitter:card" content="summary">
@@ -79,10 +79,10 @@ ga('send', 'pageview');
       <div class="outer">
         <section id="main">
   
-    <article id="post-safe-wallet-idea" class="article article-type-post" itemscope="" itemprop="blogPost">
+    <article id="post-Taproot2" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2014/06/15/safe-wallet-idea/" class="article-date">
-  <time datetime="2014-06-15T11:40:21.000Z" itemprop="datePublished">Jun 15 2014</time>
+    <a href="/2020/12/01/Taproot2/" class="article-date">
+  <time datetime="2020-12-01T14:55:43.000Z" itemprop="datePublished">Dec 1 2020</time>
 </a>
     
   </div>
@@ -93,7 +93,7 @@ ga('send', 'pageview');
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2014/06/15/safe-wallet-idea/">比特币安全钱包的想法</a>
+      <a class="article-title" href="/2020/12/01/Taproot2/">Taproot简介二</a>
     </h1>
   
 
@@ -101,96 +101,72 @@ ga('send', 'pageview');
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>从财富不可侵犯角度讲，比特币是人类史上最安全的货币。但令人郁闷的是，安全地存储比特币却遇到诸多麻烦。私钥机制使得其神圣不可侵犯，也使其资金安全遇到麻烦。</p>
-<p>个人存储管理比特币非常不现实，安全性差，丢币概率高。在线钱包显得更加安全可靠一些，主要分两类：</p>
+        <p>之前写过一篇从技术层面解读Taproot：《Taproot简介》，这次再多啰嗦解读几句（不带公式的）。</p>
+<p>生活中的合约、合同通常有以下一些特征：</p>
 <ul>
-<li>链下(Off-Chain)，链下钱包服务即银行模式，若服务商出现任何问题，储户资金即出问题</li>
-<li>链上(On-Chain)，链上钱包“理论上”安全，因其不掌握用户私钥（仅保存私钥的密文），但也不绝对，例如服务器被入侵后，钱包关键代码被恶意修改，导致能够恢复出用户私钥，无论多少币，均瞬间被转移</li>
+<li>通常，合约是双方或多方的。</li>
+<li>合约的双方并不绝对信任对方，如果可以绝对信任对方，则不需要合约。</li>
+<li>合约的双方一般假设对方大概率会履约：如果还没交易就已经认为对方不会履约，可能会选择不交易，或使用一些合约条款（如惩罚）保证对方履约。</li>
+<li>设计正确的合约，应该让双方在履约的情况下均会得到较大利益（或较少损失）</li>
+<li>因此在绝大部份情况下，合约都不会有争议，双方都会合作实行合约条款。在这种情况下，合约条款一般会得到保密，不为第三方所知。</li>
+<li>若过程中出现争议（不合作）的情况，需要由第三方机构（如法院）进行仲裁。在这种情况下，合约条款需要公开，提供给律师、法官等。</li>
 </ul>
-<p>没有绝对安全的方案，只有相对安全实现，就是把出问题的概率降低得非常非常低。程序发生严重Bug、服务器被入侵这些都不能认为是极低概率事件，只是小概率而已，时间足够长的话几乎都会发生，回溯比特币这几年历史，发生过很多小概率、黑天鹅事件。</p>
-<p>这里提出一种钱包的实现方案，尝试去解决一些安全隐患问题。方案分为服务端，客户端两个部分。</p>
-<h4 id="服务端"><a href="#服务端" class="headerlink" title="服务端"></a>服务端</h4><ul>
-<li>数据服务。只读模式，包括不限于：<ul>
-<li>balance by address</li>
-<li>unspent outputs</li>
-<li>tx/block query</li>
-</ul>
-</li>
-<li>广播服务。输入是公开的数据，协助将交易(Raw Tx)广播至比特币网络</li>
-</ul>
-<h4 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h4><ul>
-<li>硬件部分<ul>
-<li>支持如ECDSA, SHA256、Ripemd160等</li>
-<li>支持硬件隔离技术，存储敏感数据，如私钥数据</li>
-</ul>
-</li>
-<li>APP部分<ul>
-<li>与硬件部分进行通信</li>
-<li>提供功能界面，实现钱包操作交互</li>
+<p>比特币链上是可以写简单合约的，例如n/m式的多重签名机制、闪电网络等。区块链的合约通常称为智能合约。</p>
+<ul>
+<li>所有合约的特性都适用于智能合约，只是区块链规则担当了仲裁的角色，换言之Code is Law。</li>
+<li>但现在比特币的智能合约，不论是2009年中本聪的原始设计，2012年出现的P2SH，还是2017年的隔离见证(P2WSH)，都有一个共同的问题：无论立约双方是否合作，合约内容必须完全公开，即合约脚本必须公开。当花费时必须提供合约脚本全部内容才能进行校验。</li>
+<li>公开合约内容主要带来两个问题<ul>
+<li>交易成本：智能合约一般都需要多个签名，加上合约内容本身，占用更多区块空间，令交易手续费上升。</li>
+<li>隐私问题：第三方可以监察区块链，通过合约内容的特征，追踪资金的流向和推断合约参与者的身份。</li>
 </ul>
 </li>
 </ul>
-<p>客户端硬件部分像拉卡拉类似的一个东西，可以通过耳机等音频设备与手机APP通信。</p>
+<p>ECDSA</p>
+<p>ECDSA是比特币诞生到现在唯一的签名验证机制。</p>
 <ul>
-<li>收款：当用户使用钱包时，插入硬件部分，启动APP，从硬件读取比特币地址列表，并去服务端查询地址数据，更新余额</li>
-<li>发款：APP根据比特币地址从服务端获取相关未花费交易，用户设置转出地址和金额，APP根据未花费交易构建待签名的空交易，将空交易传输至硬件并通知其签名。硬件从隔离区读取数据并由加密芯片完成签名后，将完整交易放入普通数据区，APP从普通数据区读取签名后的交易并提交至服务端广播</li>
-<li>数据备份：硬件支持AES双向加密算法，用户在APP输入备份密码，传至硬件，硬件从隔离区读取数据并由加密芯片完成AES加密，将加密后的数据放入普通数据区，由APP传输至手机、云盘等完成备份</li>
-<li>硬件遗失：为了防止遗失导致硬件破解丢币，敏感数据在隔离区中平时即以加密形式存在，每次使用时，输入进入密码，才能使用</li>
+<li>数字签名是比特币认证交易合法性的最重要手段，确权的唯一标准。</li>
+<li>自2009年以来，比特币均使用ECDSA为数字签名标准（包括P2PK, P2PKH, 2012年的P2SH, 2017年的P2WPKH和P2WSH）。</li>
+<li>比特币的公/私钥系统是线性的，因此我们可以把多个私钥相加，也可以把对应的多个公钥相加，这样产生的新私钥和新公钥仍然是一对。这是HD钱包的理论基础。</li>
+<li>但ECDSA的签名是非线性的，因此简单的把多个签名结果加起来，则不再是有效的签名</li>
+<li>因此一直以来，比特币的多签署交易均需要在区块链公开多个签署，问题和智能合约相同（交易成本，隐私问题）。</li>
+<li>201方的多方签署人数的理论极限（P2SH大概只容许最多16方）。</li>
 </ul>
-<p>安全点：</p>
+<p>Schnorr</p>
+<p>再说一下Schnorr签名算法。</p>
 <ul>
-<li>服务端必须是只读模式的。只读的设计，保障客户端不会提交敏感数据，即使服务端被黑，也无法截获用户私钥</li>
-<li>客户端必须实现硬件隔离，保护私钥等敏感数据，使得操作系统无法读取敏感信息，木马、恶意软件就没有办法盗取</li>
+<li>Schnorr签署的专利于2008年才失效，当时没有广泛的开源实现及应用，所以2009年诞生的比特币也没有使用。签名算法通常是需要深厚的数学理论基础才能设计。一个小的理解偏差，编码错误则可能导致严重问题。</li>
+<li>Schnorr 签署使用的公/私钥系统和ECDSA相同，因此现有的私钥管理(如BIP32)可以继续使用</li>
+<li>Schnorr和ECDSA的区别在于：Schnorr签名是线性的。对于同一内容X，如果用多个私钥各自签名，然后把对应的多个公钥相加，再把多个签名相加，得出的新签名会是新公钥对内容X的有效签名。<ul>
+<li>利用这个特性，签名人数没有理论极限。只要各方一致合作，就可以把签名相加起来，看起来和单方签名无异。</li>
 </ul>
-<p>这只是一个初步的想法，可能存在重大缺陷，也许有团队已经在实现了，贴出来希望大家一起讨论。</p>
+</li>
+<li>Schnorr签名算法的安全性于2012年得到数学证明。</li>
+</ul>
+<p>Taproot</p>
+<p>Taproot解决的问题</p>
+<ul>
+<li>Taproot以Schnorr签名算法为基础</li>
+<li>以Taproot进行的智能合约，如果双方合作，不但无需公开合约内容，而且交易会和最简单普遍的单方签名交易看起来没有分别。即交易成本极小化及隐私极大化。</li>
+<li>如果双方不合作，申诉方仍需要公开合约脚本内容以供区块链仲裁。<ul>
+<li>但通过使用MAST（Merklized Alternative Script Trees），申诉方只需要公开合约的相关部份，而非所有合约条款，也因此尽量降低交易成本和对隐私的影响。即合约可能有多条执行路径，仅公布即将执行的路径即可。</li>
+</ul>
+</li>
+</ul>
+<p>Taproot没有解决的问题</p>
+<ul>
+<li>Taproot没有把交易金额隐藏，因此仍可以通过分析输入和输出金额估计资金流向。</li>
+<li>Taproot地址和旧式地址一样，会在区块链公开。如果使用者重覆使用Taproot地址，那和重覆使用旧式地址有相同的隐私问题。</li>
+</ul>
+<p>总结</p>
+<p>比特币在隐私方向上，有两大待攻克的难题。一是流向隐匿，这在UTXO系统里是比较棘手的；二是金额隐匿，可以通过类似Grin的技术来解决，需要扩展区块或分叉来实现。</p>
+<p>即使上述两大难点并没有解决掉，但Taproot对于比特币合约来说，即实现了交易成本极小化，又使得隐私极大化。还是一个显著的小小进步。</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2014/06/15/safe-wallet-idea/" data-id="cki63v4vw0003dn8zx9mrqd7l" class="article-share-link">Share</a>
+      <a data-url="http://panzhibiao.com/2020/12/01/Taproot2/" data-id="cki63v4ww000cdn8zc21f0cqh" class="article-share-link">Share</a>
       
-        <a href="http://panzhibiao.com/2014/06/15/safe-wallet-idea/#disqus_thread" class="article-comment-link">Comments</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-open-nodes-plan" class="article article-type-post" itemscope="" itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2014/06/14/open-nodes-plan/" class="article-date">
-  <time datetime="2014-06-14T03:37:31.000Z" itemprop="datePublished">Jun 14 2014</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2014/06/14/open-nodes-plan/">开放节点计划</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>本主题已转移至新地址： <a href="http://blog.open-nodes.org/2014/06/14/open-nodes-plan/" target="_blank" rel="noopener">http://blog.open-nodes.org/2014/06/14/open-nodes-plan/</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://panzhibiao.com/2014/06/14/open-nodes-plan/" data-id="cki63v4vu0002dn8z5e5u78wx" class="article-share-link">Share</a>
-      
-        <a href="http://panzhibiao.com/2014/06/14/open-nodes-plan/#disqus_thread" class="article-comment-link">Comments</a>
+        <a href="http://panzhibiao.com/2020/12/01/Taproot2/#disqus_thread" class="article-comment-link">Comments</a>
       
       
       

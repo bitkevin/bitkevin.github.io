@@ -2,58 +2,65 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://panzhibiao.com/2020/12/01/Taproot2/</loc>
+    
+    <lastmod>2020-12-01T14:57:18.269Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://panzhibiao.com/2019/03/13/important-random-k-and-fake-signatures/</loc>
     
-    <lastmod>2019-03-13T09:39:23.763Z</lastmod>
+    <lastmod>2019-03-13T09:39:23.000Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://panzhibiao.com/2019/02/28/schnorr-sigature/</loc>
     
-    <lastmod>2019-03-08T03:09:14.306Z</lastmod>
+    <lastmod>2019-03-08T03:09:14.000Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://panzhibiao.com/2019/03/01/Taproot/</loc>
     
-    <lastmod>2019-03-01T04:04:34.066Z</lastmod>
+    <lastmod>2019-03-01T04:04:34.000Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://panzhibiao.com/2019/02/24/MAST/</loc>
     
-    <lastmod>2019-02-26T07:18:34.721Z</lastmod>
+    <lastmod>2019-02-26T07:18:34.000Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://panzhibiao.com/2019/02/12/p2sh/</loc>
     
-    <lastmod>2019-02-26T07:11:27.056Z</lastmod>
+    <lastmod>2019-02-26T07:11:27.000Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://panzhibiao.com/2019/02/21/BIP141/</loc>
     
-    <lastmod>2019-02-24T14:35:42.488Z</lastmod>
+    <lastmod>2019-02-24T14:35:42.000Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://panzhibiao.com/2019/02/21/bip143/</loc>
     
-    <lastmod>2019-02-21T10:45:37.146Z</lastmod>
+    <lastmod>2019-02-21T10:45:37.000Z</lastmod>
     
   </url>
   
   <url>
     <loc>http://panzhibiao.com/2019/02/11/bip8/</loc>
     
-    <lastmod>2019-02-21T10:41:38.504Z</lastmod>
+    <lastmod>2019-02-21T10:41:38.000Z</lastmod>
     
   </url>
   
@@ -65,7 +72,7 @@
   </url>
   
   <url>
-    <loc>http://panzhibiao.com/2014/06/15/safe-wallet-idea/</loc>
+    <loc>http://panzhibiao.com/2016/04/21/BIP9/</loc>
     
     <lastmod>2018-03-25T15:08:43.000Z</lastmod>
     
@@ -79,42 +86,7 @@
   </url>
   
   <url>
-    <loc>http://panzhibiao.com/2016/04/21/BIP9/</loc>
-    
-    <lastmod>2018-03-25T15:08:43.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://panzhibiao.com/2013/08/03/proof-of-work-and-mining/</loc>
-    
-    <lastmod>2018-03-25T15:08:43.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>http://panzhibiao.com/2013/07/20/bitcoin-clients/</loc>
-    
-    <lastmod>2018-03-25T15:08:43.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://panzhibiao.com/2013/08/12/timestamp-system-and-proof-of-existance/</loc>
-    
-    <lastmod>2018-03-25T15:08:43.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://panzhibiao.com/2013/07/30/bitcoin-basic/</loc>
-    
-    <lastmod>2018-03-25T15:08:43.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://panzhibiao.com/2013/10/27/bitcoin-transaction-02/</loc>
     
     <lastmod>2018-03-25T15:08:43.000Z</lastmod>
     
@@ -128,7 +100,28 @@
   </url>
   
   <url>
-    <loc>http://panzhibiao.com/2013/10/27/bitcoin-transaction-01/</loc>
+    <loc>http://panzhibiao.com/2013/07/30/bitcoin-basic/</loc>
+    
+    <lastmod>2018-03-25T15:08:43.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://panzhibiao.com/2013/08/03/proof-of-work-and-mining/</loc>
+    
+    <lastmod>2018-03-25T15:08:43.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://panzhibiao.com/2013/08/12/timestamp-system-and-proof-of-existance/</loc>
+    
+    <lastmod>2018-03-25T15:08:43.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://panzhibiao.com/2013/10/27/bitcoin-transaction-02/</loc>
     
     <lastmod>2018-03-25T15:08:43.000Z</lastmod>
     
@@ -142,7 +135,21 @@
   </url>
   
   <url>
+    <loc>http://panzhibiao.com/2014/06/15/safe-wallet-idea/</loc>
+    
+    <lastmod>2018-03-25T15:08:43.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://panzhibiao.com/2015/03/11/shadowsocks-add-bitcoin-support/</loc>
+    
+    <lastmod>2018-03-25T15:08:43.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://panzhibiao.com/2013/10/27/bitcoin-transaction-01/</loc>
     
     <lastmod>2018-03-25T15:08:43.000Z</lastmod>
     
